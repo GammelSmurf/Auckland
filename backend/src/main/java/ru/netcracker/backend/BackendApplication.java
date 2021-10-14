@@ -1,4 +1,4 @@
-package ru.netcracker.auckland;
+package ru.netcracker.backend;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

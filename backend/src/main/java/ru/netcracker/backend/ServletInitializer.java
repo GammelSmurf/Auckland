@@ -1,4 +1,4 @@
-package ru.netcracker.auckland;
+package ru.netcracker.backend;
 
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;

@@ -8,6 +8,10 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
+    <properties>
+        <main.basedir>${project.basedir}</main.basedir>
+    </properties>
+
     <modules>
         <module>frontend</module>
         <module>backend</module>

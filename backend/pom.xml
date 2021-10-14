@@ -16,6 +16,8 @@
     <description>backend</description>
     <properties>
         <java.version>11</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <front-src-dir>../frontend</front-src-dir>
     </properties>
     <dependencies>
         <!--<dependency>
@@ -89,11 +91,8 @@
                             <resources>
                                 <resource>
                                     <!--suppress UnresolvedMavenProperty -->
-                                    <directory>${project.parent.basedir}/frontend/build</directory>
-                                    <includes>
-                                        <include>static/</include>
-                                        <include>index.html</include>
-                                    </includes>
+                                    <directory>${front-src-dir}/build</directory>
+                                    <filtering>false</filtering>
                                 </resource>
                             </resources>
                         </configuration>

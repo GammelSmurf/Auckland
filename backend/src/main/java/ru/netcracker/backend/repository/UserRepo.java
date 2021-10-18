@@ -1,4 +1,4 @@
-package ru.netcracker.backend.repositorie;
+package ru.netcracker.backend.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

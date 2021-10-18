@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.netcracker.backend.exception.ResourceNotFoundException;
 import ru.netcracker.backend.models.Auction;
-import ru.netcracker.backend.repositorie.AuctionRepo;
+import ru.netcracker.backend.repository.AuctionRepo;
 import ru.netcracker.backend.service.AuctionService;
 
 @Service

@@ -86,13 +86,12 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>src/main/resources/public</outputDirectory>
+                            <outputDirectory>${basedir}/target/classes/static</outputDirectory>
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
                                     <!--suppress UnresolvedMavenProperty -->
                                     <directory>${front-src-dir}/build</directory>
-                                    <filtering>false</filtering>
                                 </resource>
                             </resources>
                         </configuration>

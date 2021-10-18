@@ -1,6 +1,7 @@
 package ru.netcracker.backend.models.user;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
 import ru.netcracker.backend.models.Auction;
@@ -37,5 +38,6 @@ public class User {
 
 
     @OneToMany(mappedBy = "user",fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL)
+    @JsonBackReference
     private Set<Auction> subscribes= new HashSet<>(0);
 }

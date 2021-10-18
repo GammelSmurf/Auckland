@@ -7,6 +7,7 @@ import ru.netcracker.backend.models.user.User;
 import javax.persistence.*;
 import java.sql.Date;
 import java.sql.Time;
+import java.time.Duration;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,10 +22,10 @@ public class Auction {
     private Long id;
 
     private String name;
-    private Date begin_date;
-    private Time lot_duration;
-    private Time boost_time;
-    private Integer users_limit;
+    private Time beginDate;
+    private Duration lotDuration;
+    private Time boostTime;
+    private Integer usersLimit;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable=false)
@@ -42,7 +43,7 @@ public class Auction {
             name = "ratings",
             joinColumns = @JoinColumn(name = "auction_id") ,
             inverseJoinColumns = @JoinColumn(name = "user_id") )
-    private Set<User> user_likes= new HashSet<>();
+    private Set<User> userLikes= new HashSet<>();
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(

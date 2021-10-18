@@ -1,8 +1,7 @@
-package ru.netcracker.backend.Models;
+package ru.netcracker.backend.models;
 
 import lombok.Getter;
 import lombok.Setter;
-import ru.netcracker.backend.Models.User.User;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -12,11 +11,14 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 public class Lot {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name="lot_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @ManyToOne
-    @JoinColumn(name="auction_id")
+    @JoinColumn(name="auction_id", nullable = false)
     private Auction auction;
 
     private String name;

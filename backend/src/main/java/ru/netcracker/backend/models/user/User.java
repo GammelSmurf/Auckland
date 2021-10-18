@@ -24,10 +24,10 @@ public class User {
     private String password;
     private String email;
     private String name;
-    private String second_name;
+    private String secondName;
     private String about;
     private String status;
-    private Boolean is_banned;
+    private Boolean isBanned;
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(

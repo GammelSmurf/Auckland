@@ -2,6 +2,7 @@ package ru.netcracker.backend.controller;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.netcracker.backend.models.Auction;
@@ -24,6 +25,6 @@ public class AuctionController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Auction> getAuction(@PathVariable(name = "id") Long id) {
-        return auctionService.getAuction(id);
+        return new ResponseEntity<>(auctionService.getAuction(id), HttpStatus.FOUND);
     }
 }

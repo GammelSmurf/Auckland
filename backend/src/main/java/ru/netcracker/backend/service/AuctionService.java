@@ -7,6 +7,6 @@ import ru.netcracker.backend.models.Auction;
 
 public interface AuctionService {
     Page<Auction> getAllAuctions(Pageable pageable);
-    ResponseEntity<Auction> getAuction(long auctionId);
+    Auction getAuction(long auctionId);
     //ResponseEntity<Auction> createAuction();
 }

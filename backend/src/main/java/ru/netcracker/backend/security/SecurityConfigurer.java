@@ -53,12 +53,11 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
                 .authorizeRequests().antMatchers("/auth/signin", "/", "/favicon.ico").permitAll()
-                    .antMatchers("/api/auth/signin").permitAll()
+                    .antMatchers("/api/auth/signin", "/api/auction").permitAll()
                     .antMatchers("/public/**", "/resources/**","/resources/public/**", "/static/**").permitAll()
                 .anyRequest().authenticated()
                 .and().exceptionHandling().and().sessionManagement()
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        ;
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
     }
 

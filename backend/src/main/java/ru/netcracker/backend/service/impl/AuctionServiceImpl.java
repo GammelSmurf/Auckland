@@ -26,9 +26,9 @@ public class AuctionServiceImpl implements AuctionService {
     }
 
     @Override
-    public ResponseEntity<Auction> getAuction(long auctionId) {
+    public Auction getAuction(long auctionId) {
         Auction auction = auctionRepo.findById(auctionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Auction with id " + auctionId + " was not found."));
-        return new ResponseEntity<>(auction, HttpStatus.FOUND);
+        return auction;
     }
 }

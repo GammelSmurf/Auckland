@@ -9,7 +9,7 @@ import ru.netcracker.backend.service.AuthService;
 
 @CrossOrigin("*")
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;

@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/auckland
+    username: student
+    password: 12121212
+  jpa:
+    generate-ddl: true
+    open-in-view: true
+  data:
+    web:
+      pageable:
+        default-page-size: 30
+        max-page-size: 500
+
+Auckland:
+  app:
+    jwtSecret: donttry
+    jwtExpirationMs: 86400000

@@ -1,5 +1,6 @@
 package ru.netcracker.backend.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -12,6 +13,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import ru.netcracker.backend.models.user.ERole;
+import ru.netcracker.backend.models.user.User;
+import ru.netcracker.backend.repository.UserRepo;
 
 @Configuration
 @EnableWebSecurity
@@ -49,14 +52,12 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
-                .authorizeRequests().antMatchers("/auth/signin").permitAll()
-                .antMatchers("/home").hasAnyAuthority(ERole.USER.name(),ERole.ADMIN.name())
-                .antMatchers( "/favicon.ico").permitAll()
-                .antMatchers("/public/**", "/resources/**","/resources/public/**", "/static/**").permitAll()
+                .authorizeRequests().antMatchers("/auth/signin", "/", "/favicon.ico").permitAll()
+                    .antMatchers("/api/auth/signin").permitAll()
+                    .antMatchers("/public/**", "/resources/**","/resources/public/**", "/static/**").permitAll()
                 .anyRequest().authenticated()
-                .and().exceptionHandling().
-                and().sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and().exceptionHandling().and().sessionManagement()
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         ;
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
     }

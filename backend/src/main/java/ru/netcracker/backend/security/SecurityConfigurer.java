@@ -1,6 +1,5 @@
 package ru.netcracker.backend.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -15,6 +14,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import ru.netcracker.backend.models.user.ERole;
 import ru.netcracker.backend.models.user.User;
 import ru.netcracker.backend.repository.UserRepo;
+import springfox.documentation.RequestHandler;
+import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
 
 @Configuration
 @EnableWebSecurity
@@ -44,6 +48,15 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
         return authProvider;
     }
 
+    @Bean
+    public Docket api() {
+        return new Docket(DocumentationType.SWAGGER_2)
+                .select()
+                .apis(RequestHandlerSelectors.any())
+                .paths(PathSelectors.any())
+                .build();
+    }
+
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(authenticationProvider());
@@ -52,7 +65,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
-                .authorizeRequests().antMatchers("/auth/signin", "/", "/favicon.ico").permitAll()
+                .authorizeRequests().antMatchers("/auth/signin", "/", "/favicon.ico", "/swagger-ui/**", "/swagger-resources/**", "/v2/**").permitAll()
                     .antMatchers("/api/auth/signin", "/api/auction").permitAll()
                     .antMatchers("/public/**", "/resources/**","/resources/public/**", "/static/**").permitAll()
                 .anyRequest().authenticated()

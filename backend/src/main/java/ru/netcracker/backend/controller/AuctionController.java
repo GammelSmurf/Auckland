@@ -43,6 +43,7 @@ public class AuctionController {
     @PostMapping
     public ResponseEntity<AuctionDto> createAuction(@RequestBody AuctionDto auctionDto) {
         Auction auctionRequest = modelMapper.map(auctionDto, Auction.class);
+
         Auction auction = auctionService.createAuction(auctionRequest);
 
         AuctionDto auctionResponse = modelMapper.map(auction, AuctionDto.class);

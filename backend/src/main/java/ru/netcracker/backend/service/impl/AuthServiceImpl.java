@@ -7,8 +7,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import ru.netcracker.backend.dto.requests.AuthRequest;
-import ru.netcracker.backend.dto.responses.JwtResponse;
+import ru.netcracker.backend.dto.requests.AuthRequestDTO;
+import ru.netcracker.backend.dto.responses.JwtResponseDTO;
 import ru.netcracker.backend.security.JwtUtil;
 import ru.netcracker.backend.security.MyUserDetails;
 import ru.netcracker.backend.service.AuthService;
@@ -22,9 +22,9 @@ public class AuthServiceImpl implements AuthService {
     final private JwtUtil jwtUtil;
 
     @Override
-    public JwtResponse authenticateUser(AuthRequest authRequest) {
+    public JwtResponseDTO authenticateUser(AuthRequestDTO authRequestDTO) {
         Authentication authentication = authenticationProvider.authenticate(
-                new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
+                new UsernamePasswordAuthenticationToken(authRequestDTO.getUsername(), authRequestDTO.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         MyUserDetails userDetails = (MyUserDetails) authentication.getPrincipal();
@@ -33,7 +33,7 @@ public class AuthServiceImpl implements AuthService {
                 .collect(Collectors.toList());
 
         String jwt = jwtUtil.generateJwtToken(userDetails);
-        return new JwtResponse(
+        return new JwtResponseDTO(
                 userDetails.getId(),
                 jwt, userDetails.getUsername(), roles);
     }

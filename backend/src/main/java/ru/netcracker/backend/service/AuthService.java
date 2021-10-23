@@ -1,8 +1,8 @@
 package ru.netcracker.backend.service;
 
-import ru.netcracker.backend.dto.requests.AuthRequest;
-import ru.netcracker.backend.dto.responses.JwtResponse;
+import ru.netcracker.backend.dto.requests.AuthRequestDTO;
+import ru.netcracker.backend.dto.responses.JwtResponseDTO;
 
 public interface AuthService {
-    JwtResponse authenticateUser(AuthRequest authRequest);
+    JwtResponseDTO authenticateUser(AuthRequestDTO authRequestDTO);
 }

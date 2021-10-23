@@ -10,11 +10,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AuctionDto {
-    private long id;
+    private Long id;
     private String name;
     private LocalDateTime beginDate;
-    private int lotDuration;
+    private Integer lotDuration;
     private LocalDateTime boostTime;
-    private int usersLimit;
-    private long userId;
+    private Integer usersLimit;
+    private Long userId;
 }

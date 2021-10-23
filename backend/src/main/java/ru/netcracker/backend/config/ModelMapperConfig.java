@@ -13,6 +13,7 @@ public class ModelMapperConfig {
     @Bean
     public ModelMapper modelMapper() {
         ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setFieldMatchingEnabled(true);
 
         PropertyMap<Auction, AuctionRequest> auctionMap = new PropertyMap<>() {
             protected void configure() {
@@ -28,8 +29,8 @@ public class ModelMapperConfig {
 
         PropertyMap<Auction, AuctionResponse> auctionResponseMap = new PropertyMap<>() {
             protected void configure() {
-                map().setUsersCount(source.getSubscribers() == null ? 0 : source.getSubscribers().size());
-                map().setUserLikes(source.getUserLikes() == null ? 0 : source.getUserLikes().size());
+                map().setUsersCount(source.getSubscribersCount());
+                map().setUserLikes(source.getLikesCount());
                 map().setUserId(source.getUser().getId());
             }
         };

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.netcracker.backend.models.domain.Auction;
 import ru.netcracker.backend.models.requests.AuctionRequest;
+import ru.netcracker.backend.models.responses.AuctionResponse;
 
 import java.time.LocalDateTime;
 
@@ -29,5 +30,9 @@ class DtoTests {
 
         assertThat(auction.getId()).isNull();
         assertThat(auction.getUser().getId()).isNotNull();
+
+        AuctionResponse auctionResponse = modelMapper.map(auction, AuctionResponse.class);
+
+        assertThat(auctionResponse.getUserId()).isEqualTo(1L);
     }
 }

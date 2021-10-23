@@ -53,4 +53,11 @@ public class Auction {
             inverseJoinColumns = @JoinColumn(name = "user_id") )
     private Set<User> subscribers= new HashSet<>();
 
+    public int getLikesCount() {
+        return getUserLikes().size();
+    }
+
+    public int getSubscribersCount() {
+        return getSubscribers().size();
+    }
 }

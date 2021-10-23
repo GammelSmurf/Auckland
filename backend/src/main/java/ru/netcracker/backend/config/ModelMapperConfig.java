@@ -28,9 +28,8 @@ public class ModelMapperConfig {
 
         PropertyMap<Auction, AuctionResponse> auctionResponseMap = new PropertyMap<>() {
             protected void configure() {
-                map().setUserId(source.getUser().getId());
-                map().setUsersCount(source.getSubscribers().size());
-                map().setUserLikes(source.getUserLikes().size());
+                map().setUsersCount(source.getSubscribers() == null ? 0 : source.getSubscribers().size());
+                map().setUserLikes(source.getUserLikes() == null ? 0 : source.getUserLikes().size());
             }
         };
 

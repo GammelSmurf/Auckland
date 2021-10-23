@@ -1,4 +1,4 @@
-package ru.netcracker.backend.models.dto;
+package ru.netcracker.backend.models.requests;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,11 +9,11 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuctionDto {
+public class AuctionRequest {
     private String name;
     private LocalDateTime beginDate;
-    private Integer lotDuration;
+    private int lotDuration;
     private LocalDateTime boostTime;
-    private Integer usersLimit;
-    private Long userId;
+    private int usersLimit;
+    private long userId;
 }

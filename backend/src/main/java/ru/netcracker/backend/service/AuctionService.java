@@ -2,11 +2,12 @@ package ru.netcracker.backend.service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
-import ru.netcracker.backend.models.Auction;
+import ru.netcracker.backend.models.domain.Auction;
 
 public interface AuctionService {
     Page<Auction> getAllAuctions(Pageable pageable);
-    Auction getAuction(long auctionId);
-    //ResponseEntity<Auction> createAuction();
+    Auction createAuction(Auction auction);
+    Auction updateAuction(long id, Auction auction);
+    void deleteAuction(long id);
+    Auction getAuctionById(long id);
 }

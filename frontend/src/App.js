@@ -7,10 +7,11 @@ import AuthService from "./services/AuthService";
 import GenericNotFound from "./components/GenericNotFound";
 import Auction from "./components/Auction";
 
-import './App.css';
+import './css/App.css';
+import './css/auction.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
-
-import "./css/App.css"
+import Register from "./components/Register";
 
 const App = withRouter(({location})=> {
 
@@ -33,6 +34,7 @@ const App = withRouter(({location})=> {
           <Switch>
               <PrivateRoute path='/home' exact={true} component={Home}/>
               <Route path='/auth/signin' exact={true} component={Login}/>
+              <Route path='/auth/signup' exact={true} component={Register}/>
               <Route path='/auction' exact={true} component={Auction}/>
               <Route component={GenericNotFound} />
           </Switch>

@@ -24,4 +24,14 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/signup")
+    public ResponseEntity<String> createUser(@RequestBody AuthRequest authRequestDTO) {
+        try {
+            return authService.createUser(authRequestDTO);
+        }
+        catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
 }

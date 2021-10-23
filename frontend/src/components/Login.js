@@ -77,7 +77,7 @@ const Login = (props) => {
                                 </Form.Text>
                             }
                         </Form.Group>
-                        <Button type="submit" style={{marginTop: "15px"}}>Login</Button>
+                        <Button type="submit" variant="warning" className="authSubmitButton">Login</Button>
                     </Form>
                 </div>
             </div>

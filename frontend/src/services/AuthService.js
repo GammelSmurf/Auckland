@@ -16,6 +16,23 @@ const login = (username, password) => {
         });
 };
 
+const register = (username, password, email) => {
+    return axios
+        .post(API_URL + "signup", {
+            username,
+            password,
+            email
+        }).then(
+            response => {
+                return response;
+            }
+        ).catch((error) => {
+            if (error.response) {
+                return error.response;
+            }
+        });
+};
+
 const getCurrentUser = () => {
     return JSON.parse(localStorage.getItem("user"));
 };
@@ -29,4 +46,4 @@ const logout = () => {
     localStorage.removeItem("user");
 };
 
-export default {login, logout, getCurrentUser, isAuthenticated}
+export default {login, register, logout, getCurrentUser, isAuthenticated}

@@ -26,8 +26,22 @@ public class User {
     private String name;
     private String secondName;
     private String about;
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private EStatus status;
     private Boolean isBanned;
+
+    public User(){}
+
+    public User(String username, String password, String email){
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        name = "";
+        secondName = "";
+        about = "";
+        status = EStatus.NOT_CONFIRMED;
+        isBanned = false;
+    }
 
     @ElementCollection(targetClass=ERole.class, fetch = FetchType.EAGER)
     @JoinTable(name = "users_roles",

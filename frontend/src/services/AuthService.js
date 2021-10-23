@@ -22,7 +22,6 @@ const getCurrentUser = () => {
 
 const isAuthenticated = () => {
     const currentUser = getCurrentUser();
-    console.log(currentUser)
     return currentUser !== null;
 };
 

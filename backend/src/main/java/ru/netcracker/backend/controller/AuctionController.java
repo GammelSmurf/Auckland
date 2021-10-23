@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/auction")
+@CrossOrigin("*")
 public class AuctionController {
 
     private final ModelMapper modelMapper;

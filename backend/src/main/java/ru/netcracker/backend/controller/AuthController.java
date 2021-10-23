@@ -7,9 +7,9 @@ import ru.netcracker.backend.models.requests.AuthRequest;
 import ru.netcracker.backend.models.responses.MessageResponse;
 import ru.netcracker.backend.service.AuthService;
 
-@CrossOrigin("*")
 @RestController
 @RequestMapping("/api/auth")
+@CrossOrigin("*")
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;

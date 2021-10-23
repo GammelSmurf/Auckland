@@ -29,12 +29,12 @@ public class User {
     private String status;
     private Boolean isBanned;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "users_roles",
-            joinColumns = @JoinColumn(name = "user_id") ,
-            inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> roles= new HashSet<>();
+    @ElementCollection(targetClass=ERole.class, fetch = FetchType.EAGER)
+    @JoinTable(name = "users_roles",
+            joinColumns = @JoinColumn(name = "user_id"))
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
+    private Set<ERole> roles= new HashSet<>();
 
 
     @OneToMany(mappedBy = "user",fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL)

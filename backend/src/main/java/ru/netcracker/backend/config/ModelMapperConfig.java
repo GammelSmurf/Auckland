@@ -10,24 +10,19 @@ import ru.netcracker.backend.models.responses.AuctionResponse;
 
 @Configuration
 public class ModelMapperConfig {
+
     @Bean
     public ModelMapper modelMapper() {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setFieldMatchingEnabled(true);
 
-        PropertyMap<Auction, AuctionRequest> auctionMap = new PropertyMap<>() {
-            protected void configure() {
-                map().setUserId(source.getUser().getId());
-            }
-        };
-
-        PropertyMap<AuctionRequest, Auction> auctionRequestMap = new PropertyMap<>() {
+        PropertyMap<AuctionRequest, Auction> requestToAuctionMap = new PropertyMap<>() {
             protected void configure() {
                 map().setId(null);
             }
         };
 
-        PropertyMap<Auction, AuctionResponse> auctionResponseMap = new PropertyMap<>() {
+        PropertyMap<Auction, AuctionResponse> auctionToResponseMap = new PropertyMap<>() {
             protected void configure() {
                 map().setId(source.getId());
                 map().setUsersCount(source.getSubscribersCount());
@@ -36,10 +31,8 @@ public class ModelMapperConfig {
             }
         };
 
-
-        modelMapper.addMappings(auctionMap);
-        modelMapper.addMappings(auctionRequestMap);
-        modelMapper.addMappings(auctionResponseMap);
+        modelMapper.addMappings(requestToAuctionMap);
+        modelMapper.addMappings(auctionToResponseMap);
         return modelMapper;
     }
 }

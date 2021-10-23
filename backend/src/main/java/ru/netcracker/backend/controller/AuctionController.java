@@ -10,6 +10,7 @@ import ru.netcracker.backend.service.AuctionService;
 
 @RestController
 @RequestMapping("/api/auction")
+@CrossOrigin("*")
 public class AuctionController {
 
     private final AuctionService auctionService;

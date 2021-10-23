@@ -7,7 +7,10 @@ const Home = () => {
     const [message, setMessage] = useState('');
     useEffect(() => {
         HomeService.getHello().then(
-            (response) => setMessage(response.data))
+            (response) => {
+                console.log(response)
+                setMessage(response.data)
+            })
     })
     const currentUser = AuthService.getCurrentUser();
     return (

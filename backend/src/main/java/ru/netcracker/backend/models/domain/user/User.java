@@ -1,10 +1,10 @@
-package ru.netcracker.backend.models.user;
+package ru.netcracker.backend.models.domain.user;
 
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
-import ru.netcracker.backend.models.Auction;
+import ru.netcracker.backend.models.domain.Auction;
 
 import javax.persistence.*;
 import java.util.HashSet;

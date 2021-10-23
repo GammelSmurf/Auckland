@@ -3,8 +3,8 @@ package ru.netcracker.backend.security;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import ru.netcracker.backend.models.user.Role;
-import ru.netcracker.backend.models.user.User;
+import ru.netcracker.backend.models.domain.user.Role;
+import ru.netcracker.backend.models.domain.user.User;
 
 import java.util.ArrayList;
 import java.util.Collection;

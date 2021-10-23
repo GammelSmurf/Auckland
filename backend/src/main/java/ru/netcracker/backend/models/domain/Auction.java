@@ -1,13 +1,14 @@
-package ru.netcracker.backend.models;
+package ru.netcracker.backend.models.domain;
 
 import lombok.Getter;
 import lombok.Setter;
-import ru.netcracker.backend.models.user.User;
+import ru.netcracker.backend.models.domain.user.User;
 
 import javax.persistence.*;
-import java.sql.Date;
+
 import java.sql.Time;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,9 +23,9 @@ public class Auction {
     private Long id;
 
     private String name;
-    private Time beginDate;
-    private Duration lotDuration;
-    private Time boostTime;
+    private LocalDateTime beginDate;
+    private Integer lotDuration;
+    private LocalDateTime boostTime;
     private Integer usersLimit;
 
     @ManyToOne

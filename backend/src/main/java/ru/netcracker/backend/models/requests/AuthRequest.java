@@ -1,4 +1,4 @@
-package ru.netcracker.backend.dto.requests;
+package ru.netcracker.backend.models.requests;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthRequestDTO {
+public class AuthRequest {
     private String username;
     private String password;
 }

@@ -30,6 +30,7 @@ public class ModelMapperConfig {
             protected void configure() {
                 map().setUsersCount(source.getSubscribers() == null ? 0 : source.getSubscribers().size());
                 map().setUserLikes(source.getUserLikes() == null ? 0 : source.getUserLikes().size());
+                map().setUserId(source.getUser().getId());
             }
         };
 

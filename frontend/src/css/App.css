@@ -1,0 +1,69 @@
+.App-logo {
+    height: 40vmin;
+    pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .App-logo {
+        animation: App-logo-spin infinite 20s linear;
+    }
+}
+
+.App-header {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(10px + 2vmin);
+}
+
+@keyframes App-logo-spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.standardPageHeader hr {
+    opacity: 1;
+    color: #FFC107;
+}
+
+.authSubmitButton {
+    margin-top: 15px;
+}
+
+.wrapper  {
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
+
+.navHeader {
+    border-top: 3px solid #FFC107 !important;
+}
+
+.responseText {
+    animation-duration: 1.5s;
+    animation-name: responseTextAnimation;
+}
+@keyframes responseTextAnimation {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    border-top: 1px solid #FFC107;
+    font-family: "News Cycle","Arial Narrow Bold",sans-serif;
+}
+

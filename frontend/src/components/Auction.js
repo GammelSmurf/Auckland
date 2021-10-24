@@ -1,0 +1,102 @@
+import React, {useEffect, useState} from "react";
+import {Button} from 'react-bootstrap';
+import AuctionService from "../services/AuctionService";
+import BootStrapTable from 'react-bootstrap-table-next';
+import ToolkitProvider,{Search} from 'react-bootstrap-table2-toolkit';
+
+const Auction = () => {
+
+    const [data, setData] = useState([]);
+    const {SearchBar} = Search;
+
+    const parseDate = (itemDateTime) => {
+        const dateTime = new Date(itemDateTime);
+        const options = { year: '2-digit', month: '2-digit', day: '2-digit',
+            hour: '2-digit', minute: '2-digit', second: '2-digit'};
+        const dateTimeFormat = new Intl.DateTimeFormat('ru-RU', options).format;
+        return dateTimeFormat(dateTime);
+    }
+
+    useEffect(() => {
+        AuctionService.getAllAuctions().then(
+            (response) => {
+                let dataPrev = [];
+                console.log(response)
+                response.data.forEach(item => {
+                    dataPrev.push(
+                        {
+                            id: item.id, name: item.name, beginDate: parseDate(item.beginDate), participants: item.usersLimit, likesCount: item.userLikes, usersCount: item.usersCount
+                        }
+                    )
+                })
+                setData(dataPrev);
+            }
+        );
+    }, []);
+
+    const participantsFormatter = (cell, row) => {
+        return (
+            <p>{row.usersCount + " / " + cell}</p>
+        );
+    }
+
+    const columns = [{
+        dataField: 'id',
+        text: 'id',
+        sort: true
+    },{
+        dataField: 'name',
+        text: 'Auction name',
+        sort: true
+    }, {
+        dataField: 'beginDate',
+        text: 'Start',
+        sort: true
+    }, {
+        dataField: 'participants',
+        text: 'Participants',
+        formatter: participantsFormatter,
+        sort: true
+    }, {
+        dataField: 'likesCount',
+        text: 'Likes',
+        sort: true
+    }];
+
+    const createAuction = () => {
+        AuctionService.createAuction({name: "name", beginDate: "2021-10-23T18:28:48.815Z",
+            lotDuration: 10, boostTime: "2021-10-23T18:28:48.815Z", usersLimit: 15, userId: 13}).then(() => window.location.reload())
+    }
+
+    return (
+        <div className="container">
+            <div className="wrapper">
+                <ToolkitProvider
+                    keyField="id"
+                    data={ data }
+                    columns={ columns }
+                    search
+                >
+                    {
+                        props =>
+                            <div>
+                                <div className="toolkit">
+                                    <SearchBar { ...props.searchProps } srText=""/>
+                                    <Button variant={"warning"} onClick={createAuction}>
+                                        Create auction
+                                    </Button>
+                                </div>
+                                <BootStrapTable keyField='id'  {...props.baseProps} hover bordered={ false }
+                                                noDataIndication={() => <p>Table is empty</p>}/>
+                            </div>
+
+                    }
+                </ToolkitProvider>
+
+            </div>
+
+        </div>
+    )
+}
+
+export default Auction;

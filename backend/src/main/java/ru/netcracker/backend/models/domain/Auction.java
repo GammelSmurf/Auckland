@@ -7,6 +7,7 @@ import ru.netcracker.backend.models.domain.user.User;
 import javax.persistence.*;
 
 import java.sql.Time;
+import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -23,9 +24,10 @@ public class Auction {
     private Long id;
 
     private String name;
-    private LocalDateTime beginDate;
-    private Integer lotDuration;
-    private LocalDateTime boostTime;
+    private Timestamp beginDate;
+    private Time lotDuration;
+
+    private Time boostTime;
     private Integer usersLimit;
 
     @ManyToOne

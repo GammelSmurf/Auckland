@@ -9,6 +9,8 @@ import ru.netcracker.backend.models.domain.Auction;
 import ru.netcracker.backend.models.requests.AuctionRequest;
 import ru.netcracker.backend.models.responses.AuctionResponse;
 
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @SpringBootTest
@@ -21,9 +23,9 @@ class DtoTests {
     public void auctionDto() {
         AuctionRequest auctionRequest = new AuctionRequest();
         auctionRequest.setName("string");
-        auctionRequest.setBeginDate(LocalDateTime.of(1234, 5, 19, 5, 5));
-        auctionRequest.setBoostTime(LocalDateTime.of(1234, 5, 19, 5, 5));
-        auctionRequest.setLotDuration(1235);
+        auctionRequest.setBeginDate(Timestamp.valueOf("2021-12-07 14:00:00"));
+        auctionRequest.setBoostTime(Time.valueOf("00:02:00"));
+        auctionRequest.setLotDuration(Time.valueOf("00:02:00"));
         auctionRequest.setUserId(1L);
 
         Auction auction = modelMapper.map(auctionRequest, Auction.class);

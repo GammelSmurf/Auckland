@@ -28,9 +28,6 @@ public class ModelMapperConfig {
                 map().setUsersCount(source.getSubscribersCount());
                 map().setUserLikes(source.getLikesCount());
                 map().setUserId(source.getUser().getId());
-                map().setBeginDate(source.getBeginDate());
-                map().setBoostTime(source.getBoostTime());
-                map().setLotDuration(source.getLotDuration());
             }
         };
 

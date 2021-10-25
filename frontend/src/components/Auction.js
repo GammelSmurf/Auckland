@@ -3,13 +3,11 @@ import {Button} from 'react-bootstrap';
 import AuctionService from "../services/AuctionService";
 import BootStrapTable from 'react-bootstrap-table-next';
 import ToolkitProvider,{Search} from 'react-bootstrap-table2-toolkit';
-import AuthService from "../services/AuthService";
 
 const Auction = () => {
 
     const [data, setData] = useState([]);
     const {SearchBar} = Search;
-    const currentUser = AuthService.getCurrentUser();
 
     const parseDate = (itemDateTime) => {
         const dateTime = new Date(itemDateTime);
@@ -67,7 +65,7 @@ const Auction = () => {
 
     const createAuction = () => {
         AuctionService.createAuction({name: "name", beginDate: "2021-10-23T18:28:48.815Z",
-            lotDuration: 10, boostTime: "2021-10-23T18:28:48.815Z", usersLimit: 15, userId: currentUser.id}).then(() => window.location.reload())
+            lotDuration: 10, boostTime: "2021-10-23T18:28:48.815Z", usersLimit: 15, userId: 13}).then(() => window.location.reload())
     }
 
     return (

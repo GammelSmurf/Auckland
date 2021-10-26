@@ -75,7 +75,7 @@ const Auction = () => {
         setIsModalAddActive(true);
     }
 
-    const handleModalAddClose = () => {setIsModalAddActive(false); window.location.reload();};
+    const handleModalAddClose = () => {setIsModalAddActive(false)};
 
     return (
         <div className="container">

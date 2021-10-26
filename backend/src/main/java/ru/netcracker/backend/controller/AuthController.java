@@ -1,11 +1,16 @@
 package ru.netcracker.backend.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.netcracker.backend.exception.EmailExistsException;
+import ru.netcracker.backend.exception.UserExistsException;
 import ru.netcracker.backend.models.requests.AuthRequest;
 import ru.netcracker.backend.models.responses.MessageResponse;
 import ru.netcracker.backend.service.AuthService;
+
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -25,13 +30,19 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<String> createUser(@RequestBody AuthRequest authRequestDTO) {
+    public ResponseEntity<String> createUser(@RequestBody AuthRequest authRequestDTO, HttpServletRequest request) {
         try {
-            return authService.createUser(authRequestDTO);
+            authService.createUser(authRequestDTO, getSiteURL(request));
+            return ResponseEntity.ok("User created");
         }
-        catch (Exception e) {
+        catch (Exception | EmailExistsException | UserExistsException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+
+    private String getSiteURL(HttpServletRequest request) {
+        String siteURL = request.getRequestURL().toString();
+        return siteURL.replace(request.getServletPath(), "");
     }
 
 }

@@ -11,6 +11,21 @@ spring:
       pageable:
         default-page-size: 30
         max-page-size: 500
+  mail:
+    host: smtp.yandex.ru
+    port: 465
+    username: aucklandteam@yandex.ru
+    password:
+    properties:
+      "mail.smtp.auth": true
+      "mail.smtp.starttls.enable": true
+      "mail.smtp.starttls.required": true
+      "mail.smtp.ssl.": smtp.yandex.ru
+      "mail.smtp.connectiontimeout": 5000
+      "mail.smtp.timeout": 5000
+      "mail.smtp.writetimeout": 5000
+    default-encoding: UTF-8
+    protocol: smtps
 
 Auckland:
   app:

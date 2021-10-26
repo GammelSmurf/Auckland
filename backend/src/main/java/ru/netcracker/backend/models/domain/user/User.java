@@ -4,6 +4,7 @@ package ru.netcracker.backend.models.domain.user;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
+import net.bytebuddy.utility.RandomString;
 import ru.netcracker.backend.models.domain.Auction;
 
 import javax.persistence.*;
@@ -30,6 +31,9 @@ public class User {
     private EStatus status;
     private Boolean isBanned;
 
+    private String verificationCode;
+    private boolean enabled;
+
     public User(){}
 
     public User(String username, String password, String email){
@@ -41,6 +45,8 @@ public class User {
         about = "";
         status = EStatus.NOT_CONFIRMED;
         isBanned = false;
+        verificationCode = RandomString.make(64);
+        enabled = false;
     }
 
     @ElementCollection(targetClass=ERole.class, fetch = FetchType.EAGER)

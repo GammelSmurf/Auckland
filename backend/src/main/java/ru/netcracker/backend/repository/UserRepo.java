@@ -11,4 +11,6 @@ public interface UserRepo extends JpaRepository<User, Long> {
     User getUserById(Long id);
     Boolean existsByUsername(String username);
     Boolean existsByEmail(String email);
+    @Query("SELECT u FROM User u WHERE u.verificationCode = ?1")
+    public User findByVerificationCode(String code);
 }

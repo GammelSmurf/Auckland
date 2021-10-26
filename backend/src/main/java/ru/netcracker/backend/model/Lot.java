@@ -1,10 +1,9 @@
-package ru.netcracker.backend.models.domain;
+package ru.netcracker.backend.model;
 
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
 
 @Entity
 @Table(name="lots")

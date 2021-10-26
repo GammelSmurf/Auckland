@@ -1,13 +1,10 @@
 package ru.netcracker.backend.service;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import ru.netcracker.backend.exception.EmailExistsException;
 import ru.netcracker.backend.exception.UserExistsException;
-import ru.netcracker.backend.models.domain.user.User;
-import ru.netcracker.backend.models.requests.AuthRequest;
-import ru.netcracker.backend.models.responses.JwtResponse;
-import ru.netcracker.backend.models.responses.UserResponse;
+import ru.netcracker.backend.model.user.User;
+import ru.netcracker.backend.requests.AuthRequest;
+import ru.netcracker.backend.responses.JwtResponse;
 
 import javax.mail.MessagingException;
 import java.io.UnsupportedEncodingException;

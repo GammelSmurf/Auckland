@@ -5,13 +5,12 @@ import static org.assertj.core.api.Assertions.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import ru.netcracker.backend.models.domain.Auction;
-import ru.netcracker.backend.models.requests.AuctionRequest;
-import ru.netcracker.backend.models.responses.AuctionResponse;
+import ru.netcracker.backend.model.Auction;
+import ru.netcracker.backend.requests.AuctionRequest;
+import ru.netcracker.backend.responses.AuctionResponse;
 
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 
 @SpringBootTest
 class DtoTests {

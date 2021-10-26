@@ -6,12 +6,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.netcracker.backend.models.domain.Auction;
-import ru.netcracker.backend.models.domain.Lot;
-import ru.netcracker.backend.models.requests.AuctionRequest;
-import ru.netcracker.backend.models.requests.LotRequest;
-import ru.netcracker.backend.models.responses.AuctionResponse;
-import ru.netcracker.backend.models.responses.LotResponse;
+import ru.netcracker.backend.model.Lot;
+import ru.netcracker.backend.requests.LotRequest;
+import ru.netcracker.backend.responses.LotResponse;
 import ru.netcracker.backend.service.LotService;
 
 @RestController

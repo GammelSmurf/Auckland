@@ -4,7 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
-import ru.netcracker.backend.models.domain.Auction;
+import ru.netcracker.backend.model.Auction;
 import ru.netcracker.backend.repository.AuctionRepository;
 import ru.netcracker.backend.service.AuctionService;
 
@@ -60,7 +60,7 @@ public class AuctionServiceImpl implements AuctionService {
         Optional<Auction> result = auctionRepo.findById(id);
         if(result.isPresent()) {
             return result.get();
-        }else {
+        } else {
             throw new ResourceNotFoundException("Post id: " + id);
         }
     }

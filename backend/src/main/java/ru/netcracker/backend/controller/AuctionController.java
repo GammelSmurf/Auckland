@@ -7,9 +7,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.netcracker.backend.models.domain.Auction;
-import ru.netcracker.backend.models.requests.AuctionRequest;
-import ru.netcracker.backend.models.responses.AuctionResponse;
+import ru.netcracker.backend.model.Auction;
+import ru.netcracker.backend.requests.AuctionRequest;
+import ru.netcracker.backend.responses.AuctionResponse;
 import ru.netcracker.backend.service.AuctionService;
 
 import java.util.List;

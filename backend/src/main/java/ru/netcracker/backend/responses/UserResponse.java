@@ -1,4 +1,4 @@
-package ru.netcracker.backend.models.responses;
+package ru.netcracker.backend.responses;
 
 public class UserResponse {
     private String username;

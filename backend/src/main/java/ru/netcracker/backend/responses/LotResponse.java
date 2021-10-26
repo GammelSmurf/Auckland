@@ -1,4 +1,4 @@
-package ru.netcracker.backend.models.requests;
+package ru.netcracker.backend.responses;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LotRequest {
+public class LotResponse {
+    private Long id;
     private String name;
     private String description;
     private Long minBank;

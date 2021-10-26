@@ -4,12 +4,12 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import ru.netcracker.backend.models.domain.Auction;
-import ru.netcracker.backend.models.domain.Lot;
-import ru.netcracker.backend.models.requests.AuctionRequest;
-import ru.netcracker.backend.models.requests.LotRequest;
-import ru.netcracker.backend.models.responses.AuctionResponse;
-import ru.netcracker.backend.models.responses.LotResponse;
+import ru.netcracker.backend.model.Auction;
+import ru.netcracker.backend.model.Lot;
+import ru.netcracker.backend.requests.AuctionRequest;
+import ru.netcracker.backend.requests.LotRequest;
+import ru.netcracker.backend.responses.AuctionResponse;
+import ru.netcracker.backend.responses.LotResponse;
 
 @Configuration
 public class ModelMapperConfig {
@@ -24,6 +24,8 @@ public class ModelMapperConfig {
                 map().setId(null);
             }
         };
+
+
         PropertyMap<LotRequest, Lot> requestToLotMap = new PropertyMap<>() {
             protected void configure() {
                 map().setId(null);

@@ -1,7 +1,7 @@
 package ru.netcracker.backend.service.impl;
 
 import org.springframework.stereotype.Service;
-import ru.netcracker.backend.models.domain.Lot;
+import ru.netcracker.backend.model.Lot;
 import ru.netcracker.backend.repository.LotRepository;
 import ru.netcracker.backend.service.LotService;
 

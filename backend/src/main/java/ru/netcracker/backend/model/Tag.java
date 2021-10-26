@@ -1,4 +1,4 @@
-package ru.netcracker.backend.models.domain;
+package ru.netcracker.backend.model;
 
 import lombok.Getter;
 import lombok.Setter;

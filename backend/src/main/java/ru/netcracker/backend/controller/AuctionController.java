@@ -1,5 +1,7 @@
 package ru.netcracker.backend.controller;
 
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Pageable;
@@ -17,17 +19,11 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/auction")
 @CrossOrigin("*")
+@RequiredArgsConstructor
 @Slf4j
 public class AuctionController {
-
     private final ModelMapper modelMapper;
-
     private final AuctionService auctionService;
-
-    public AuctionController(ModelMapper modelMapper, AuctionService auctionService) {
-        this.modelMapper = modelMapper;
-        this.auctionService = auctionService;
-    }
 
     @GetMapping
     public List<AuctionResponse> getAllAuctions(Pageable pageable) {
@@ -39,7 +35,7 @@ public class AuctionController {
     public ResponseEntity<AuctionResponse> getAuction(@PathVariable(name = "id") Long id) {
         Auction auction = auctionService.getAuctionById(id);
         AuctionResponse auctionDto = modelMapper.map(auction, AuctionResponse.class);
-        log.info("sent auction: " + auctionDto);
+        log.info("sent auction: {}", auctionDto);
         return new ResponseEntity<>(auctionDto, HttpStatus.FOUND);
     }
 
@@ -50,7 +46,7 @@ public class AuctionController {
         Auction auction = auctionService.createAuction(auctionRequest);
 
         AuctionResponse auctionResponse = modelMapper.map(auction, AuctionResponse.class);
-        log.info("created auction: " + auctionRequest);
+        log.info("created auction: {}", auctionRequest);
         return new ResponseEntity<>(auctionResponse, HttpStatus.CREATED);
     }
 
@@ -60,14 +56,14 @@ public class AuctionController {
         Auction auction = auctionService.updateAuction(id, auctionRequest);
 
         AuctionResponse auctionResponse = modelMapper.map(auction, AuctionResponse.class);
-        log.info("updated auction: " + auctionRequest + "with id: " + id);
+        log.info("updated auction: {} with id: {}", auctionRequest, id);
         return new ResponseEntity<>(auctionResponse, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAuction(@PathVariable(name = "id") Long id) {
         auctionService.deleteAuction(id);
-        log.info("deleted auction with id: " + id);
+        log.info("deleted auction with id: {}", id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

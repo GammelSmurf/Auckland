@@ -14,9 +14,8 @@ import ru.netcracker.backend.service.AuthService;
 @Controller
 @RequiredArgsConstructor
 public class RedirectController implements ErrorController {
-
-    private static final String PATH = "/error";
     private final AuthService authService;
+    private static final String PATH = "/error";
 
     @GetMapping("/verify")
     public ResponseEntity<String> verifyUser(@Param("code") String code) {

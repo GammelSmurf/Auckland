@@ -1,10 +1,7 @@
 package ru.netcracker.backend.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -20,8 +17,7 @@ import ru.netcracker.backend.models.domain.user.ERole;
 import ru.netcracker.backend.models.domain.user.User;
 import ru.netcracker.backend.models.requests.AuthRequest;
 import ru.netcracker.backend.models.responses.JwtResponse;
-import ru.netcracker.backend.models.responses.UserResponse;
-import ru.netcracker.backend.repository.UserRepo;
+import ru.netcracker.backend.repository.UserRepository;
 import ru.netcracker.backend.security.JwtUtil;
 import ru.netcracker.backend.security.MyUserDetails;
 import ru.netcracker.backend.service.AuthService;
@@ -29,12 +25,8 @@ import ru.netcracker.backend.service.AuthService;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.UnsupportedEncodingException;
-import java.time.DayOfWeek;
-import java.time.LocalDateTime;
-import java.time.temporal.WeekFields;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -46,7 +38,7 @@ public class AuthServiceImpl implements AuthService {
 
     final private AuthenticationProvider authenticationProvider;
     final private JwtUtil jwtUtil;
-    final private UserRepo userRepo;
+    final private UserRepository userRepo;
     final private JavaMailSender javaMailSender;
 
     @Override
@@ -89,7 +81,7 @@ public class AuthServiceImpl implements AuthService {
     public void sendVerificationEmail(User user, String siteURL) throws MessagingException, UnsupportedEncodingException {
         String toAddress = user.getEmail();
         String fromAddress = localEmail;
-        String senderName = "Your company name";
+        String senderName = "Auckland team";
         String subject = "Please verify your registration";
         String content = "Dear [[name]],<br>"
                 + "Please click the link below to verify your registration:<br>"

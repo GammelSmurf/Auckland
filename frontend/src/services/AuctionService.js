@@ -18,8 +18,8 @@ const createAuction = (values) =>{
             userId: values.userId
 
         }, {headers: authHeader()})
-        .then(() => {
-            window.location.reload();
+        .then(response => {
+            return response
         });
 };
 

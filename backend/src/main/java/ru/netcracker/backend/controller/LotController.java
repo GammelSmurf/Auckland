@@ -1,5 +1,6 @@
 package ru.netcracker.backend.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import ru.netcracker.backend.service.LotService;
 @RestController
 @RequestMapping("/api/lot")
 @CrossOrigin("*")
+@Slf4j
 public class LotController {
     private final ModelMapper modelMapper;
     private final LotService lotService;
@@ -29,6 +31,7 @@ public class LotController {
         Lot lotRequest = modelMapper.map(lotDto, Lot.class);
         Lot lot = lotService.createLot(lotRequest);
         LotResponse lotResponse = modelMapper.map(lot, LotResponse.class);
+        log.info("created lot: " + lotRequest);
         return new ResponseEntity<>(lotResponse, HttpStatus.CREATED);
     }
 }

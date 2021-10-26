@@ -1,6 +1,7 @@
 package ru.netcracker.backend.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/api/auth")
 @CrossOrigin("*")
 @RequiredArgsConstructor
+@Slf4j
 public class AuthController {
     private final AuthService authService;
 
@@ -33,6 +35,7 @@ public class AuthController {
     public ResponseEntity<String> createUser(@RequestBody AuthRequest authRequestDTO, HttpServletRequest request) {
         try {
             authService.createUser(authRequestDTO, getSiteURL(request));
+            log.info("created user: " + authRequestDTO);
             return ResponseEntity.ok("User created");
         }
         catch (Exception | EmailExistsException | UserExistsException e) {

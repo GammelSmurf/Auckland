@@ -1,5 +1,6 @@
 package ru.netcracker.backend.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/auction")
 @CrossOrigin("*")
+@Slf4j
 public class AuctionController {
 
     private final ModelMapper modelMapper;
@@ -37,6 +39,7 @@ public class AuctionController {
     public ResponseEntity<AuctionResponse> getAuction(@PathVariable(name = "id") Long id) {
         Auction auction = auctionService.getAuctionById(id);
         AuctionResponse auctionDto = modelMapper.map(auction, AuctionResponse.class);
+        log.info("sent auction: " + auctionDto);
         return new ResponseEntity<>(auctionDto, HttpStatus.FOUND);
     }
 
@@ -47,6 +50,7 @@ public class AuctionController {
         Auction auction = auctionService.createAuction(auctionRequest);
 
         AuctionResponse auctionResponse = modelMapper.map(auction, AuctionResponse.class);
+        log.info("created auction: " + auctionRequest);
         return new ResponseEntity<>(auctionResponse, HttpStatus.CREATED);
     }
 
@@ -56,12 +60,14 @@ public class AuctionController {
         Auction auction = auctionService.updateAuction(id, auctionRequest);
 
         AuctionResponse auctionResponse = modelMapper.map(auction, AuctionResponse.class);
+        log.info("updated auction: " + auctionRequest + "with id: " + id);
         return new ResponseEntity<>(auctionResponse, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAuction(@PathVariable(name = "id") Long id) {
         auctionService.deleteAuction(id);
+        log.info("deleted auction with id: " + id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

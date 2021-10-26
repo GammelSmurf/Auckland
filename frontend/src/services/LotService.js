@@ -4,7 +4,6 @@ import authHeader from "./AuthHeader";
 const API_URL = 'http://localhost:8080/api/lot/';
 
 const createLot = (values) =>{
-   // console.log(values)
     return axios
         .post(API_URL, {
             name: values.lotName,
@@ -15,7 +14,7 @@ const createLot = (values) =>{
             auctionId: values.auctionId
 
         }, {headers: authHeader()})
-        .then(response => {
+        .then(() => {
 
         });
 };

@@ -51,10 +51,12 @@ const NewAuctionModal = (props) => {
              nextStep();
         }
         else{
-            AuctionService.createAuction(values).then((response) =>
-                values["auctionId"] = response.data.id
+            AuctionService.createAuction(values).then((response) => {
+                    console.log(response)
+                    values["auctionId"] = response.data.id
+                }
             ).then(
-                () => LotService.createLot(values).then(props.hide())
+                () => LotService.createLot(values).then(() => {props.hide(); window.location.reload();})
             );
         }
         event.preventDefault();

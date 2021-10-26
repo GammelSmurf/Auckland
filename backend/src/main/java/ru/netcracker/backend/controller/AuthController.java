@@ -35,7 +35,7 @@ public class AuthController {
     public ResponseEntity<String> createUser(@RequestBody AuthRequest authRequestDTO, HttpServletRequest request) {
         try {
             authService.createUser(authRequestDTO, getSiteURL(request));
-            log.info("created user: " + authRequestDTO);
+            log.info("created user: {}", authRequestDTO);
             return ResponseEntity.ok("User created");
         }
         catch (Exception | EmailExistsException | UserExistsException e) {

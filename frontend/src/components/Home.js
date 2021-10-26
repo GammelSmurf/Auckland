@@ -8,7 +8,6 @@ const Home = () => {
     useEffect(() => {
         HomeService.getHello().then(
             (response) => {
-                console.log(response)
                 setMessage(response.data)
             })
     })

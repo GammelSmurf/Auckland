@@ -6,16 +6,16 @@ const getAllAuctions = () => {
     return axios.get(API_URL, { headers: authHeader() });
 }
 
-const createAuction = (newAuction) =>{
-    console.log(newAuction)
+const createAuction = (values) =>{
+    console.log(values)
     return axios
         .post(API_URL, {
-            name: newAuction.name,
-            beginDate: newAuction.beginDate,
-            lotDuration: newAuction.lotDuration,
-            boostTime: newAuction.boostTime,
-            usersLimit: newAuction.usersLimit,
-            userId: newAuction.userId
+            name: values.aucName,
+            beginDate: values.beginDate,
+            lotDuration: values.lotDuration,
+            boostTime: values.boostTime,
+            usersLimit: values.usersLimit,
+            userId: values.userId
 
         }, {headers: authHeader()})
         .then(response => {

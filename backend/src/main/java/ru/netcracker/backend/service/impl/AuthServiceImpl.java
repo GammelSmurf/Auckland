@@ -64,17 +64,16 @@ public class AuthServiceImpl implements AuthService {
             throw new EmailExistsException("There is an account with that email address: " + authRequest.getEmail());
         if (userRepo.existsByEmail(authRequest.getEmail()))
             throw new UserExistsException("There is an account with that username: " + authRequest.getUsername());
-        else {
-            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-            String password = encoder.encode(authRequest.getPassword());
-            User user = new User(authRequest.getUsername(), password, authRequest.getEmail());
-            Set<ERole> roles = new HashSet<>();
-            roles.add(ERole.USER);
-            user.setRoles(roles);
-            User userToVerify = userRepo.save(user);
 
-            sendVerificationEmail(userToVerify, siteURL);
-        }
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        String password = encoder.encode(authRequest.getPassword());
+        User user = new User(authRequest.getUsername(), password, authRequest.getEmail());
+        Set<ERole> roles = new HashSet<>();
+        roles.add(ERole.USER);
+        user.setRoles(roles);
+        User userToVerify = userRepo.save(user);
+
+        sendVerificationEmail(userToVerify, siteURL);
     }
 
     @Override

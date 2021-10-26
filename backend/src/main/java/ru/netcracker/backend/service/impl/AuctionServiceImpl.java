@@ -21,8 +21,7 @@ public class AuctionServiceImpl implements AuctionService {
 
     @Override
     public Page<Auction> getAllAuctions(Pageable pageable) {
-        Page<Auction> auctions = auctionRepo.findAll(pageable);
-        return auctions;
+        return auctionRepo.findAll(pageable);
     }
 
     @Override

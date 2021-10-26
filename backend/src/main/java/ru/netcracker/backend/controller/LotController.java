@@ -25,8 +25,10 @@ public class LotController {
 
     @PostMapping
     public ResponseEntity<LotResponse> createLot(@RequestBody LotRequest lotDto) {
-        Lot lot = lotService.createLot(modelMapper.map(lotDto, Lot.class));
-        LotResponse lotResponse = modelMapper.map(lot, LotResponse.class);
+        LotResponse lotResponse = modelMapper.map(
+                lotService.createLot(modelMapper.map(lotDto, Lot.class)
+                ), LotResponse.class);
+
         log.info("created lot: {}", lotDto);
         return new ResponseEntity<>(lotResponse, HttpStatus.CREATED);
     }

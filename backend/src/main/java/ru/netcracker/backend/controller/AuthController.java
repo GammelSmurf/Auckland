@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.netcracker.backend.exception.EmailExistsException;
 import ru.netcracker.backend.exception.UserExistsException;
 import ru.netcracker.backend.models.requests.AuthRequest;
-import ru.netcracker.backend.models.responses.MessageResponse;
 import ru.netcracker.backend.service.AuthService;
 
 import javax.mail.MessagingException;

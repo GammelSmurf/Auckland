@@ -33,22 +33,29 @@ public class AuctionController {
     @GetMapping("/{id}")
     public ResponseEntity<AuctionResponse> getAuction(@PathVariable(name = "id") Long id) {
         AuctionResponse auctionDto = modelMapper.map(auctionService.getAuctionById(id), AuctionResponse.class);
+
         log.info("sent auction: {}", auctionDto);
         return new ResponseEntity<>(auctionDto, HttpStatus.FOUND);
     }
 
     @PostMapping
     public ResponseEntity<AuctionResponse> createAuction(@RequestBody AuctionRequest auctionDto) {
-        Auction auction = auctionService.createAuction(modelMapper.map(auctionDto, Auction.class));
-        AuctionResponse auctionResponse = modelMapper.map(auction, AuctionResponse.class);
+        AuctionResponse auctionResponse = modelMapper.map(
+                auctionService.createAuction(
+                        modelMapper.map(auctionDto, Auction.class)
+                ), AuctionResponse.class);
+
         log.info("created auction: {}", auctionDto);
         return new ResponseEntity<>(auctionResponse, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<AuctionResponse> updateAuction(@PathVariable long id, @RequestBody AuctionRequest auctionDto) {
-        Auction auction = auctionService.updateAuction(id, modelMapper.map(auctionDto, Auction.class));
-        AuctionResponse auctionResponse = modelMapper.map(auction, AuctionResponse.class);
+        AuctionResponse auctionResponse = modelMapper.map(
+                auctionService.updateAuction(id, modelMapper.map(
+                        auctionDto, Auction.class)
+                ), AuctionResponse.class);
+
         log.info("updated auction: {} with id: {}", auctionDto, id);
         return new ResponseEntity<>(auctionResponse, HttpStatus.OK);
     }

@@ -91,7 +91,7 @@ const Auction = () => {
                             <div>
                                 <div className="toolkit">
                                     <SearchBar { ...props.searchProps } srText=""/>
-                                    <Button variant={"warning"} onClick={createAuction}>
+                                    <Button variant={"warning"} onClick={createAuction} style={{marginBottom: "4px"}}>
                                         Create auction
                                     </Button>
                                 </div>

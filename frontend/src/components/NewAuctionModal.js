@@ -64,7 +64,7 @@ const NewAuctionModal = (props) => {
                     {
                         {
                             1: <AucForm handleChange={handleChange} minDateTime={parseDateTime()}/>,
-                            2: <LotForm handleChange={handleChange} />,
+                            2: <LotForm handleChange={handleChange}/>,
                         }[step]
                     }
                     {step === 1 ? (

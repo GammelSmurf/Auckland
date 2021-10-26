@@ -8,7 +8,7 @@ const AucForm = (props) => {
             return props.minDateTime.split(' ').join('T');
         }
         return (
-                <div>
+                <div style={{minHeight: "400px"}}>
                     <Form.Group>
                         <Form.Label>
                             Name

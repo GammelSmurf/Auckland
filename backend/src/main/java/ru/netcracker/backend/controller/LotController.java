@@ -31,7 +31,7 @@ public class LotController {
         Lot lotRequest = modelMapper.map(lotDto, Lot.class);
         Lot lot = lotService.createLot(lotRequest);
         LotResponse lotResponse = modelMapper.map(lot, LotResponse.class);
-        log.info("created lot: " + lotRequest);
+        log.info("created lot: {}", lotRequest);
         return new ResponseEntity<>(lotResponse, HttpStatus.CREATED);
     }
 }

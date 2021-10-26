@@ -27,8 +27,6 @@ public class User {
     private String name;
     private String secondName;
     private String about;
-    @Enumerated(EnumType.STRING)
-    private EStatus status;
     private Boolean isBanned;
 
     private String verificationCode;
@@ -43,7 +41,6 @@ public class User {
         name = "";
         secondName = "";
         about = "";
-        status = EStatus.NOT_CONFIRMED;
         isBanned = false;
         verificationCode = RandomString.make(64);
         enabled = false;

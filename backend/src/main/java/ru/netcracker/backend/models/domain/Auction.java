@@ -1,5 +1,6 @@
 package ru.netcracker.backend.models.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
 import ru.netcracker.backend.models.domain.user.User;
@@ -33,6 +34,10 @@ public class Auction {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable=false)
     private User user;
+
+    @OneToMany(mappedBy = "auction",fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL)
+    @JsonBackReference
+    private Set<Lot> lots= new HashSet<>(0);
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(

@@ -50,6 +50,7 @@ public class ModelMapperConfig {
         modelMapper.addMappings(requestToAuctionMap);
         modelMapper.addMappings(auctionToResponseMap);
         modelMapper.addMappings(lotToResponseMap);
+        modelMapper.addMappings(requestToLotMap);
         return modelMapper;
     }
 }

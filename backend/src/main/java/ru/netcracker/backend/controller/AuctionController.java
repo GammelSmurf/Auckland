@@ -1,6 +1,5 @@
 package ru.netcracker.backend.controller;
 
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -33,30 +32,24 @@ public class AuctionController {
 
     @GetMapping("/{id}")
     public ResponseEntity<AuctionResponse> getAuction(@PathVariable(name = "id") Long id) {
-        Auction auction = auctionService.getAuctionById(id);
-        AuctionResponse auctionDto = modelMapper.map(auction, AuctionResponse.class);
+        AuctionResponse auctionDto = modelMapper.map(auctionService.getAuctionById(id), AuctionResponse.class);
         log.info("sent auction: {}", auctionDto);
         return new ResponseEntity<>(auctionDto, HttpStatus.FOUND);
     }
 
     @PostMapping
     public ResponseEntity<AuctionResponse> createAuction(@RequestBody AuctionRequest auctionDto) {
-        Auction auctionRequest = modelMapper.map(auctionDto, Auction.class);
-
-        Auction auction = auctionService.createAuction(auctionRequest);
-
+        Auction auction = auctionService.createAuction(modelMapper.map(auctionDto, Auction.class));
         AuctionResponse auctionResponse = modelMapper.map(auction, AuctionResponse.class);
-        log.info("created auction: {}", auctionRequest);
+        log.info("created auction: {}", auctionDto);
         return new ResponseEntity<>(auctionResponse, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<AuctionResponse> updateAuction(@PathVariable long id, @RequestBody AuctionRequest auctionDto) {
-        Auction auctionRequest = modelMapper.map(auctionDto, Auction.class);
-        Auction auction = auctionService.updateAuction(id, auctionRequest);
-
+        Auction auction = auctionService.updateAuction(id, modelMapper.map(auctionDto, Auction.class));
         AuctionResponse auctionResponse = modelMapper.map(auction, AuctionResponse.class);
-        log.info("updated auction: {} with id: {}", auctionRequest, id);
+        log.info("updated auction: {} with id: {}", auctionDto, id);
         return new ResponseEntity<>(auctionResponse, HttpStatus.OK);
     }
 

@@ -62,7 +62,7 @@ public class AuthServiceImpl implements AuthService {
     public void createUser(AuthRequest authRequest, String siteURL) throws MessagingException, UnsupportedEncodingException, EmailExistsException, UserExistsException {
         if (userRepo.existsByEmail(authRequest.getEmail()))
             throw new EmailExistsException("There is an account with that email address: " + authRequest.getEmail());
-        else if (userRepo.existsByEmail(authRequest.getEmail()))
+        if (userRepo.existsByEmail(authRequest.getEmail()))
             throw new UserExistsException("There is an account with that username: " + authRequest.getUsername());
         else {
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
@@ -108,7 +108,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public boolean verify(String verificationCode) {
-        User user = userRepo.findByVerificationCode(verificationCode);
+        User user = userRepo.findUserByVerificationCode(verificationCode);
 
         if (user == null || user.isEnabled()) {
             return false;

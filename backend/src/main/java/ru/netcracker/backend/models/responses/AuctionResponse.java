@@ -4,10 +4,12 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.netcracker.backend.models.domain.Lot;
 
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -25,5 +27,6 @@ public class AuctionResponse {
     private int usersCount;
     private int userLikes;
     private long userId;
+    private Set<Lot> lots;
 
 }

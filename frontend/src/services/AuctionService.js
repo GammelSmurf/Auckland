@@ -19,7 +19,7 @@ const createAuction = (values) =>{
 
         }, {headers: authHeader()})
         .then(response => {
-
+            return response;
         });
 };
 

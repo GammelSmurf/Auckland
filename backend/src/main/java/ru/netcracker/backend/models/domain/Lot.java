@@ -24,6 +24,6 @@ public class Lot {
     private String name;
     private String picture;
     private String description;
-    private BigDecimal minBank;
-    private BigDecimal step;
+    private Long minBank;
+    private Long step;
 }

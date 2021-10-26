@@ -4,10 +4,12 @@ import AuthService from "../services/AuthService";
 import AuctionService from "../services/AuctionService";
 import AucForm from "./AucForm";
 import LotForm from "./LotForm";
+import LotService from "../services/LotService";
 
 const NewAuctionModal = (props) => {
     const [validated, setValidated] = useState(false);
     const [step, setStep] = useState(1);
+    //const [auctionId, setAuctionId] = useState(1);
     const currentUser = AuthService.getCurrentUser();
 
     const parseDateTime = () => {
@@ -27,6 +29,8 @@ const NewAuctionModal = (props) => {
         description: "",
         minBank: "1",
         step: "1",
+        picture: "",
+        auctionId: ""
     });
 
     const nextStep = () => {
@@ -47,7 +51,11 @@ const NewAuctionModal = (props) => {
              nextStep();
         }
         else{
-            AuctionService.createAuction(values).then(props.hide());
+            AuctionService.createAuction(values).then((response) =>
+                values["auctionId"] = response.data.id
+            ).then(
+                () => LotService.createLot(values).then(props.hide())
+            );
         }
         event.preventDefault();
         event.stopPropagation();

@@ -1,7 +1,7 @@
 package ru.netcracker.backend.config;
 
 import org.modelmapper.ModelMapper;
-import org.modelmapper.PropertyMap;
+import org.modelmapper.TypeMap;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import ru.netcracker.backend.model.Auction;
@@ -19,40 +19,25 @@ public class ModelMapperConfig {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setFieldMatchingEnabled(true);
 
-        PropertyMap<AuctionRequest, Auction> requestToAuctionMap = new PropertyMap<>() {
-            protected void configure() {
-                map().setId(null);
-            }
-        };
+        TypeMap<AuctionRequest, Auction> requestToAuctionMap =
+                modelMapper.createTypeMap(AuctionRequest.class, Auction.class);
+        requestToAuctionMap.addMappings(mapper -> mapper.skip(Auction::setId));
 
+        TypeMap<LotRequest, Lot> requestToLotMap =
+                modelMapper.createTypeMap(LotRequest.class, Lot.class);
+        requestToLotMap.addMappings(mapper -> mapper.skip(Lot::setId));
 
-        PropertyMap<LotRequest, Lot> requestToLotMap = new PropertyMap<>() {
-            protected void configure() {
-                map().setId(null);
-            }
-        };
+        TypeMap<Lot, LotResponse> lotToResponseMap =
+                modelMapper.createTypeMap(Lot.class, LotResponse.class);
+        lotToResponseMap.addMappings(mapper -> mapper.map(src->src.getAuction().getId(), LotResponse::setAuctionId));
 
-        PropertyMap<Auction, AuctionResponse> auctionToResponseMap = new PropertyMap<>() {
-            protected void configure() {
-                map().setId(source.getId());
-                map().setUsersCount(source.getSubscribersCount());
-                map().setUserLikes(source.getLikesCount());
-                map().setUserId(source.getUser().getId());
-                map().setLots(source.getLots());
-            }
-        };
+        TypeMap<Auction, AuctionResponse> auctionToResponseMap =
+                modelMapper.createTypeMap(Auction.class, AuctionResponse.class);
+        auctionToResponseMap.addMappings(mapper -> {
+                    mapper.map(Auction::getSubscribersCount, AuctionResponse::setUsersCount);
+                    mapper.map(Auction::getLikesCount, AuctionResponse::setUserLikes);
+                });
 
-        PropertyMap<Lot, LotResponse> lotToResponseMap = new PropertyMap<>() {
-            protected void configure() {
-                map().setId(source.getId());
-                map().setAuctionId(source.getAuction().getId());
-            }
-        };
-
-        modelMapper.addMappings(requestToAuctionMap);
-        modelMapper.addMappings(auctionToResponseMap);
-        modelMapper.addMappings(lotToResponseMap);
-        modelMapper.addMappings(requestToLotMap);
         return modelMapper;
     }
 }

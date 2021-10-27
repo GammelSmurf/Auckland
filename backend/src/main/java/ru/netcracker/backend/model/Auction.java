@@ -1,16 +1,14 @@
-package ru.netcracker.backend.models.domain;
+package ru.netcracker.backend.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
-import ru.netcracker.backend.models.domain.user.User;
+import ru.netcracker.backend.model.user.User;
 
 import javax.persistence.*;
 
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 

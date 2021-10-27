@@ -1,16 +1,15 @@
 package ru.netcracker.backend.service.impl;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.netcracker.backend.models.domain.Lot;
-import ru.netcracker.backend.repository.LotRepo;
+import ru.netcracker.backend.model.Lot;
+import ru.netcracker.backend.repository.LotRepository;
 import ru.netcracker.backend.service.LotService;
 
 @Service
 public class LotServiceImpl implements LotService {
-    private final LotRepo lotRepo;
+    private final LotRepository lotRepo;
 
-    public LotServiceImpl(LotRepo lotRepo) {
+    public LotServiceImpl(LotRepository lotRepo) {
         this.lotRepo = lotRepo;
     }
 

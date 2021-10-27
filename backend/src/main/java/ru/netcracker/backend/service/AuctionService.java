@@ -2,7 +2,7 @@ package ru.netcracker.backend.service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import ru.netcracker.backend.models.domain.Auction;
+import ru.netcracker.backend.model.Auction;
 
 public interface AuctionService {
     Page<Auction> getAllAuctions(Pageable pageable);

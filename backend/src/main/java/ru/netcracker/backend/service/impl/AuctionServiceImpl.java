@@ -1,12 +1,11 @@
 package ru.netcracker.backend.service.impl;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
-import ru.netcracker.backend.models.domain.Auction;
-import ru.netcracker.backend.repository.AuctionRepo;
+import ru.netcracker.backend.model.Auction;
+import ru.netcracker.backend.repository.AuctionRepository;
 import ru.netcracker.backend.service.AuctionService;
 
 import java.util.Optional;
@@ -14,16 +13,15 @@ import java.util.Optional;
 @Service
 public class AuctionServiceImpl implements AuctionService {
 
-    private final AuctionRepo auctionRepo;
+    private final AuctionRepository auctionRepo;
 
-    public AuctionServiceImpl(AuctionRepo auctionRepo) {
+    public AuctionServiceImpl(AuctionRepository auctionRepo) {
         this.auctionRepo = auctionRepo;
     }
 
     @Override
     public Page<Auction> getAllAuctions(Pageable pageable) {
-        Page<Auction> auctions = auctionRepo.findAll(pageable);
-        return auctions;
+        return auctionRepo.findAll(pageable);
     }
 
     @Override
@@ -62,7 +60,7 @@ public class AuctionServiceImpl implements AuctionService {
         Optional<Auction> result = auctionRepo.findById(id);
         if(result.isPresent()) {
             return result.get();
-        }else {
+        } else {
             throw new ResourceNotFoundException("Post id: " + id);
         }
     }

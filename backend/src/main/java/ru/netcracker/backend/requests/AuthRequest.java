@@ -1,4 +1,4 @@
-package ru.netcracker.backend.models.requests;
+package ru.netcracker.backend.requests;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

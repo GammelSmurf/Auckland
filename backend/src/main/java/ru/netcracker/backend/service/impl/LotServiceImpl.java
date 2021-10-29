@@ -7,14 +7,14 @@ import ru.netcracker.backend.service.LotService;
 
 @Service
 public class LotServiceImpl implements LotService {
-    private final LotRepository lotRepo;
+  private final LotRepository lotRepository;
 
-    public LotServiceImpl(LotRepository lotRepo) {
-        this.lotRepo = lotRepo;
-    }
+  public LotServiceImpl(LotRepository lotRepo) {
+    this.lotRepository = lotRepo;
+  }
 
-    @Override
-    public Lot createLot(Lot lot) {
-        return lotRepo.save(lot);
-    }
+  @Override
+  public Lot createLot(Lot lot) {
+    return lotRepository.save(lot);
+  }
 }

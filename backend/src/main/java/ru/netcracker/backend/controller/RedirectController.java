@@ -14,22 +14,21 @@ import ru.netcracker.backend.service.AuthService;
 @Controller
 @RequiredArgsConstructor
 public class RedirectController implements ErrorController {
-    private final AuthService authService;
-    private static final String PATH = "/error";
+  private final AuthService authService;
+  private static final String PATH = "/error";
 
-    @GetMapping("/verify")
-    public ResponseEntity<String> verifyUser(@Param("code") String code) {
-        if (authService.verify(code)) {
-            return ResponseEntity.ok("User verified");
-        } else {
-            return ResponseEntity.badRequest().body("User not verified");
-        }
+  @GetMapping("/verify")
+  public ResponseEntity<String> verifyUser(@Param("code") String code) {
+    if (authService.verify(code)) {
+      return ResponseEntity.ok("User verified");
+    } else {
+      return ResponseEntity.badRequest().body("User not verified");
     }
+  }
 
-    @RequestMapping(value = PATH)
-    @ResponseStatus(HttpStatus.OK)
-    public String error() {
-        return "forward:/index.html";
-    }
-
+  @RequestMapping(value = PATH)
+  @ResponseStatus(HttpStatus.OK)
+  public String error() {
+    return "forward:/index.html";
+  }
 }

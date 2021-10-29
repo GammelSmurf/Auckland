@@ -12,13 +12,17 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AuctionRequest {
-    private String name;
-    @JsonFormat(shape= JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    private Timestamp beginDate;
-    @JsonFormat(shape= JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
-    private Time lotDuration;
-    @JsonFormat(shape= JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
-    private Time boostTime;
-    private int usersLimit;
-    private long userId;
+  private String name;
+
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+  private Timestamp beginDate;
+
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
+  private Time lotDuration;
+
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
+  private Time boostTime;
+
+  private int usersLimit;
+  private long userId;
 }

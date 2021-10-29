@@ -5,16 +5,15 @@ import lombok.Setter;
 
 import javax.persistence.*;
 
-
 @Entity
-@Table(name="tags")
+@Table(name = "tags")
 @Getter
 @Setter
 public class Tag {
-    @Id
-    @Column(name="tag_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @Column(name = "tag_id")
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    private String name;
+  private String name;
 }

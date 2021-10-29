@@ -8,5 +8,5 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class MessageResponse {
-    private String message;
+  private String message;
 }

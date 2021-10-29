@@ -5,13 +5,14 @@ import Login from "./components/Login";
 import NavBar from "./components/NavBar";
 import AuthService from "./services/AuthService";
 import GenericNotFound from "./components/GenericNotFound";
-import Auction from "./components/Auction";
+import Auctions from "./components/Auctions";
 
 import './css/App.css';
 import './css/auction.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
 import Register from "./components/Register";
+import Auction from "./components/Auction";
 
 const App = withRouter(({location})=> {
 
@@ -29,13 +30,14 @@ const App = withRouter(({location})=> {
     )
   return (
       <div>
-          {(location.pathname === '/home' || location.pathname === '/auction') && <NavBar />}
+          {(location.pathname === '/home' || location.pathname === '/auctions') && <NavBar />}
         <div>
           <Switch>
               <PrivateRoute path='/home' exact={true} component={Home}/>
               <Route path='/auth/signin' exact={true} component={Login}/>
               <Route path='/auth/signup' exact={true} component={Register}/>
-              <Route path='/auction' exact={true} component={Auction}/>
+              <Route path='/auctions' exact={true} component={Auctions}/>
+              <Route path='/auctions/:id' exact={true} component={Auction}/>
               <Route component={GenericNotFound} />
           </Switch>
         </div>

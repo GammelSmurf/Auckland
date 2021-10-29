@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/auction")
+@RequestMapping("/api/auctions")
 @CrossOrigin("*")
 @RequiredArgsConstructor
 @Slf4j
@@ -37,7 +37,7 @@ public class AuctionController {
         modelMapper.map(auctionService.getAuctionById(id), AuctionResponse.class);
 
     log.info("sent auction: {}", auctionDto);
-    return new ResponseEntity<>(auctionDto, HttpStatus.FOUND);
+    return new ResponseEntity<>(auctionDto, HttpStatus.OK);
   }
 
   @PostMapping

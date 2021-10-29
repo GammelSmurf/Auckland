@@ -14,7 +14,7 @@ const MyNavBar = () =>{
                     <Navbar.Collapse id="basic-navbar-nav">
                         <Nav style={{marginLeft: "auto"}}>
                             <Nav.Link href="/home">Home</Nav.Link>
-                            <Nav.Link href="/auction">Auctions</Nav.Link>
+                            <Nav.Link href="/auctions">Auctions</Nav.Link>
                             <Nav.Link href="/auth/signin" onClick={logOut}>Logout</Nav.Link>
                         </Nav>
                     </Navbar.Collapse>

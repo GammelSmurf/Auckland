@@ -14,7 +14,7 @@ const Home = () => {
     const currentUser = AuthService.getCurrentUser();
     return (
         <header className='App-header'>
-            <h3>Sprint №2. CRUD Service</h3>
+            <h3>Sprint №3. Auction page</h3>
             <img src={logo} className='App-logo' alt='logo' />
             <p>
                 {message}

@@ -7,7 +7,7 @@ const createLot = (values) =>{
     return axios
         .post(API_URL, {
             name: values.lotName,
-            description: values.description,
+            description: values.lotDescription,
             minBank: values.minBank,
             step: values.step,
             picture: values.picture,

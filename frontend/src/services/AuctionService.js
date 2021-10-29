@@ -19,6 +19,7 @@ const createAuction = (values) =>{
     return axios
         .post(API_URL, {
             name: values.aucName,
+            description: values.aucDescription,
             beginDate: values.beginDate,
             lotDuration: values.lotDuration,
             boostTime: values.boostTime,

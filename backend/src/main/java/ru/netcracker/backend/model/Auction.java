@@ -23,6 +23,7 @@ public class Auction {
   private Long id;
 
   private String name;
+  private String description;
   private Timestamp beginDate;
   private Time lotDuration;
 

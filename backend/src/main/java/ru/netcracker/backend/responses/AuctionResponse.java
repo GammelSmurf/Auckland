@@ -16,6 +16,7 @@ import java.util.Set;
 public class AuctionResponse {
   private long id;
   private String name;
+  private String description;
 
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
   private Timestamp beginDate;

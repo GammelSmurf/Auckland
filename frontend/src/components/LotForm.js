@@ -1,5 +1,5 @@
-import {Button, Form} from "react-bootstrap";
-import React, {useState} from "react";
+import {Form} from "react-bootstrap";
+import React from "react";
 
 const LotForm = (props) => {
     return (
@@ -19,7 +19,7 @@ const LotForm = (props) => {
                         <Form.Label>
                             Description
                         </Form.Label>
-                        <Form.Control as="textarea" rows={4} required onChange={props.handleChange("description")}/>
+                        <Form.Control as="textarea" rows={4} required onChange={props.handleChange("lotDescription")}/>
                         <Form.Control.Feedback type="invalid">
                             The value cannot be empty
                         </Form.Control.Feedback>

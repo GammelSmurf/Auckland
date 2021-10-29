@@ -1,5 +1,5 @@
 import React from 'react';
-import {Route, Switch, withRouter, Redirect} from 'react-router-dom';
+import {Route, Switch, withRouter, Redirect,matchPath} from 'react-router-dom';
 import Home from './components/Home';
 import Login from "./components/Login";
 import NavBar from "./components/NavBar";
@@ -14,7 +14,7 @@ import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
 import Register from "./components/Register";
 import Auction from "./components/Auction";
 
-const App = withRouter(({location})=> {
+const App = withRouter((props)=> {
 
     const PrivateRoute = ({ component: Component, ...rest }) => (
         <Route {...rest} render={props => (
@@ -30,7 +30,7 @@ const App = withRouter(({location})=> {
     )
   return (
       <div>
-          {(location.pathname === '/home' || location.pathname === '/auctions') && <NavBar />}
+          {(props.location.pathname === '/home' || props.location.pathname === '/auctions' || matchPath(props.location.pathname, { path: '/auctions/:id' })) && <NavBar />}
         <div>
           <Switch>
               <PrivateRoute path='/home' exact={true} component={Home}/>

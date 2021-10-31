@@ -11,19 +11,19 @@ import javax.persistence.*;
 @Setter
 public class Lot {
 
-  @Id
-  @Column(name = "lot_id")
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+    @Id
+    @Column(name = "lot_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  @ManyToOne
-  @JoinColumn(name = "auction_id", nullable = false)
-  private Auction auction;
+    @ManyToOne
+    @JoinColumn(name = "auction_id", nullable = false)
+    private Auction auction;
 
-  private String name;
-  private String picture;
-  @Column(length = 10000)
-  private String description;
-  private Long minBank;
-  private Long step;
+    private String name;
+    private String picture;
+    @Column(length = 10000)
+    private String description;
+    private Long minBank;
+    private Long step;
 }

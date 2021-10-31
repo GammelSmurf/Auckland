@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useState} from "react";
 import {Modal, Form, Button} from "react-bootstrap";
 import AuthService from "../services/AuthService";
 import AuctionService from "../services/AuctionService";
@@ -20,13 +20,14 @@ const NewAuctionModal = (props) => {
         userId: currentUser.id,
 
         aucName: "",
+        aucDescription: "",
         usersLimit: "100",
         beginDate: parseDateTime(),
         lotDuration: "00:30:00",
         boostTime: "00:10:00",
 
         lotName: "",
-        description: "",
+        lotDescription: "",
         minBank: "1",
         step: "1",
         picture: "",

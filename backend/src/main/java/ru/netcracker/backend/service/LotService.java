@@ -1,7 +1,18 @@
 package ru.netcracker.backend.service;
 
+import ru.netcracker.backend.model.Auction;
 import ru.netcracker.backend.model.Lot;
 
+import java.util.List;
+
 public interface LotService {
-    Lot createLot(Lot lot);
+  List<Lot> getAllLots();
+
+  Lot createLot(Lot lot);
+
+  Lot updateLot(long id, Lot lot);
+
+  void deleteLot(long id);
+
+  Lot getLotById(long id);
 }

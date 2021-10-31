@@ -1,5 +1,5 @@
-import {Button, Form} from "react-bootstrap";
-import React, {useRef, useState} from "react";
+import {Form} from "react-bootstrap";
+import React from "react";
 
 
 const AucForm = (props) => {
@@ -14,6 +14,15 @@ const AucForm = (props) => {
                             Name
                         </Form.Label>
                         <Form.Control required onChange={props.handleChange("aucName")}/>
+                        <Form.Control.Feedback type="invalid">
+                            The value cannot be empty
+                        </Form.Control.Feedback>
+                    </Form.Group>
+                    <Form.Group>
+                        <Form.Label>
+                            Description
+                        </Form.Label>
+                        <Form.Control as="textarea" rows={4} required onChange={props.handleChange("aucDescription")}/>
                         <Form.Control.Feedback type="invalid">
                             The value cannot be empty
                         </Form.Control.Feedback>

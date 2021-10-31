@@ -17,16 +17,16 @@ import ru.netcracker.backend.service.LotService;
 @RequiredArgsConstructor
 @Slf4j
 public class LotController {
-  private final ModelMapper modelMapper;
-  private final LotService lotService;
+    private final ModelMapper modelMapper;
+    private final LotService lotService;
 
-  @PostMapping
-  public ResponseEntity<LotResponse> createLot(@RequestBody LotRequest lotDto) {
-    LotResponse lotResponse =
-        modelMapper.map(
-            lotService.createLot(modelMapper.map(lotDto, Lot.class)), LotResponse.class);
+    @PostMapping
+    public ResponseEntity<LotResponse> createLot(@RequestBody LotRequest lotDto) {
+        LotResponse lotResponse =
+                modelMapper.map(
+                        lotService.createLot(modelMapper.map(lotDto, Lot.class)), LotResponse.class);
 
-    log.info("created lot: {}", lotDto);
-    return new ResponseEntity<>(lotResponse, HttpStatus.CREATED);
-  }
+        log.info("created lot: {}", lotDto);
+        return new ResponseEntity<>(lotResponse, HttpStatus.CREATED);
+    }
 }

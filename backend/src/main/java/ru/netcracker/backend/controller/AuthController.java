@@ -19,25 +19,25 @@ import java.io.UnsupportedEncodingException;
 @RequiredArgsConstructor
 @Slf4j
 public class AuthController {
-  private final AuthService authService;
+    private final AuthService authService;
 
-  @PostMapping("/signin")
-  public ResponseEntity<?> generateToken(@RequestBody AuthRequest authRequestDTO) {
-    return ResponseEntity.ok(authService.authenticateUser(authRequestDTO));
-  }
+    @PostMapping("/signin")
+    public ResponseEntity<?> generateToken(@RequestBody AuthRequest authRequestDTO) {
+        return ResponseEntity.ok(authService.authenticateUser(authRequestDTO));
+    }
 
-  @PostMapping("/signup")
-  public ResponseEntity<String> createUser(
-      @RequestBody AuthRequest authRequestDTO, HttpServletRequest request)
-      throws UserExistsException, MessagingException, UnsupportedEncodingException,
-          EmailExistsException {
-    authService.createUser(authRequestDTO, getSiteURL(request));
-    log.info("created user: {}", authRequestDTO);
-    return ResponseEntity.ok("User created");
-  }
+    @PostMapping("/signup")
+    public ResponseEntity<String> createUser(
+            @RequestBody AuthRequest authRequestDTO, HttpServletRequest request)
+            throws UserExistsException, MessagingException, UnsupportedEncodingException,
+            EmailExistsException {
+        authService.createUser(authRequestDTO, getSiteURL(request));
+        log.info("created user: {}", authRequestDTO);
+        return ResponseEntity.ok("User created");
+    }
 
-  private String getSiteURL(HttpServletRequest request) {
-    String siteURL = request.getRequestURL().toString();
-    return siteURL.replace(request.getServletPath(), "");
-  }
+    private String getSiteURL(HttpServletRequest request) {
+        String siteURL = request.getRequestURL().toString();
+        return siteURL.replace(request.getServletPath(), "");
+    }
 }

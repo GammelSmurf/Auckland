@@ -10,14 +10,14 @@ import javax.mail.MessagingException;
 import java.io.UnsupportedEncodingException;
 
 public interface AuthService {
-  JwtResponse authenticateUser(AuthRequest authRequestDTO);
+    JwtResponse authenticateUser(AuthRequest authRequestDTO);
 
-  void createUser(AuthRequest authRequest, String siteURL)
-      throws MessagingException, UnsupportedEncodingException, EmailExistsException,
-          UserExistsException;
+    void createUser(AuthRequest authRequest, String siteURL)
+            throws MessagingException, UnsupportedEncodingException, EmailExistsException,
+            UserExistsException;
 
-  void sendVerificationEmail(User user, String siteURL)
-      throws MessagingException, UnsupportedEncodingException;
+    void sendVerificationEmail(User user, String siteURL)
+            throws MessagingException, UnsupportedEncodingException;
 
-  boolean verify(String verificationCode);
+    boolean verify(String verificationCode);
 }

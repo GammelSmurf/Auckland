@@ -1,12 +1,12 @@
 package ru.netcracker.backend.responses;
 
 public class UserResponse {
-  private String username;
-  private String password;
-  private String email;
-  private String name;
-  private String secondName;
-  private String about;
-  private Boolean isBanned;
-  private Boolean enabled;
+    private String username;
+    private String password;
+    private String email;
+    private String name;
+    private String secondName;
+    private String about;
+    private Boolean isBanned;
+    private Boolean enabled;
 }

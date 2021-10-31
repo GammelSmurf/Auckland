@@ -29,91 +29,91 @@ import java.util.List;
 @EnableGlobalMethodSecurity(securedEnabled = true, jsr250Enabled = true, prePostEnabled = true)
 @RequiredArgsConstructor
 public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
-  private final JwtFilter jwtFilter;
-  private final UserDetailsServiceImpl userDetailsService;
+    private final JwtFilter jwtFilter;
+    private final UserDetailsServiceImpl userDetailsService;
 
-  @Bean
-  public UserDetailsService userDetailsService() {
-    return userDetailsService;
-  }
+    @Bean
+    public UserDetailsService userDetailsService() {
+        return userDetailsService;
+    }
 
-  @Bean
-  public BCryptPasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
-  }
+    @Bean
+    public BCryptPasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
-  @Bean
-  public DaoAuthenticationProvider authenticationProvider() {
-    DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-    authProvider.setUserDetailsService(userDetailsService());
-    authProvider.setPasswordEncoder(passwordEncoder());
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService());
+        authProvider.setPasswordEncoder(passwordEncoder());
 
-    return authProvider;
-  }
+        return authProvider;
+    }
 
-  private SecurityContext securityContext() {
-    return SecurityContext.builder().securityReferences(defaultAuth()).build();
-  }
+    private SecurityContext securityContext() {
+        return SecurityContext.builder().securityReferences(defaultAuth()).build();
+    }
 
-  private ApiKey apiKey() {
-    return new ApiKey("JWT", "Authorization", "header");
-  }
+    private ApiKey apiKey() {
+        return new ApiKey("JWT", "Authorization", "header");
+    }
 
-  private List<SecurityReference> defaultAuth() {
-    AuthorizationScope authorizationScope = new AuthorizationScope("global", "accessEverything");
-    AuthorizationScope[] authorizationScopes = new AuthorizationScope[1];
-    authorizationScopes[0] = authorizationScope;
-    return List.of(new SecurityReference("JWT", authorizationScopes));
-  }
+    private List<SecurityReference> defaultAuth() {
+        AuthorizationScope authorizationScope = new AuthorizationScope("global", "accessEverything");
+        AuthorizationScope[] authorizationScopes = new AuthorizationScope[1];
+        authorizationScopes[0] = authorizationScope;
+        return List.of(new SecurityReference("JWT", authorizationScopes));
+    }
 
-  @Bean
-  public Docket api() {
-    return new Docket(DocumentationType.SWAGGER_2)
-        .securityContexts(List.of(securityContext()))
-        .securitySchemes(List.of(apiKey()))
-        .select()
-        .apis(RequestHandlerSelectors.any())
-        .paths(PathSelectors.any())
-        .build();
-  }
+    @Bean
+    public Docket api() {
+        return new Docket(DocumentationType.SWAGGER_2)
+                .securityContexts(List.of(securityContext()))
+                .securitySchemes(List.of(apiKey()))
+                .select()
+                .apis(RequestHandlerSelectors.any())
+                .paths(PathSelectors.any())
+                .build();
+    }
 
-  @Override
-  protected void configure(AuthenticationManagerBuilder auth) {
-    auth.authenticationProvider(authenticationProvider());
-  }
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) {
+        auth.authenticationProvider(authenticationProvider());
+    }
 
-  @Override
-  protected void configure(HttpSecurity http) throws Exception {
-    http.cors()
-        .and()
-        .csrf()
-        .disable()
-        .exceptionHandling()
-        .and()
-        .sessionManagement()
-        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        .and()
-        .authorizeRequests()
-        .antMatchers(
-            "/",
-            "/favicon.ico",
-            "/swagger-resources/**",
-            "/swagger-ui/**",
-            "/v2/**",
-            "/**/*.png",
-            "/**/*.gif",
-            "/**/*.svg",
-            "/**/*.jpg",
-            "/**/*.html",
-            "/**/*.css",
-            "/**/*.js")
-        .permitAll()
-        .antMatchers("/api/auth/**", "/verify/**")
-        .permitAll()
-        .anyRequest()
-        .authenticated();
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.cors()
+                .and()
+                .csrf()
+                .disable()
+                .exceptionHandling()
+                .and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .authorizeRequests()
+                .antMatchers(
+                        "/",
+                        "/favicon.ico",
+                        "/swagger-resources/**",
+                        "/swagger-ui/**",
+                        "/v2/**",
+                        "/**/*.png",
+                        "/**/*.gif",
+                        "/**/*.svg",
+                        "/**/*.jpg",
+                        "/**/*.html",
+                        "/**/*.css",
+                        "/**/*.js")
+                .permitAll()
+                .antMatchers("/api/auth/**", "/verify/**")
+                .permitAll()
+                .anyRequest()
+                .authenticated();
 
-    // Add our custom JWT security filter
-    http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-  }
+        // Add our custom JWT security filter
+        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+    }
 }

@@ -5,13 +5,13 @@ import org.springframework.data.domain.Pageable;
 import ru.netcracker.backend.model.Auction;
 
 public interface AuctionService {
-  Page<Auction> getAllAuctions(Pageable pageable);
+    Page<Auction> getAllAuctions(Pageable pageable);
 
-  Auction createAuction(Auction auction);
+    Auction createAuction(Auction auction);
 
-  Auction updateAuction(long id, Auction auction);
+    Auction updateAuction(long id, Auction auction);
 
-  void deleteAuction(long id);
+    void deleteAuction(long id);
 
-  Auction getAuctionById(long id);
+    Auction getAuctionById(long id);
 }

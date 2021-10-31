@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin("*")
 @RequiredArgsConstructor
 public class HomeController {
-  @GetMapping
-  public String home() {
-    return "Hello world!";
-  }
+    @GetMapping
+    public String home() {
+        return "Hello world!";
+    }
 }

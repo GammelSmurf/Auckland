@@ -13,16 +13,16 @@ import ru.netcracker.backend.repository.UserRepository;
 @Service
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
-  private final UserRepository userRepo;
+    private final UserRepository userRepo;
 
-  @Override
-  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    User user = userRepo.findUserByUsername(username);
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepo.findUserByUsername(username);
 
-    if (user == null) {
-      throw new UsernameNotFoundException("Could not find user " + username);
+        if (user == null) {
+            throw new UsernameNotFoundException("Could not find user " + username);
+        }
+
+        return new MyUserDetails(user);
     }
-
-    return new MyUserDetails(user);
-  }
 }

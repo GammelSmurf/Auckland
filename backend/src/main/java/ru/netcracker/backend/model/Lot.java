@@ -2,6 +2,7 @@ package ru.netcracker.backend.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import ru.netcracker.backend.model.auction.Auction;
 
 import javax.persistence.*;
 
@@ -19,6 +20,9 @@ public class Lot {
     @ManyToOne
     @JoinColumn(name = "auction_id", nullable = false)
     private Auction auction;
+
+    @OneToOne(mappedBy = "lot")
+    private AuctionProcess auctionProcess;
 
     private String name;
     private String picture;

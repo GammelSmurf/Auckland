@@ -1,8 +1,11 @@
-package ru.netcracker.backend.model;
+package ru.netcracker.backend.model.auction;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
+import ru.netcracker.backend.model.AuctionProcess;
+import ru.netcracker.backend.model.Lot;
+import ru.netcracker.backend.model.Tag;
 import ru.netcracker.backend.model.user.User;
 
 import javax.persistence.*;
@@ -28,8 +31,15 @@ public class Auction {
     private Timestamp beginDate;
     private Time lotDuration;
 
+    @Enumerated(EnumType.STRING)
+    private AuctionStatus status;
+
     private Time boostTime;
     private Integer usersLimit;
+
+    public Auction() {
+        status = AuctionStatus.DRAFT;
+    }
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -63,6 +73,9 @@ public class Auction {
             joinColumns = @JoinColumn(name = "auction_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
     private Set<User> subscribers = new HashSet<>();
+
+    @OneToOne(mappedBy = "auction")
+    private AuctionProcess auctionProcess;
 
     public int getLikesCount() {
         return getUserLikes().size();

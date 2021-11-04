@@ -1,11 +1,11 @@
 package ru.netcracker.backend;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import static org.assertj.core.api.Assertions.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import ru.netcracker.backend.model.Auction;
+import ru.netcracker.backend.model.auction.Auction;
 import ru.netcracker.backend.requests.AuctionRequest;
 import ru.netcracker.backend.responses.AuctionResponse;
 
@@ -29,11 +29,11 @@ class DtoTests {
 
         Auction auction = modelMapper.map(auctionRequest, Auction.class);
 
-        assertThat(auction.getId()).isNull();
-        assertThat(auction.getUser().getId()).isNotNull();
+        Assertions.assertNull(auction.getId());
+        Assertions.assertNotNull(auction.getUser().getId());
 
         AuctionResponse auctionResponse = modelMapper.map(auction, AuctionResponse.class);
 
-        assertThat(auctionResponse.getUserId()).isEqualTo(1L);
+        Assertions.assertEquals(auctionResponse.getUserId(), 1L);
     }
 }

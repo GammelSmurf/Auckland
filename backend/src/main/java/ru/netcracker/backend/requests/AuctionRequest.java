@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.netcracker.backend.model.auction.AuctionStatus;
 
 import java.sql.Time;
 import java.sql.Timestamp;

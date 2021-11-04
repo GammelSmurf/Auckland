@@ -1,23 +1,21 @@
 package ru.netcracker.backend.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
-import ru.netcracker.backend.model.Auction;
+import ru.netcracker.backend.model.auction.Auction;
+import ru.netcracker.backend.model.auction.AuctionStatus;
 import ru.netcracker.backend.repository.AuctionRepository;
 import ru.netcracker.backend.service.AuctionService;
 
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class AuctionServiceImpl implements AuctionService {
-
     private final AuctionRepository auctionRepository;
-
-    public AuctionServiceImpl(AuctionRepository auctionRepo) {
-        this.auctionRepository = auctionRepo;
-    }
 
     @Override
     public Page<Auction> getAllAuctions(Pageable pageable) {
@@ -43,6 +41,7 @@ public class AuctionServiceImpl implements AuctionService {
         auction.setUserLikes(auctionRequest.getUserLikes());
         auction.setSubscribers(auctionRequest.getSubscribers());
         auction.setTags(auctionRequest.getTags());
+        auction.setStatus(auctionRequest.getStatus());
 
         return auctionRepository.save(auction);
     }
@@ -63,5 +62,14 @@ public class AuctionServiceImpl implements AuctionService {
         } else {
             throw new ResourceNotFoundException("Post id: " + id);
         }
+    }
+
+    @Override
+    public void makeAuctionAvailable(long id) {
+        Auction auction =
+                auctionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Post id: " + id));
+        auction.setStatus(AuctionStatus.WAITING);
+
+        auctionRepository.save(auction);
     }
 }

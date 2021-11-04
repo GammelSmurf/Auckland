@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
 import net.bytebuddy.utility.RandomString;
-import ru.netcracker.backend.model.Auction;
+import ru.netcracker.backend.model.auction.Auction;
 
 import javax.persistence.*;
 import java.util.HashSet;

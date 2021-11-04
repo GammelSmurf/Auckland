@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.netcracker.backend.model.Lot;
+import ru.netcracker.backend.model.auction.AuctionStatus;
 
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -26,6 +27,9 @@ public class AuctionResponse {
 
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
   private Time boostTime;
+
+  @JsonFormat(shape = JsonFormat.Shape.STRING)
+  private AuctionStatus status;
 
   private int usersLimit;
   private int usersCount;

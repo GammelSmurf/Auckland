@@ -3,15 +3,11 @@ package ru.netcracker.backend.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.netcracker.backend.model.Auction;
 import ru.netcracker.backend.model.Lot;
-import ru.netcracker.backend.requests.AuctionRequest;
 import ru.netcracker.backend.requests.LotRequest;
-import ru.netcracker.backend.responses.AuctionResponse;
 import ru.netcracker.backend.responses.LotResponse;
 import ru.netcracker.backend.service.LotService;
 
@@ -46,7 +42,8 @@ public class LotController {
     public ResponseEntity<LotResponse> createLot(@RequestBody LotRequest lotDto) {
         LotResponse lotResponse =
                 modelMapper.map(
-                        lotService.createLot(modelMapper.map(lotDto, Lot.class)), LotResponse.class);
+                        lotService.createLot(modelMapper.map(lotDto, Lot.class)),
+                        LotResponse.class);
 
         log.info("created lot: {}", lotDto);
         return new ResponseEntity<>(lotResponse, HttpStatus.CREATED);
@@ -57,7 +54,8 @@ public class LotController {
             @PathVariable long id, @RequestBody LotRequest lotDto) {
         LotResponse lotResponse =
                 modelMapper.map(
-                        lotService.updateLot(id, modelMapper.map(lotDto, Lot.class)), LotResponse.class);
+                        lotService.updateLot(id, modelMapper.map(lotDto, Lot.class)),
+                        LotResponse.class);
 
         log.info("updated lot: {} with id: {}", lotDto, id);
         return new ResponseEntity<>(lotResponse, HttpStatus.OK);

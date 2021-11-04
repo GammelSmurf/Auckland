@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.netcracker.backend.model.Auction;
+import ru.netcracker.backend.model.auction.Auction;
 import ru.netcracker.backend.requests.AuctionRequest;
 import ru.netcracker.backend.responses.AuctionResponse;
 import ru.netcracker.backend.service.AuctionService;
@@ -51,12 +51,19 @@ public class AuctionController {
         return new ResponseEntity<>(auctionResponse, HttpStatus.CREATED);
     }
 
+    @PutMapping("/{id}/available")
+    public ResponseEntity<Void> makeAuctionAvailable(@PathVariable long id) {
+        auctionService.makeAuctionAvailable(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<AuctionResponse> updateAuction(
             @PathVariable long id, @RequestBody AuctionRequest auctionDto) {
         AuctionResponse auctionResponse =
                 modelMapper.map(
-                        auctionService.updateAuction(id, modelMapper.map(auctionDto, Auction.class)),
+                        auctionService.updateAuction(
+                                id, modelMapper.map(auctionDto, Auction.class)),
                         AuctionResponse.class);
 
         log.info("updated auction: {} with id: {}", auctionDto, id);

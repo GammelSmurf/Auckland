@@ -1,6 +1,5 @@
 package ru.netcracker.backend.service;
 
-import ru.netcracker.backend.model.Auction;
 import ru.netcracker.backend.model.Lot;
 
 import java.util.List;

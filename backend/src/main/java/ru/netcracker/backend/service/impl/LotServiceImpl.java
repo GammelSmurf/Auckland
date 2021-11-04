@@ -1,10 +1,8 @@
 package ru.netcracker.backend.service.impl;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
-import ru.netcracker.backend.model.Auction;
 import ru.netcracker.backend.model.Lot;
 import ru.netcracker.backend.repository.LotRepository;
 import ru.netcracker.backend.service.LotService;
@@ -13,12 +11,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class LotServiceImpl implements LotService {
   private final LotRepository lotRepository;
-
-  public LotServiceImpl(LotRepository lotRepo) {
-    this.lotRepository = lotRepo;
-  }
 
   @Override
   public List<Lot> getAllLots() {

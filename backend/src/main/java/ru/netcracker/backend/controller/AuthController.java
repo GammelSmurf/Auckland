@@ -30,7 +30,7 @@ public class AuthController {
     public ResponseEntity<String> createUser(
             @RequestBody AuthRequest authRequestDTO, HttpServletRequest request)
             throws UserExistsException, MessagingException, UnsupportedEncodingException,
-            EmailExistsException {
+                    EmailExistsException {
         authService.createUser(authRequestDTO, getSiteURL(request));
         log.info("created user: {}", authRequestDTO);
         return ResponseEntity.ok("User created");

@@ -24,7 +24,7 @@ public class AuthController {
 
     @PostMapping("/signin")
     public ResponseEntity<?> generateToken(@RequestBody AuthRequest authRequestDTO) {
-        return ResponseEntity.ok(authService.authenticateUser(authRequestDTO));
+        return new ResponseEntity<>((authService.authenticateUser(authRequestDTO)), HttpStatus.OK);
     }
 
     @PostMapping("/signup")
@@ -34,7 +34,7 @@ public class AuthController {
                     EmailExistsException {
         authService.createUser(authRequestDTO, getSiteURL(request));
         log.info("created user: {}", authRequestDTO);
-        return ResponseEntity.ok("User created");
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/password/change")

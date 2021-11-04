@@ -1,3 +1,4 @@
+
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/auckland
@@ -31,3 +32,5 @@ Auckland:
   app:
     jwtSecret: donttry
     jwtExpirationMs: 86400000
+  mail:
+    senderName: Auckland team

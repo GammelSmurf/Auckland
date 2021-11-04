@@ -1,9 +1,9 @@
 package ru.netcracker.backend.service.impl;
 
-import lombok.RequiredArgsConstructor;
+import lombok.*;
+import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -21,25 +21,30 @@ import ru.netcracker.backend.repository.UserRepository;
 import ru.netcracker.backend.security.JwtUtil;
 import ru.netcracker.backend.security.MyUserDetails;
 import ru.netcracker.backend.service.AuthService;
+import ru.netcracker.backend.util.MimeMessageBuilder;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
-    @Value("${spring.mail.username}")
-    private String localEmail;
 
+    @Value("${spring.mail.username}")
+    private String fromAddress;
+    @Value("${Auckland.mail.senderName}")
+    private String senderName;
     private final AuthenticationProvider authenticationProvider;
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
     private final JavaMailSender javaMailSender;
+    private final BCryptPasswordEncoder encoder;
 
     @Override
     public JwtResponse authenticateUser(AuthRequest authRequestDTO) {
@@ -62,7 +67,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void createUser(AuthRequest authRequest, String siteURL)
             throws MessagingException, UnsupportedEncodingException, EmailExistsException,
-            UserExistsException {
+                    UserExistsException {
         if (userRepository.existsByEmail(authRequest.getEmail()))
             throw new EmailExistsException(
                     "There is an account with that email address: " + authRequest.getEmail());
@@ -84,39 +89,36 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void sendVerificationEmail(User user, String siteURL)
             throws MessagingException, UnsupportedEncodingException {
-        String toAddress = user.getEmail();
-        String fromAddress = localEmail;
-        String senderName = "Auckland team";
-        String subject = "Please verify your registration";
-        String content =
-                "Dear [[name]],<br>"
-                        + "Please click the link below to verify your registration:<br>"
-                        + "<h3><a href=\"[[URL]]\" target=\"_self\">VERIFY</a></h3>"
-                        + "Thank you,<br>"
-                        + "Your company name.";
-
-        MimeMessage message = javaMailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message);
-
-        helper.setFrom(fromAddress, senderName);
-        helper.setTo(toAddress);
-        helper.setSubject(subject);
-
-        content = content.replace("[[name]]", user.getUsername());
-        String verifyURL = siteURL + "/verify?code=" + user.getVerificationCode();
-
-        content = content.replace("[[URL]]", verifyURL);
-
-        helper.setText(content, true);
+        MimeMessage message =
+                new MimeMessageBuilder(javaMailSender)
+                        .setFromAddress(fromAddress)
+                        .setSenderName(senderName)
+                        .setTo(user)
+                        .setSubject("Please verify your registration")
+                        .setMethodURL(
+                                siteURL
+                                        + "/verify?code="
+                                        + user.getVerificationCode()
+                                        + "&username="
+                                        + user.getUsername())
+                        .setContent(
+                                "Dear [[name]],<br>"
+                                        + "Please click the link below to verify your registration:<br>"
+                                        + "<h3><a href=\"[[URL]]\" target=\"_self\">VERIFY</a></h3>"
+                                        + "Thank you,<br>"
+                                        + "Auckland Team.")
+                        .build();
 
         javaMailSender.send(message);
     }
 
     @Override
-    public boolean verify(String verificationCode) {
-        User user = userRepository.findUserByVerificationCode(verificationCode);
+    public boolean verify(String verificationCode, String username) {
+        User user = userRepository.findUserByUsername(username);
 
-        if (user == null || user.isEnabled()) {
+        if (user == null
+                || !Objects.equals(user.getVerificationCode(), verificationCode)
+                || user.isEnabled()) {
             return false;
         } else {
             user.setVerificationCode(null);
@@ -124,6 +126,69 @@ public class AuthServiceImpl implements AuthService {
             userRepository.save(user);
 
             return true;
+        }
+    }
+
+    @Override
+    public void sentChangePasswordForm(String username, String siteURL)
+            throws MessagingException, UnsupportedEncodingException {
+        User user = userRepository.findUserByUsername(username);
+        if (user == null) {
+            return;
+        }
+        user.setRestoreCode(RandomString.make(64));
+        userRepository.save(user);
+
+        MimeMessage message =
+                new MimeMessageBuilder(javaMailSender)
+                        .setFromAddress(fromAddress)
+                        .setSenderName(senderName)
+                        .setTo(user)
+                        .setSubject("Password recover")
+                        .setMethodURL(
+                                siteURL
+                                        + "/restore?code="
+                                        + user.getRestoreCode()
+                                        + "&username="
+                                        + user.getUsername())
+                        .setContent(
+                                "Dear [[name]],<br>"
+                                        + "Please click the link below to restore your password:<br>"
+                                        + "<h3><a href=\"[[URL]]\" target=\"_self\">VERIFY</a></h3>"
+                                        + "Thank you,<br>"
+                                        + "Auckland Team.")
+                        .build();
+
+        javaMailSender.send(message);
+    }
+
+    @Override
+    public void generateNewPassword(String restoreCode, String username) throws MessagingException, UnsupportedEncodingException {
+        User user = userRepository.findUserByUsername(username);
+
+        if (user == null
+                || !Objects.equals(user.getRestoreCode(), restoreCode)) {
+            return;
+        } else {
+            String password = RandomString.make(8);
+            user.setPassword(encoder.encode(password));
+            userRepository.save(user);
+
+            MimeMessage message =
+                    new MimeMessageBuilder(javaMailSender)
+                            .setFromAddress(fromAddress)
+                            .setSenderName(senderName)
+                            .setTo(user)
+                            .setSubject("Password recover")
+                            .setContent(
+                                    "Dear [[name]],<br>"
+                                            + "Here is your new password:<br>"
+                                            + "<h3>"
+                                            + password
+                                            + "</h3>"
+                                            + "Thank you,<br>"
+                                            + "Auckland Team.")
+                            .build();
         }
     }
 }

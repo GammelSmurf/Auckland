@@ -19,5 +19,9 @@ public interface AuthService {
     void sendVerificationEmail(User user, String siteURL)
             throws MessagingException, UnsupportedEncodingException;
 
-    boolean verify(String verificationCode);
+    boolean verify(String verificationCode, String username);
+
+    void sentChangePasswordForm(String username, String siteURL) throws MessagingException, UnsupportedEncodingException;
+
+    void generateNewPassword(String restoreCode, String username) throws MessagingException, UnsupportedEncodingException;
 }

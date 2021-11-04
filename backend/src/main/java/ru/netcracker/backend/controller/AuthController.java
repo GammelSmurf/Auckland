@@ -2,6 +2,7 @@ package ru.netcracker.backend.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.netcracker.backend.exception.EmailExistsException;
@@ -34,6 +35,12 @@ public class AuthController {
         authService.createUser(authRequestDTO, getSiteURL(request));
         log.info("created user: {}", authRequestDTO);
         return ResponseEntity.ok("User created");
+    }
+
+    @PostMapping("/password/change")
+    public ResponseEntity<Void> passwordChangeRequest(@RequestParam("username") String username, HttpServletRequest request) throws MessagingException, UnsupportedEncodingException {
+        authService.sentChangePasswordForm(username, getSiteURL(request));
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     private String getSiteURL(HttpServletRequest request) {

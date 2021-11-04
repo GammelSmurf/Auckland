@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import ru.netcracker.backend.service.AuthService;
 
+import javax.mail.MessagingException;
+import java.io.UnsupportedEncodingException;
+
 @Controller
 @RequiredArgsConstructor
 public class RedirectController implements ErrorController {
@@ -18,12 +21,18 @@ public class RedirectController implements ErrorController {
     private static final String PATH = "/error";
 
     @GetMapping("/verify")
-    public ResponseEntity<String> verifyUser(@Param("code") String code) {
-        if (authService.verify(code)) {
+    public ResponseEntity<String> verifyUser(@Param("code") String code, @Param("username") String username) {
+        if (authService.verify(code, username)) {
             return ResponseEntity.ok("User verified");
         } else {
             return ResponseEntity.badRequest().body("User not verified");
         }
+    }
+
+    @GetMapping("/recover")
+    public ResponseEntity<Void> recoverPassword(@Param("code") String code, @Param("username") String username) throws MessagingException, UnsupportedEncodingException {
+       authService.generateNewPassword(code, username);
+       return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @RequestMapping(value = PATH)

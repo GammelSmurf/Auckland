@@ -29,6 +29,7 @@ public class User {
     private Boolean isBanned;
 
     private String verificationCode;
+    private String restoreCode;
     private boolean enabled;
 
     public User() {

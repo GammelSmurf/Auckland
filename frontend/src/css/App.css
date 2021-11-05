@@ -1,3 +1,7 @@
+.row {
+    padding: 5px;
+}
+
 .App-logo {
     height: 40vmin;
     pointer-events: none;
@@ -38,7 +42,7 @@
 
 .wrapper  {
     padding-top: 50px;
-    padding-bottom: 50px;
+    padding-bottom: 80px;
 }
 
 .navHeader {
@@ -56,10 +60,6 @@
     to {
         opacity: 1;
     }
-}
-
-.form-control {
-    margin-bottom: 10px;
 }
 
 .footer {

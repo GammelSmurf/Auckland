@@ -31,11 +31,10 @@ public class LotController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<LotResponse> getLot(@PathVariable(name = "id") Long id) {
-        LotResponse lotDto = modelMapper.map(lotService.getLotById(id), LotResponse.class);
-
-        log.info("sent lot: {}", lotDto);
-        return new ResponseEntity<>(lotDto, HttpStatus.OK);
+    public List<LotResponse> getLotsByAuctionId(@PathVariable(name = "id") Long id) {
+        return lotService.getLotsByAuctionId(id).stream()
+                .map(lot -> modelMapper.map(lot, LotResponse.class))
+                .collect(Collectors.toList());
     }
 
     @PostMapping

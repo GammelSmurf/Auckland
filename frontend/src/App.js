@@ -8,6 +8,7 @@ import GenericNotFound from "./components/GenericNotFound";
 import Auctions from "./components/Auctions";
 
 import './css/App.css';
+import './css/auctions.css';
 import './css/auction.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';

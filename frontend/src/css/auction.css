@@ -1,19 +1,43 @@
-.toolkit button {
-    margin-left: 20px;
-    font-weight: 500;
+.auctionBlock {
+    border-radius: 7px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    padding: 15px;
+    overflow-y: auto;
+}
+.auctionMenu {
+    width: 100%;
+    display: inline-block;
 }
 
-.lotFormAnim {
-    animation-duration: 1s;
-    animation-name: lotFormAnimation;
+.auctionMenu button{
+    margin-right: 10px;
+    padding: 5px 20px;
 }
-@keyframes lotFormAnimation {
+
+.auctionMenu .backArrow {
+    margin-right: 10px;
+}
+.auctionMenu .backArrow:hover {
+    cursor: pointer;
+}
+
+.configBlock {
+    overflow: hidden;
+    animation-duration: 1.5s;
+    animation-fill-mode: forwards;
+    animation-name: configBlockAnimation;
+}
+@keyframes configBlockAnimation {
     from {
-        margin-left: 100%;
-        width: 300%;
+
+        max-height: 0;
     }
     to {
-        margin-left: 0%;
-        width: 100%;
+
+        max-height: 300px;
     }
+}
+
+.configBlock .input-group {
+    margin-top: 15px;
 }

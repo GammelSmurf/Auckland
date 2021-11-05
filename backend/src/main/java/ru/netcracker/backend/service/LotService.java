@@ -13,5 +13,5 @@ public interface LotService {
 
   void deleteLot(long id);
 
-  Lot getLotById(long id);
+  List<Lot> getLotsByAuctionId(long id);
 }

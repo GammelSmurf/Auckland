@@ -33,6 +33,7 @@ public class AuctionServiceImpl implements AuctionService {
                 auctionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Auction with id: " + id + " was not found"));
 
         auction.setName(auctionRequest.getName());
+        auction.setDescription(auctionRequest.getDescription());
         auction.setBeginDate(auctionRequest.getBeginDate());
         auction.setLotDuration(auctionRequest.getLotDuration());
         auction.setBoostTime(auctionRequest.getBoostTime());

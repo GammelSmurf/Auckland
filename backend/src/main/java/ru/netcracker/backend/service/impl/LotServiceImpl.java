@@ -53,12 +53,7 @@ public class LotServiceImpl implements LotService {
   }
 
   @Override
-  public Lot getLotById(long id) {
-    Optional<Lot> result = lotRepository.findById(id);
-    if (result.isPresent()) {
-      return result.get();
-    } else {
-      throw new ResourceNotFoundException("Post id: " + id);
-    }
+  public List<Lot> getLotsByAuctionId(long id) {
+    return lotRepository.findAllByAuctionId(id);
   }
 }

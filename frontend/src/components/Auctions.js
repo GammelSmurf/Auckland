@@ -4,18 +4,31 @@ import AuctionService from "../services/AuctionService";
 import BootStrapTable from 'react-bootstrap-table-next';
 import ToolkitProvider,{Search} from 'react-bootstrap-table2-toolkit';
 import AuthService from "../services/AuthService";
-import NewAuctionModal from "./NewAuctionModal";
+import ModalDialog from "./ModalDialog";
 
-const Auctions = () => {
-    const minDateTime = new Date();
-    minDateTime.setHours(minDateTime.getHours()+27);
+const Auctions = (props) => {
     const [data, setData] = useState([]);
     const [isModalAddActive, setIsModalAddActive] = useState(false);
     const {SearchBar} = Search;
     const currentUser = AuthService.getCurrentUser();
 
+    const values = {
+        userId: currentUser.id,
+        aucName: "Auction name",
+        aucDescription: "Lorem Ipsum - это текст-\"рыба\", часто используемый в печати и вэб-дизайне. Lorem Ipsum является стандартной \"рыбой\" для текстов на латинице с начала XVI века. В то время некий безымянный печатник создал большую коллекцию размеров и форм шрифтов, используя Lorem Ipsum для распечатки образцов. Lorem Ipsum не только успешно пережил без заметных изменений пять веков, но и перешагнул в электронный дизайн.",
+        usersLimit: 100,
+        beginDate: "",
+        lotDuration: "00:30:00",
+        boostTime: "00:00:10"
+    }
 
-    const parseDate = (itemDateTime) => {
+    const parseMinDate = () => {
+        const minDate = new Date();
+        minDate.setHours(minDate.getHours()+27);
+        return minDate.toISOString().slice(0,-5).split('T').join(' ');
+    }
+
+    const parseDateInfo = (itemDateTime) => {
         const dateTime = new Date(itemDateTime);
         const options = { year: '2-digit', month: '2-digit', day: '2-digit',
             hour: '2-digit', minute: '2-digit', second: '2-digit'};
@@ -31,7 +44,7 @@ const Auctions = () => {
                 response.data.forEach(item => {
                     dataPrev.push(
                         {
-                            id: item.id, name: item.name, beginDate: parseDate(item.beginDate), participants: item.usersLimit, likesCount: item.userLikes, usersCount: item.usersCount
+                            id: item.id, name: item.name, beginDate: parseDateInfo(item.beginDate), participants: item.usersLimit, likesCount: item.userLikes, usersCount: item.usersCount
                         }
                     )
                 })
@@ -69,10 +82,15 @@ const Auctions = () => {
         sort: true
     }];
 
+    const rowEvents = {
+        onClick: (e, row, rowIndex) => {
+            props.history.push("/auctions/" + row.id)
+        }
+    };
+
     const createAuction = () => {
-        /*AuctionService.createAuction({name: "name", beginDate: "2021-10-23T18:28:48.815Z",
-            lotDuration: 10, boostTime: "2021-10-23T18:28:48.815Z", usersLimit: 15, userId: currentUser.id}).then(() => window.location.reload())*/
-        setIsModalAddActive(true);
+        values.beginDate = parseMinDate();
+        AuctionService.createAuction(values).then((response) => props.history.push("/auctions/" + response.data.id));
     }
 
     const handleModalAddClose = () => {setIsModalAddActive(false)};
@@ -91,19 +109,18 @@ const Auctions = () => {
                             <div>
                                 <div className="toolkit">
                                     <SearchBar { ...props.searchProps } srText=""/>
-                                    <Button variant={"warning"} onClick={createAuction} style={{marginBottom: "4px"}}>
+                                    <Button variant={"warning"} onClick={() => setIsModalAddActive(true)} style={{marginBottom: "4px"}}>
                                         Create auction
                                     </Button>
                                 </div>
-                                <BootStrapTable keyField='id'  {...props.baseProps} hover bordered={ false }
+                                <BootStrapTable keyField='id'  {...props.baseProps} hover bordered={ false } rowEvents={ rowEvents }
                                                 noDataIndication={() => <p>Table is empty</p>}/>
                             </div>
 
                     }
                 </ToolkitProvider>
-                <NewAuctionModal show={isModalAddActive} hide={handleModalAddClose} minDateTime={minDateTime}/>
             </div>
-
+            <ModalDialog show={isModalAddActive} hide={handleModalAddClose} title={"New auction"} body={"Do you really want to create new auction? You will be redirected to auction draft..."} action={createAuction}/>
         </div>
     )
 }

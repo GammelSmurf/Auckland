@@ -189,6 +189,8 @@ public class AuthServiceImpl implements AuthService {
                                             + "Thank you,<br>"
                                             + "Auckland Team.")
                             .build();
+
+            javaMailSender.send(message);
         }
     }
 }

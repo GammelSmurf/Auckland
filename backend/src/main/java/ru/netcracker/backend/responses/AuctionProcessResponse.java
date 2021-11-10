@@ -14,4 +14,5 @@ public class AuctionProcessResponse {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
     private Time remainingTime;
     private Long currentBank;
+    private AuctionLogResponse auctionLogResponse;
 }

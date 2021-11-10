@@ -7,6 +7,7 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
+import ru.netcracker.backend.exception.ValidationException;
 import ru.netcracker.backend.model.AuctionProcess;
 import ru.netcracker.backend.requests.AuctionProcessRequest;
 import ru.netcracker.backend.responses.AuctionProcessResponse;
@@ -22,12 +23,14 @@ public class AuctionProcessController {
     @MessageMapping("/play/{id}")
     @SendTo("/auction/state/{id}")
     public AuctionProcessResponse play(
-            @DestinationVariable Long id, AuctionProcessRequest auctionProcessRequest) {
+            @DestinationVariable Long id, AuctionProcessRequest auctionProcessRequest)
+            throws ValidationException {
         AuctionProcessResponse auctionProcessResponse =
                 modelMapper.map(
                         auctionProcessService.updateAuctionProcess(
                                 id, modelMapper.map(auctionProcessRequest, AuctionProcess.class)),
                         AuctionProcessResponse.class);
+
         log.info("auction with id: {} has: {}", id, auctionProcessResponse);
         return auctionProcessResponse;
     }

@@ -3,6 +3,7 @@ package ru.netcracker.backend.model.auction;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
+import ru.netcracker.backend.model.AuctionLog;
 import ru.netcracker.backend.model.AuctionProcess;
 import ru.netcracker.backend.model.Lot;
 import ru.netcracker.backend.model.Tag;
@@ -76,6 +77,9 @@ public class Auction {
 
     @OneToOne(mappedBy = "auction")
     private AuctionProcess auctionProcess;
+
+    @OneToOne(mappedBy = "auction")
+    private AuctionLog auctionLog;
 
     public int getLikesCount() {
         return getUserLikes().size();

@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import ru.netcracker.backend.exception.EmailExistsException;
 import ru.netcracker.backend.exception.UserExistsException;
+import ru.netcracker.backend.exception.ValidationException;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
@@ -41,5 +42,15 @@ public class AdviceController {
         body.put("message", ex.getMessage());
 
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<Object> handleValidationException(ResourceNotFoundException ex) {
+
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("message", ex.getMessage());
+
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 }

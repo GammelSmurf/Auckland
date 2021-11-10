@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
 import net.bytebuddy.utility.RandomString;
+import ru.netcracker.backend.model.AuctionProcess;
 import ru.netcracker.backend.model.auction.Auction;
 
 import javax.persistence.*;
@@ -52,6 +53,9 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     private Set<ERole> roles = new HashSet<>();
+
+    @OneToOne(mappedBy = "user")
+    private AuctionProcess auctionProcess;
 
     @OneToMany(
             mappedBy = "user",

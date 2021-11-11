@@ -60,7 +60,8 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
     }
 
     private List<SecurityReference> defaultAuth() {
-        AuthorizationScope authorizationScope = new AuthorizationScope("global", "accessEverything");
+        AuthorizationScope authorizationScope =
+                new AuthorizationScope("global", "accessEverything");
         AuthorizationScope[] authorizationScopes = new AuthorizationScope[1];
         authorizationScopes[0] = authorizationScope;
         return List.of(new SecurityReference("JWT", authorizationScopes));
@@ -108,7 +109,8 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
                         "/**/*.css",
                         "/**/*.js")
                 .permitAll()
-                .antMatchers("/ws/**", "/app/**").permitAll()
+                .antMatchers("/ws/**", "/app/**")
+                .permitAll()
                 .antMatchers("/api/auth/**", "/verify/**")
                 .permitAll()
                 .anyRequest()

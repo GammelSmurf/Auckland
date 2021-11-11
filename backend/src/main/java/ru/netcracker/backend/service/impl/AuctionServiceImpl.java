@@ -30,7 +30,12 @@ public class AuctionServiceImpl implements AuctionService {
     @Override
     public Auction updateAuction(long id, Auction auctionRequest) {
         Auction auction =
-                auctionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Auction with id: " + id + " was not found"));
+                auctionRepository
+                        .findById(id)
+                        .orElseThrow(
+                                () ->
+                                        new ResourceNotFoundException(
+                                                "Auction with id: " + id + " was not found"));
 
         auction.setName(auctionRequest.getName());
         auction.setDescription(auctionRequest.getDescription());
@@ -50,7 +55,9 @@ public class AuctionServiceImpl implements AuctionService {
     @Override
     public void deleteAuction(long id) {
         Auction auction =
-                auctionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Post id: " + id));
+                auctionRepository
+                        .findById(id)
+                        .orElseThrow(() -> new ResourceNotFoundException("Post id: " + id));
 
         auctionRepository.delete(auction);
     }
@@ -68,7 +75,9 @@ public class AuctionServiceImpl implements AuctionService {
     @Override
     public void makeAuctionAvailable(long id) {
         Auction auction =
-                auctionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Post id: " + id));
+                auctionRepository
+                        .findById(id)
+                        .orElseThrow(() -> new ResourceNotFoundException("Post id: " + id));
         auction.setStatus(AuctionStatus.WAITING);
 
         auctionRepository.save(auction);

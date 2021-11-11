@@ -5,5 +5,4 @@ import org.springframework.stereotype.Repository;
 import ru.netcracker.backend.model.auction.Auction;
 
 @Repository
-public interface AuctionRepository extends JpaRepository<Auction, Long> {
-}
+public interface AuctionRepository extends JpaRepository<Auction, Long> {}

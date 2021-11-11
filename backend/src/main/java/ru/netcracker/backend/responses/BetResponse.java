@@ -13,5 +13,6 @@ import java.sql.Time;
 public class BetResponse {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
     private Time remainingTime;
+
     private Long currentBank;
 }

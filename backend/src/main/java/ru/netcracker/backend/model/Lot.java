@@ -26,8 +26,10 @@ public class Lot {
 
     private String name;
     private String picture;
+
     @Column(length = 10000)
     private String description;
+
     private Long minBank;
     private Long step;
 }

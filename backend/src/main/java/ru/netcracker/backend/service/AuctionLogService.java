@@ -8,6 +8,8 @@ import java.util.List;
 
 public interface AuctionLogService {
     List<AuctionLog> getAuctionLogs(long auctionId);
+
     void logBet(Long auctionId, Bet bet);
+
     void logChange(Long auctionId, Auction auction);
 }

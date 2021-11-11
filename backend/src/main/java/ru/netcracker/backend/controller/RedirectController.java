@@ -21,7 +21,8 @@ public class RedirectController implements ErrorController {
     private static final String PATH = "/error";
 
     @GetMapping("/verify")
-    public ResponseEntity<String> verifyUser(@Param("code") String code, @Param("username") String username) {
+    public ResponseEntity<String> verifyUser(
+            @Param("code") String code, @Param("username") String username) {
         if (authService.verify(code, username)) {
             return ResponseEntity.ok("User verified");
         } else {
@@ -30,9 +31,11 @@ public class RedirectController implements ErrorController {
     }
 
     @GetMapping("/recover")
-    public ResponseEntity<Void> recoverPassword(@Param("code") String code, @Param("username") String username) throws MessagingException, UnsupportedEncodingException {
-       authService.generateNewPassword(code, username);
-       return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<Void> recoverPassword(
+            @Param("code") String code, @Param("username") String username)
+            throws MessagingException, UnsupportedEncodingException {
+        authService.generateNewPassword(code, username);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @RequestMapping(value = PATH)

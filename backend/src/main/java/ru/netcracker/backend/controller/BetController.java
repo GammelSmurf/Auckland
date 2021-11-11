@@ -24,12 +24,11 @@ public class BetController {
 
     @MessageMapping("/play/{id}")
     @SendTo("/auction/state/{id}")
-    public BetResponse play(
-            @DestinationVariable Long id, BetRequest betRequest) throws BankLessThanStepException, BankLessThanMinException, BankLessThanOldException {
+    public BetResponse play(@DestinationVariable Long id, BetRequest betRequest)
+            throws BankLessThanStepException, BankLessThanMinException, BankLessThanOldException {
         BetResponse betResponse =
                 modelMapper.map(
-                        betService.makeBet(
-                                id, modelMapper.map(betRequest, Bet.class)),
+                        betService.makeBet(id, modelMapper.map(betRequest, Bet.class)),
                         BetResponse.class);
 
         log.info("auction with id: {} has: {}", id, betResponse);

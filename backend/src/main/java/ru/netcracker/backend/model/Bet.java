@@ -18,14 +18,11 @@ public class Bet {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
-    private Auction auction;
+    @OneToOne private Auction auction;
 
-    @OneToOne
-    private Lot lot;
+    @OneToOne private Lot lot;
 
-    @OneToOne
-    private User user;
+    @OneToOne private User user;
 
     private Time remainingTime;
     private Long currentBank;

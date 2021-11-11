@@ -27,8 +27,10 @@ public class Auction {
     private Long id;
 
     private String name;
+
     @Column(length = 10000)
     private String description;
+
     private Timestamp beginDate;
     private Time lotDuration;
 

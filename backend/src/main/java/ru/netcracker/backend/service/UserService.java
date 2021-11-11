@@ -5,6 +5,8 @@ import ru.netcracker.backend.model.user.User;
 
 public interface UserService {
     User banUser(String username) throws UserExistsException;
+
     User unbanUser(String username);
+
     User addCurrency(String username, long currency);
 }

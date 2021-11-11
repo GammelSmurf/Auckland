@@ -16,8 +16,8 @@ public class AuctionLog {
     @Column(name = "auction_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @OneToOne
-    private Auction auction;
+
+    @OneToOne private Auction auction;
     private String logMessage;
     private Date logTime;
 }

@@ -38,8 +38,10 @@ public class AuthServiceImpl implements AuthService {
 
     @Value("${spring.mail.username}")
     private String fromAddress;
+
     @Value("${Auckland.mail.senderName}")
     private String senderName;
+
     private final AuthenticationProvider authenticationProvider;
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
@@ -164,11 +166,11 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void generateNewPassword(String restoreCode, String username) throws MessagingException, UnsupportedEncodingException {
+    public void generateNewPassword(String restoreCode, String username)
+            throws MessagingException, UnsupportedEncodingException {
         User user = userRepository.findUserByUsername(username);
 
-        if (user == null
-                || !Objects.equals(user.getRestoreCode(), restoreCode)) {
+        if (user == null || !Objects.equals(user.getRestoreCode(), restoreCode)) {
             return;
         } else {
             String password = RandomString.make(8);

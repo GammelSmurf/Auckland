@@ -14,14 +14,16 @@ public interface AuthService {
 
     void createUser(AuthRequest authRequest, String siteURL)
             throws MessagingException, UnsupportedEncodingException, EmailExistsException,
-            UserExistsException;
+                    UserExistsException;
 
     void sendVerificationEmail(User user, String siteURL)
             throws MessagingException, UnsupportedEncodingException;
 
     boolean verify(String verificationCode, String username);
 
-    void sentChangePasswordForm(String username, String siteURL) throws MessagingException, UnsupportedEncodingException;
+    void sentChangePasswordForm(String username, String siteURL)
+            throws MessagingException, UnsupportedEncodingException;
 
-    void generateNewPassword(String restoreCode, String username) throws MessagingException, UnsupportedEncodingException;
+    void generateNewPassword(String restoreCode, String username)
+            throws MessagingException, UnsupportedEncodingException;
 }

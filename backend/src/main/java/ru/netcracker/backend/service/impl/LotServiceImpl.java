@@ -13,47 +13,47 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class LotServiceImpl implements LotService {
-  private final LotRepository lotRepository;
+    private final LotRepository lotRepository;
 
-  @Override
-  public List<Lot> getAllLots() {
-    return lotRepository.findAll();
-  }
+    @Override
+    public List<Lot> getAllLots() {
+        return lotRepository.findAll();
+    }
 
-  @Override
-  public Lot createLot(Lot lot) {
-    return lotRepository.save(lot);
-  }
+    @Override
+    public Lot createLot(Lot lot) {
+        return lotRepository.save(lot);
+    }
 
-  @Override
-  public Lot updateLot(long id, Lot lotRequest) {
-    Lot lot =
-        lotRepository
-            .findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Post id: " + id));
+    @Override
+    public Lot updateLot(long id, Lot lotRequest) {
+        Lot lot =
+                lotRepository
+                        .findById(id)
+                        .orElseThrow(() -> new ResourceNotFoundException("Post id: " + id));
 
-    lot.setName(lotRequest.getName());
-    lot.setPicture(lotRequest.getPicture());
-    lot.setDescription(lotRequest.getDescription());
-    lot.setMinBank(lotRequest.getMinBank());
-    lot.setStep(lotRequest.getStep());
-    lot.setAuction(lotRequest.getAuction());
+        lot.setName(lotRequest.getName());
+        lot.setPicture(lotRequest.getPicture());
+        lot.setDescription(lotRequest.getDescription());
+        lot.setMinBank(lotRequest.getMinBank());
+        lot.setStep(lotRequest.getStep());
+        lot.setAuction(lotRequest.getAuction());
 
-    return lotRepository.save(lot);
-  }
+        return lotRepository.save(lot);
+    }
 
-  @Override
-  public void deleteLot(long id) {
-    Lot lot =
-        lotRepository
-            .findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Post id: " + id));
+    @Override
+    public void deleteLot(long id) {
+        Lot lot =
+                lotRepository
+                        .findById(id)
+                        .orElseThrow(() -> new ResourceNotFoundException("Post id: " + id));
 
-    lotRepository.delete(lot);
-  }
+        lotRepository.delete(lot);
+    }
 
-  @Override
-  public List<Lot> getLotsByAuctionId(long id) {
-    return lotRepository.findAllByAuctionId(id);
-  }
+    @Override
+    public List<Lot> getLotsByAuctionId(long id) {
+        return lotRepository.findAllByAuctionId(id);
+    }
 }

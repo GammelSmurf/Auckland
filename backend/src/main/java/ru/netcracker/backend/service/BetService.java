@@ -10,7 +10,8 @@ public interface BetService {
 
     Bet getBet(Long auctionId);
 
-    Bet makeBet(long id, Bet bet) throws BankLessThanStepException, BankLessThanMinException, BankLessThanOldException;
+    Bet makeBet(long id, Bet bet)
+            throws BankLessThanStepException, BankLessThanMinException, BankLessThanOldException;
 
     String getRemainingTime(long auctionId);
 }

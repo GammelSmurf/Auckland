@@ -38,7 +38,9 @@ public class AuthController {
     }
 
     @PostMapping("/password/change")
-    public ResponseEntity<Void> passwordChangeRequest(@RequestParam("username") String username, HttpServletRequest request) throws MessagingException, UnsupportedEncodingException {
+    public ResponseEntity<Void> passwordChangeRequest(
+            @RequestParam("username") String username, HttpServletRequest request)
+            throws MessagingException, UnsupportedEncodingException {
         authService.sentChangePasswordForm(username, getSiteURL(request));
         return new ResponseEntity<>(HttpStatus.OK);
     }

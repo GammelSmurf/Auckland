@@ -67,5 +67,4 @@ public class MimeMessageBuilder {
         helper.setText(content, true);
         return message;
     }
-
 }

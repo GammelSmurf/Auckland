@@ -35,8 +35,7 @@ public class User {
     private String restoreCode;
     private boolean enabled;
 
-    public User() {
-    }
+    public User() {}
 
     public User(String username, String password, String email) {
         this.username = username;

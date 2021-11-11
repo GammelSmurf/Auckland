@@ -14,6 +14,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
 import Register from "./components/Register";
 import Auction from "./components/Auction";
+import Users from "./components/Users";
 
 const App = withRouter((props)=> {
 
@@ -31,7 +32,7 @@ const App = withRouter((props)=> {
     )
   return (
       <div>
-          {(props.location.pathname === '/home' || props.location.pathname === '/auctions' || matchPath(props.location.pathname, { path: '/auctions/:id' })) && <NavBar />}
+          {(props.location.pathname === '/home' || props.location.pathname === '/auctions' || matchPath(props.location.pathname, { path: '/auctions/:id' }) || props.location.pathname === '/users') && <NavBar />}
         <div>
           <Switch>
               <PrivateRoute path='/home' exact={true} component={Home}/>
@@ -39,6 +40,7 @@ const App = withRouter((props)=> {
               <Route path='/auth/signup' exact={true} component={Register}/>
               <Route path='/auctions' exact={true} component={Auctions}/>
               <Route path='/auctions/:id' exact={true} component={Auction}/>
+              <Route path='/users' exact={true} component={Users}/>
               <Route component={GenericNotFound} />
           </Switch>
         </div>

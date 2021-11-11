@@ -33,8 +33,8 @@ public class UserController {
                 .collect(Collectors.toList());
     }
 
+    //@PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/ban")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> banUser(@RequestParam("username") String username)
             throws UserExistsException {
         User user = userService.banUser(username);
@@ -42,7 +42,7 @@ public class UserController {
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    //@PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/unban")
     public ResponseEntity<?> unbanUser(@RequestParam("username") String username) {
         User user = userService.unbanUser(username);
@@ -50,7 +50,7 @@ public class UserController {
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    //@PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/currency/add")
     public ResponseEntity<?> addCurrency(@RequestBody CurrencyRequest currencyRequest) {
         User user = userService.addCurrency(currencyRequest.getUsername(), currencyRequest.getCurrency());

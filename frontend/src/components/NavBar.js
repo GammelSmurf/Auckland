@@ -3,6 +3,7 @@ import AuthService from "../services/AuthService";
 import { Navbar, Nav, Container } from 'react-bootstrap';
 
 const MyNavBar = () =>{
+    const currentUser = AuthService.getCurrentUser();
     function logOut() {
         AuthService.logout();
     }
@@ -15,6 +16,7 @@ const MyNavBar = () =>{
                         <Nav style={{marginLeft: "auto"}}>
                             <Nav.Link href="/home">Home</Nav.Link>
                             <Nav.Link href="/auctions">Auctions</Nav.Link>
+                            {currentUser.roles.includes('ADMIN') && <Nav.Link href="/users">Users</Nav.Link>}
                             <Nav.Link href="/auth/signin" onClick={logOut}>Logout</Nav.Link>
                         </Nav>
                     </Navbar.Collapse>

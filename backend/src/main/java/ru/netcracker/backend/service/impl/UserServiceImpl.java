@@ -8,10 +8,17 @@ import ru.netcracker.backend.model.user.User;
 import ru.netcracker.backend.repository.UserRepository;
 import ru.netcracker.backend.service.UserService;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+
+    @Override
+    public List<User> getUsers(){
+        return userRepository.findAll();
+    }
 
     @Override
     public User banUser(String username) {

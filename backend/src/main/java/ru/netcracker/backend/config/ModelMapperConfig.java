@@ -6,10 +6,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import ru.netcracker.backend.model.auction.Auction;
 import ru.netcracker.backend.model.Lot;
+import ru.netcracker.backend.model.user.User;
 import ru.netcracker.backend.requests.AuctionRequest;
 import ru.netcracker.backend.requests.LotRequest;
 import ru.netcracker.backend.responses.AuctionResponse;
 import ru.netcracker.backend.responses.LotResponse;
+import ru.netcracker.backend.responses.UserResponse;
+
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 @Configuration
 public class ModelMapperConfig {
@@ -21,7 +26,8 @@ public class ModelMapperConfig {
 
         TypeMap<AuctionRequest, Auction> requestToAuctionMap =
                 modelMapper.createTypeMap(AuctionRequest.class, Auction.class);
-        requestToAuctionMap.addMappings(mapper -> mapper.skip(Auction::setId));
+        requestToAuctionMap.addMappings(
+                mapper -> mapper.skip(Auction::setId));
 
         TypeMap<LotRequest, Lot> requestToLotMap =
                 modelMapper.createTypeMap(LotRequest.class, Lot.class);
@@ -39,6 +45,9 @@ public class ModelMapperConfig {
                     mapper.map(Auction::getSubscribersCount, AuctionResponse::setUsersCount);
                     mapper.map(Auction::getLikesCount, AuctionResponse::setUserLikes);
                 });
+
+        TypeMap<User, UserResponse> userToResponseMap =
+                modelMapper.createTypeMap(User.class, UserResponse.class);
 
         return modelMapper;
     }

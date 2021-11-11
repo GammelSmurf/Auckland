@@ -10,9 +10,8 @@ import java.sql.Time;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuctionProcessResponse {
+public class BetResponse {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
     private Time remainingTime;
     private Long currentBank;
-    private AuctionLogResponse auctionLogResponse;
 }

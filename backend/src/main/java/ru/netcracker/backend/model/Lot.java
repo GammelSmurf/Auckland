@@ -22,7 +22,7 @@ public class Lot {
     private Auction auction;
 
     @OneToOne(mappedBy = "lot")
-    private AuctionProcess auctionProcess;
+    private Bet bet;
 
     private String name;
     private String picture;

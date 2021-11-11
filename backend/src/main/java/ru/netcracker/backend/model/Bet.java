@@ -12,7 +12,7 @@ import java.sql.Time;
 @Table(name = "auction_processes")
 @Getter
 @Setter
-public class AuctionProcess {
+public class Bet {
     @Id
     @Column(name = "auction_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)

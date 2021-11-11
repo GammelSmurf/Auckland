@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import ru.netcracker.backend.exception.EmailExistsException;
 import ru.netcracker.backend.exception.UserExistsException;
-import ru.netcracker.backend.exception.ValidationException;
+import ru.netcracker.backend.exception.bet.ValidationException;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
 import ru.netcracker.backend.model.AuctionLog;
-import ru.netcracker.backend.model.AuctionProcess;
+import ru.netcracker.backend.model.Bet;
 import ru.netcracker.backend.model.Lot;
 import ru.netcracker.backend.model.Tag;
 import ru.netcracker.backend.model.user.User;
@@ -76,7 +76,7 @@ public class Auction {
     private Set<User> subscribers = new HashSet<>();
 
     @OneToOne(mappedBy = "auction")
-    private AuctionProcess auctionProcess;
+    private Bet bet;
 
     @OneToOne(mappedBy = "auction")
     private AuctionLog auctionLog;

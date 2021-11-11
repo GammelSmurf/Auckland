@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
-import ru.netcracker.backend.model.AuctionProcess;
+import ru.netcracker.backend.model.Bet;
 import ru.netcracker.backend.model.auction.Auction;
 import ru.netcracker.backend.model.AuctionLog;
 import ru.netcracker.backend.repository.AuctionLogRepository;
@@ -45,16 +45,16 @@ public class AuctionLogServiceImpl implements AuctionLogService {
         sendObjectToWebSocket(auctionId, modelMapper.map(auctionLog, AuctionLogResponse.class));
     }
 
-    private AuctionLog addAuctionBetLog(AuctionProcess auctionProcess) {
+    private AuctionLog addAuctionBetLog(Bet bet) {
         AuctionLog auctionLog = new AuctionLog();
-        auctionLog.setAuction(auctionProcess.getAuction());
+        auctionLog.setAuction(bet.getAuction());
         auctionLog.setLogMessage(
                 generateMainString(
                         AuctionLogLevel.AUCTION_BET,
                         String.format(
                                 LOG_BET_MSG_TEMPLATE,
-                                auctionProcess.getUser().getUsername(),
-                                auctionProcess.getCurrentBank())));
+                                bet.getUser().getUsername(),
+                                bet.getCurrentBank())));
         auctionLog.setLogTime(generateDate());
 
         return auctionLogRepository.save(auctionLog);
@@ -73,8 +73,8 @@ public class AuctionLogServiceImpl implements AuctionLogService {
     }
 
     @Override
-    public void logBet(Long auctionId, AuctionProcess auctionProcess) {
-        AuctionLog auctionLog = addAuctionBetLog(auctionProcess);
+    public void logBet(Long auctionId, Bet bet) {
+        AuctionLog auctionLog = addAuctionBetLog(bet);
         sendAuctionLogToWebSocket(auctionId, auctionLog);
     }
 

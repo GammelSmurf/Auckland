@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
 import net.bytebuddy.utility.RandomString;
-import ru.netcracker.backend.model.AuctionProcess;
+import ru.netcracker.backend.model.Bet;
 import ru.netcracker.backend.model.auction.Auction;
 
 import javax.persistence.*;
@@ -24,7 +24,7 @@ public class User {
     private String username;
     private String password;
     private String email;
-    private String name;
+    private String firstName;
     private String secondName;
     private String about;
     private Boolean isBanned;
@@ -40,7 +40,7 @@ public class User {
         this.username = username;
         this.password = password;
         this.email = email;
-        name = "";
+        firstName = "";
         secondName = "";
         about = "";
         isBanned = false;
@@ -55,7 +55,7 @@ public class User {
     private Set<ERole> roles = new HashSet<>();
 
     @OneToOne(mappedBy = "user")
-    private AuctionProcess auctionProcess;
+    private Bet bet;
 
     @OneToMany(
             mappedBy = "user",

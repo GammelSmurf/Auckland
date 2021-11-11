@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.netcracker.backend.exception.UserExistsException;
+import ru.netcracker.backend.requests.CurrencyRequest;
 import ru.netcracker.backend.service.UserService;
 
 @RestController
@@ -17,7 +18,8 @@ public class UserController {
 
     @PostMapping("/ban")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> banUser(@RequestParam("username") String username) throws UserExistsException {
+    public ResponseEntity<?> banUser(@RequestParam("username") String username)
+            throws UserExistsException {
         return new ResponseEntity<>(userService.banUser(username), HttpStatus.OK);
     }
 
@@ -25,5 +27,14 @@ public class UserController {
     @PostMapping("/unban")
     public ResponseEntity<?> unbanUser(@RequestParam("username") String username) {
         return new ResponseEntity<>(userService.unbanUser(username), HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/currency/add")
+    public ResponseEntity<?> addCurrency(@RequestBody CurrencyRequest currencyRequest) {
+        return new ResponseEntity<>(
+                userService.addCurrency(
+                        currencyRequest.getUsername(), currencyRequest.getCurrency()),
+                HttpStatus.OK);
     }
 }

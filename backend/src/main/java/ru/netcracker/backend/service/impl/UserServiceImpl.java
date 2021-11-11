@@ -32,4 +32,14 @@ public class UserServiceImpl implements UserService {
         user.setIsBanned(false);
         return userRepository.save(user);
     }
+
+    @Override
+    public User addCurrency(String username, long currency) {
+        User user = userRepository.findUserByUsername(username);
+        if (user == null) {
+            throw new UsernameNotFoundException("There is no account with username: " + username);
+        }
+        user.setCurrency(user.getCurrency() + currency);
+        return userRepository.save(user);
+    }
 }

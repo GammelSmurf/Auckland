@@ -29,6 +29,8 @@ public class User {
     private String about;
     private Boolean isBanned;
 
+    private long currency;
+
     private String verificationCode;
     private String restoreCode;
     private boolean enabled;

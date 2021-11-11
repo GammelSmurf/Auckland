@@ -1,9 +1,12 @@
 package ru.netcracker.backend;
 
+import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
@@ -11,12 +14,17 @@ import org.springframework.messaging.simp.stomp.StompFrameHandler;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 import org.springframework.web.socket.sockjs.client.SockJsClient;
 import org.springframework.web.socket.sockjs.client.WebSocketTransport;
-import ru.netcracker.backend.requests.AuctionProcessRequest;
-import ru.netcracker.backend.responses.AuctionProcessResponse;
+import ru.netcracker.backend.model.Bet;
+import ru.netcracker.backend.repository.BetRepository;
+import ru.netcracker.backend.requests.BetRequest;
+import ru.netcracker.backend.responses.AuctionLogResponse;
+import ru.netcracker.backend.responses.BetResponse;
 
 import java.lang.reflect.Type;
 import java.sql.Time;
@@ -25,69 +33,143 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
+import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.RefreshMode.AFTER_EACH_TEST_METHOD;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Slf4j
+@Sql({"/test-data.sql"})
+@AutoConfigureEmbeddedDatabase(refresh = AFTER_EACH_TEST_METHOD)
 public class WebSocketTests {
-    @LocalServerPort
-    private Integer port;
+    @LocalServerPort private Integer port;
 
-    private long testId = 1;
+    private final long TEST_ID = 1;
+    private final String WEB_SOCKET_ENDPOINT_TEMPLATE = "ws://localhost:%d/ws";
 
     private WebSocketStompClient webSocketStompClient;
+    private StompSession session;
+
+    @Autowired
+    private BetRepository betRepository;
 
     @BeforeEach
     public void setUp() {
-        webSocketStompClient = new WebSocketStompClient(new SockJsClient(
-                List.of(new WebSocketTransport(new StandardWebSocketClient()))));
+        webSocketStompClient =
+                new WebSocketStompClient(
+                        new SockJsClient(
+                                List.of(new WebSocketTransport(new StandardWebSocketClient()))));
+        webSocketStompClient.setMessageConverter(new MappingJackson2MessageConverter());
     }
 
     @Test
     public void testConnection() throws ExecutionException, InterruptedException, TimeoutException {
-        StompSession session = webSocketStompClient
-                .connect(String.format("ws://localhost:%d/ws", port), new StompSessionHandlerAdapter() {})
-                .get(1, SECONDS);
-        System.out.println("Test port is: " + port);
+        connectToWS();
         assertTrue(session.isConnected());
     }
 
-    //@Test
-    public void testMakingAuctionProcesses() throws ExecutionException, InterruptedException, TimeoutException {
-        ArrayBlockingQueue<AuctionProcessResponse> blockingQueue = new ArrayBlockingQueue<>(1);
+    private void connectToWS() throws ExecutionException, InterruptedException, TimeoutException {
+        session =
+                webSocketStompClient
+                        .connect(
+                                String.format(WEB_SOCKET_ENDPOINT_TEMPLATE, port),
+                                new StompSessionHandlerAdapter() {})
+                        .get(1, SECONDS);
+    }
 
-        webSocketStompClient.setMessageConverter(new MappingJackson2MessageConverter());
+    @Test
+    public void testMakingBet()
+            throws ExecutionException, InterruptedException, TimeoutException {
+        ArrayBlockingQueue<BetResponse> blockingStateQueue = new ArrayBlockingQueue<>(1);
+        connectToWS();
 
-        StompSession session = webSocketStompClient
-                .connect(String.format("ws://localhost:%d/ws", port), new StompSessionHandlerAdapter() {})
-                .get(1, SECONDS);
+        session.subscribe(
+                String.format("/auction/state/%d", TEST_ID),
+                new StompFrameHandler() {
+                    @Override
+                    @NonNull
+                    public Type getPayloadType(@NonNull StompHeaders headers) {
+                        return BetResponse.class;
+                    }
 
-        session.subscribe(String.format("/auction/state/%d", testId) , new StompFrameHandler() {
+                    @Override
+                    public void handleFrame(@NonNull StompHeaders headers, Object payload) {
+                        System.out.println("Received message: " + payload);
+                        blockingStateQueue.add((BetResponse) payload);
+                    }
+                });
 
-            @Override
-            public Type getPayloadType(@NonNull StompHeaders headers) {
-                return AuctionProcessResponse.class;
-            }
+        BetRequest betRequest = new BetRequest();
+        betRequest.setCurrentBank(30000L);
+        betRequest.setRemainingTime(Time.valueOf("04:15:00"));
 
-            @Override
-            public void handleFrame(@NonNull StompHeaders headers, Object payload) {
-                System.out.println("Received message: " + payload);
-                blockingQueue.add((AuctionProcessResponse) payload);
-            }
-        });
+        BetResponse betResponse = new BetResponse();
+        betResponse.setCurrentBank(30000L);
+        betResponse.setRemainingTime(Time.valueOf("04:15:00"));
 
-        AuctionProcessRequest auctionProcessRequest = new AuctionProcessRequest();
-        auctionProcessRequest.setCurrentBank(10000L);
-        auctionProcessRequest.setRemainingTime(Time.valueOf("04:15:00"));
+        session.send(String.format("/app/play/%d", TEST_ID), betRequest);
 
-        AuctionProcessResponse auctionProcessResponse = new AuctionProcessResponse();
-        auctionProcessResponse.setCurrentBank(10000L);
-        auctionProcessResponse.setRemainingTime(Time.valueOf("04:15:00"));
+        assertEquals(betResponse, blockingStateQueue.poll(1, SECONDS));
+    }
 
-        session.send(String.format("/app/play/%d", testId), auctionProcessRequest);
+    @Test
+    public void testBetAuctionLogger()
+            throws ExecutionException, InterruptedException, TimeoutException {
+        ArrayBlockingQueue<AuctionLogResponse> blockingLogQueue = new ArrayBlockingQueue<>(1);
+        connectToWS();
 
-        assertEquals(auctionProcessResponse, blockingQueue.poll(1, SECONDS));
+        session.subscribe(
+                String.format("/auction/logs/%d", TEST_ID),
+                new StompFrameHandler() {
+                    @Override
+                    public Type getPayloadType(@NonNull StompHeaders headers) {
+                        return AuctionLogResponse.class;
+                    }
+
+                    @Override
+                    public void handleFrame(@NonNull StompHeaders headers, Object payload) {
+                        System.out.println("Received log message: " + payload);
+                        blockingLogQueue.add((AuctionLogResponse) payload);
+                    }
+                });
+
+        BetRequest betRequest = new BetRequest();
+        betRequest.setCurrentBank(30000L);
+        betRequest.setRemainingTime(Time.valueOf("04:15:00"));
+
+        session.send(String.format("/app/play/%d", TEST_ID), betRequest);
+
+        Assertions.assertEquals(
+                blockingLogQueue.poll(1, SECONDS).getLogMessage(),
+                "-Bet- test повысил ставку до 30000");
+    }
+
+    @Test
+    public void testChangeAuctionLogger() throws ExecutionException, InterruptedException, TimeoutException {
+        ArrayBlockingQueue<AuctionLogResponse> blockingLogQueue = new ArrayBlockingQueue<>(1);
+        connectToWS();
+
+        session.subscribe(
+                String.format("/auction/logs/%d", TEST_ID),
+                new StompFrameHandler() {
+                    @Override
+                    public Type getPayloadType(@NonNull StompHeaders headers) {
+                        return AuctionLogResponse.class;
+                    }
+
+                    @Override
+                    public void handleFrame(@NonNull StompHeaders headers, Object payload) {
+                        System.out.println("Received log message: " + payload);
+                        blockingLogQueue.add((AuctionLogResponse) payload);
+                    }
+                });
+
+        Bet bet = betRepository.findBetByAuctionId(TEST_ID).get();
+        bet.setRemainingTime(Time.valueOf("00:00:00"));
+        betRepository.save(bet);
+
+        session.send(String.format("/app/sync/%d", TEST_ID), null);
+        Assertions.assertEquals(blockingLogQueue.poll(1, SECONDS).getLogMessage(), "-Status change- Статус аукциона изменился на RUNNING");
     }
 }

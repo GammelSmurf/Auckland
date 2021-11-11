@@ -63,11 +63,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-
             <!-- exclude junit 4 -->
             <exclusions>
                 <exclusion>
@@ -75,7 +75,6 @@
                     <artifactId>junit</artifactId>
                 </exclusion>
             </exclusions>
-
         </dependency>
         <!-- junit 5 -->
         <dependency>
@@ -83,6 +82,13 @@
             <artifactId>junit-jupiter-api</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>io.zonky.test</groupId>
+            <artifactId>embedded-database-spring-test</artifactId>
+            <version>2.1.0</version>
+            <scope>test</scope>
+        </dependency>
+
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>

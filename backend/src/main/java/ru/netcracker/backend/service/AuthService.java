@@ -1,29 +1,24 @@
 package ru.netcracker.backend.service;
 
-import ru.netcracker.backend.exception.EmailExistsException;
-import ru.netcracker.backend.exception.UserExistsException;
-import ru.netcracker.backend.model.user.User;
-import ru.netcracker.backend.requests.AuthRequest;
+import ru.netcracker.backend.exception.user.EmailExistsException;
+import ru.netcracker.backend.exception.user.UserExistsException;
+import ru.netcracker.backend.model.User;
 import ru.netcracker.backend.responses.JwtResponse;
 
 import javax.mail.MessagingException;
 import java.io.UnsupportedEncodingException;
 
 public interface AuthService {
-    JwtResponse authenticateUser(AuthRequest authRequestDTO);
+    JwtResponse authenticateUser(User user);
 
-    void createUser(AuthRequest authRequest, String siteURL)
-            throws MessagingException, UnsupportedEncodingException, EmailExistsException,
-                    UserExistsException;
+    void createUser(User user, String siteURL)
+            throws EmailExistsException, UserExistsException, MessagingException, UnsupportedEncodingException;
 
-    void sendVerificationEmail(User user, String siteURL)
-            throws MessagingException, UnsupportedEncodingException;
+    void sendVerificationEmail(String username, String siteURL) throws MessagingException, UnsupportedEncodingException;
 
-    boolean verify(String verificationCode, String username);
+    boolean verify(String username, String verificationCode);
 
-    void sentChangePasswordForm(String username, String siteURL)
-            throws MessagingException, UnsupportedEncodingException;
+    void sendChangePasswordRequestToUserEmail(String username, String siteURL) throws MessagingException, UnsupportedEncodingException;
 
-    void generateNewPassword(String restoreCode, String username)
-            throws MessagingException, UnsupportedEncodingException;
+    void generateNewPassword(String username, String restoreCode) throws MessagingException, UnsupportedEncodingException;
 }

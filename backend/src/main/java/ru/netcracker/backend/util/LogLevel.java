@@ -1,13 +1,14 @@
 package ru.netcracker.backend.util;
 
-public enum AuctionLogLevel {
+public enum LogLevel {
     AUCTION_BET("-Bet-"),
     AUCTION_STATUS_CHANGE("-Status change-"),
+    AUCTION_WINNER("-Winner-"),
     DEBUG("-Debug-");
 
     private final String text;
 
-    AuctionLogLevel(String text) {
+    LogLevel(String text) {
         this.text = text;
     }
 

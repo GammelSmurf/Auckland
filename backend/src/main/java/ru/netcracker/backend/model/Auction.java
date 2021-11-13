@@ -1,19 +1,18 @@
-package ru.netcracker.backend.model.auction;
+package ru.netcracker.backend.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
-import ru.netcracker.backend.model.AuctionLog;
-import ru.netcracker.backend.model.Bet;
-import ru.netcracker.backend.model.Lot;
-import ru.netcracker.backend.model.Tag;
-import ru.netcracker.backend.model.user.User;
 
 import javax.persistence.*;
 
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -31,30 +30,35 @@ public class Auction {
     @Column(length = 10000)
     private String description;
 
-    private Timestamp beginDate;
-    private Time lotDuration;
+    private LocalDateTime beginDate;
+    private LocalTime lotDuration;
 
     @Enumerated(EnumType.STRING)
-    private AuctionStatus status;
+    private AuctionStatus status = AuctionStatus.DRAFT;
 
-    private Time boostTime;
+    private LocalTime boostTime;
     private Integer usersLimit;
 
-    public Auction() {
-        status = AuctionStatus.DRAFT;
-    }
+    @OneToOne(mappedBy = "auction")
+    private Bet bet;
+
+    @OneToOne(mappedBy = "auction")
+    private Log log;
+
+    @OneToOne
+    private Lot currentLot;
+
+    @OneToMany(
+            mappedBy = "auction",
+            fetch = FetchType.EAGER,
+            orphanRemoval = true,
+            cascade = CascadeType.ALL)
+    @JsonBackReference
+    private List<Lot> lots = new ArrayList<>(0);
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
-    @OneToMany(
-            mappedBy = "auction",
-            fetch = FetchType.LAZY,
-            orphanRemoval = true,
-            cascade = CascadeType.ALL)
-    @JsonBackReference
-    private Set<Lot> lots = new HashSet<>(0);
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(
@@ -76,12 +80,6 @@ public class Auction {
             joinColumns = @JoinColumn(name = "auction_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
     private Set<User> subscribers = new HashSet<>();
-
-    @OneToOne(mappedBy = "auction")
-    private Bet bet;
-
-    @OneToOne(mappedBy = "auction")
-    private AuctionLog auctionLog;
 
     public int getLikesCount() {
         return getUserLikes().size();

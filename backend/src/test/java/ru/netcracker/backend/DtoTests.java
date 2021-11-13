@@ -7,12 +7,15 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import ru.netcracker.backend.model.auction.Auction;
+import ru.netcracker.backend.model.Auction;
 import ru.netcracker.backend.requests.AuctionRequest;
 import ru.netcracker.backend.responses.AuctionResponse;
 
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -22,11 +25,13 @@ class DtoTests {
 
     @Test
     public void auctionDto() {
+        DateTimeFormatter f = DateTimeFormatter.ofPattern( "yyyy-MM-dd HH:mm:ss" );
+
         AuctionRequest auctionRequest = new AuctionRequest();
         auctionRequest.setName("string");
-        auctionRequest.setBeginDate(Timestamp.valueOf("2021-12-07 14:00:00"));
-        auctionRequest.setBoostTime(Time.valueOf("00:02:00"));
-        auctionRequest.setLotDuration(Time.valueOf("00:02:00"));
+        auctionRequest.setBeginDate(LocalDateTime.parse("2021-12-07 14:00:00", f));
+        auctionRequest.setBoostTime(LocalTime.parse("00:02:00", f));
+        auctionRequest.setLotDuration(LocalTime.parse("00:02:00", f));
         auctionRequest.setUserId(1L);
 
         Auction auction = modelMapper.map(auctionRequest, Auction.class);

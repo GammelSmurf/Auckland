@@ -1,4 +1,4 @@
-package ru.netcracker.backend.model.auction;
+package ru.netcracker.backend.model;
 
 public enum AuctionStatus {
     DRAFT,

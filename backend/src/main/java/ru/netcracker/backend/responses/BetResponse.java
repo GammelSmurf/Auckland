@@ -5,14 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.sql.Time;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class BetResponse {
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
-    private Time remainingTime;
-
-    private Long currentBank;
+    private BigDecimal currentBank;
 }

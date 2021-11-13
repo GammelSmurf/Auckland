@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface LotRepository extends JpaRepository<Lot, Long> {
-    List<Lot> findAllByAuctionId(long id);
+    List<Lot> findAllByAuction_Id(Long auctionId);
 }

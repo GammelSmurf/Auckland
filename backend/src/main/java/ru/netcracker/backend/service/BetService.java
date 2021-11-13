@@ -1,17 +1,17 @@
 package ru.netcracker.backend.service;
 
-import ru.netcracker.backend.exception.bet.BankLessThanMinException;
-import ru.netcracker.backend.exception.bet.BankLessThanOldException;
-import ru.netcracker.backend.exception.bet.BankLessThanStepException;
+import ru.netcracker.backend.exception.ValidationException;
+import ru.netcracker.backend.exception.bet.*;
 import ru.netcracker.backend.model.Bet;
+import ru.netcracker.backend.model.User;
+import ru.netcracker.backend.responses.BetResponse;
+
+import java.math.BigDecimal;
 
 public interface BetService {
-    Bet createBet(Bet bet);
+    BetResponse makeBet(String username, Long auctionId, BigDecimal lotBank) throws ValidationException;
 
-    Bet getBet(Long auctionId);
+    String syncBeforeRun(Long auctionId) throws ValidationException;
 
-    Bet makeBet(long id, Bet bet)
-            throws BankLessThanStepException, BankLessThanMinException, BankLessThanOldException;
-
-    String getRemainingTime(long auctionId);
+    String syncAfterRun(Long auctionId) throws ValidationException;
 }

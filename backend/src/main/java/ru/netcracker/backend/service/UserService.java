@@ -1,16 +1,17 @@
 package ru.netcracker.backend.service;
 
-import ru.netcracker.backend.exception.UserExistsException;
-import ru.netcracker.backend.model.user.User;
+import ru.netcracker.backend.exception.user.UserExistsException;
+import ru.netcracker.backend.responses.UserResponse;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface UserService {
-    List<User> getUsers();
+    List<UserResponse> getUsers();
 
-    User banUser(String username) throws UserExistsException;
+    UserResponse banUser(String username) throws UserExistsException;
 
-    User unbanUser(String username);
+    UserResponse unbanUser(String username);
 
-    User addCurrency(String username, long currency);
+    UserResponse addCurrency(String username, BigDecimal currency);
 }

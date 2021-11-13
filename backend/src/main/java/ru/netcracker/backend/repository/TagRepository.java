@@ -5,4 +5,5 @@ import org.springframework.stereotype.Repository;
 import ru.netcracker.backend.model.Tag;
 
 @Repository
-public interface TagRepository extends JpaRepository<Tag, Long> {}
+public interface TagRepository extends JpaRepository<Tag, Long> {
+}

@@ -2,14 +2,14 @@ package ru.netcracker.backend.model;
 
 import lombok.Getter;
 import lombok.Setter;
-import ru.netcracker.backend.model.auction.Auction;
-import ru.netcracker.backend.model.user.User;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.sql.Time;
+import java.sql.Timestamp;
 
 @Entity
-@Table(name = "auction_processes")
+@Table(name = "bet")
 @Getter
 @Setter
 public class Bet {
@@ -17,13 +17,22 @@ public class Bet {
     @Column(name = "auction_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private BigDecimal currentBank = new BigDecimal(0);
 
-    @OneToOne private Auction auction;
+    @OneToOne
+    private Auction auction;
 
-    @OneToOne private Lot lot;
+    @OneToOne
+    private Lot lot;
 
-    @OneToOne private User user;
+    @OneToOne
+    private User user;
 
-    private Time remainingTime;
-    private Long currentBank;
+    public Bet() {
+    }
+
+    public Bet(Auction auction) {
+        this.auction = auction;
+        this.lot = auction.getCurrentLot();
+    }
 }

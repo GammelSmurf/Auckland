@@ -2,34 +2,42 @@ package ru.netcracker.backend.model;
 
 import lombok.Getter;
 import lombok.Setter;
-import ru.netcracker.backend.model.auction.Auction;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "lots")
 @Getter
 @Setter
 public class Lot {
-
     @Id
     @Column(name = "lot_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String name;
+    private String picture;
+    @Column(length = 10000)
+    private String description;
 
-    @ManyToOne
-    @JoinColumn(name = "auction_id", nullable = false)
-    private Auction auction;
+    private BigDecimal minBank;
+    private BigDecimal step;
+    private LocalDateTime endTime;
+
+    private boolean finished = false;
 
     @OneToOne(mappedBy = "lot")
     private Bet bet;
 
-    private String name;
-    private String picture;
+    @OneToOne(mappedBy = "currentLot")
+    private Auction auctionLot;
 
-    @Column(length = 10000)
-    private String description;
+    @OneToOne
+    private User winner;
 
-    private Long minBank;
-    private Long step;
+    @ManyToOne
+    @JoinColumn(name = "auction_id", nullable = false)
+    private Auction auction;
 }

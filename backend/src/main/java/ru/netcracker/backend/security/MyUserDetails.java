@@ -3,8 +3,8 @@ package ru.netcracker.backend.security;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import ru.netcracker.backend.model.user.ERole;
-import ru.netcracker.backend.model.user.User;
+import ru.netcracker.backend.model.Role;
+import ru.netcracker.backend.model.User;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,10 +24,10 @@ public class MyUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Set<ERole> roles = user.getRoles();
+        Set<Role> roles = user.getRoles();
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
 
-        for (ERole role : roles) {
+        for (Role role : roles) {
             authorities.add(new SimpleGrantedAuthority(role.toString()));
         }
 

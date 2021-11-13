@@ -2,18 +2,26 @@ package ru.netcracker.backend.service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import ru.netcracker.backend.model.auction.Auction;
+import ru.netcracker.backend.exception.auction.NoLotsException;
+import ru.netcracker.backend.model.Auction;
+import ru.netcracker.backend.model.User;
+import ru.netcracker.backend.responses.AuctionResponse;
+import ru.netcracker.backend.responses.UserResponse;
+
+import java.util.List;
 
 public interface AuctionService {
-    Page<Auction> getAllAuctions(Pageable pageable);
+    List<AuctionResponse> getAllAuctions(Pageable pageable);
 
-    Auction createAuction(Auction auction);
+    AuctionResponse createAuction(Auction auction);
 
-    Auction updateAuction(long id, Auction auction);
+    AuctionResponse updateAuction(Long id, Auction auction);
 
-    void deleteAuction(long id);
+    void deleteAuction(Long id);
 
-    Auction getAuctionById(long id);
+    AuctionResponse getAuctionById(Long id);
 
-    void makeAuctionAvailable(long id);
+    void makeAuctionWaiting(Long id) throws NoLotsException;
+
+    UserResponse subscribe(String username, Long auctionId);
 }

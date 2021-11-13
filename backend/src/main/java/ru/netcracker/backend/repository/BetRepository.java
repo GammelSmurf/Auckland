@@ -10,6 +10,5 @@ import java.util.Optional;
 
 @Repository
 public interface BetRepository extends JpaRepository<Bet, Long> {
-    @Query("select a from Bet a where a.auction.id = :auctionId")
-    Optional<Bet> findBetByAuctionId(@Param("auctionId") Long auctionId);
+    Optional<Bet> findByAuction_Id(Long auctionId);
 }

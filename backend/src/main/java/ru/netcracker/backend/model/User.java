@@ -1,13 +1,12 @@
-package ru.netcracker.backend.model.user;
+package ru.netcracker.backend.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
 import net.bytebuddy.utility.RandomString;
-import ru.netcracker.backend.model.Bet;
-import ru.netcracker.backend.model.auction.Auction;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -27,36 +26,28 @@ public class User {
     private String firstName;
     private String secondName;
     private String about;
-    private Boolean isBanned;
 
-    private long currency;
+    private BigDecimal currency = new BigDecimal(0);
 
-    private String verificationCode;
+    private String verificationCode = RandomString.make(64);
     private String restoreCode;
-    private boolean enabled;
+    private boolean isBanned = false;
+    private boolean enabled = false;
 
-    public User() {}
+    public User() {
+    }
 
     public User(String username, String password, String email) {
         this.username = username;
         this.password = password;
         this.email = email;
-        firstName = "";
-        secondName = "";
-        about = "";
-        isBanned = false;
-        verificationCode = RandomString.make(64);
-        enabled = false;
     }
-
-    @ElementCollection(targetClass = ERole.class, fetch = FetchType.EAGER)
-    @JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id"))
-    @Enumerated(EnumType.STRING)
-    @Column(name = "role", nullable = false)
-    private Set<ERole> roles = new HashSet<>();
 
     @OneToOne(mappedBy = "user")
     private Bet bet;
+
+    @OneToOne(mappedBy = "winner")
+    private Lot lot;
 
     @OneToMany(
             mappedBy = "user",
@@ -65,4 +56,10 @@ public class User {
             cascade = CascadeType.ALL)
     @JsonBackReference
     private Set<Auction> subscribes = new HashSet<>(0);
+
+    @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
+    @JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
+    private Set<Role> roles = new HashSet<>();
 }

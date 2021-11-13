@@ -4,7 +4,7 @@ import com.sun.istack.NotNull;
 import lombok.NonNull;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import ru.netcracker.backend.model.user.User;
+import ru.netcracker.backend.model.User;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;

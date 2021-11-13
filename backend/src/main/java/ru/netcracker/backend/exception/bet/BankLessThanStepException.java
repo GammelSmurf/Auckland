@@ -1,6 +1,8 @@
 package ru.netcracker.backend.exception.bet;
 
-public class BankLessThanStepException extends ValidationException{
+import ru.netcracker.backend.exception.ValidationException;
+
+public class BankLessThanStepException extends ValidationException {
     public BankLessThanStepException(final String message) {
         super(message);
     }

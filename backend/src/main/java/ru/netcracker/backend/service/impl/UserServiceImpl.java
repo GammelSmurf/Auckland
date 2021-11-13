@@ -1,52 +1,62 @@
 package ru.netcracker.backend.service.impl;
 
-import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import ru.netcracker.backend.exception.UserExistsException;
-import ru.netcracker.backend.model.user.User;
+import org.springframework.transaction.annotation.Transactional;
+import ru.netcracker.backend.model.User;
 import ru.netcracker.backend.repository.UserRepository;
+import ru.netcracker.backend.responses.LotResponse;
+import ru.netcracker.backend.responses.UserResponse;
 import ru.netcracker.backend.service.UserService;
+import ru.netcracker.backend.util.UserUtil;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
+@Transactional
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final ModelMapper modelMapper;
 
-    @Override
-    public List<User> getUsers(){
-        return userRepository.findAll();
+    @Autowired
+    public UserServiceImpl(UserRepository userRepository, ModelMapper modelMapper) {
+        this.userRepository = userRepository;
+        this.modelMapper = modelMapper;
     }
 
     @Override
-    public User banUser(String username) {
-        User user = userRepository.findUserByUsername(username);
-        if (user == null) {
-            throw new UsernameNotFoundException("There is no account with username: " + username);
-        }
-        user.setIsBanned(true);
-        return userRepository.save(user);
+    @Transactional(readOnly = true)
+    public List<UserResponse> getUsers(){
+        return userRepository.findAll().stream()
+                .map(user -> modelMapper.map(user, UserResponse.class))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public User unbanUser(String username) {
-        User user = userRepository.findUserByUsername(username);
-        if (user == null) {
-            throw new UsernameNotFoundException("There is no account with username: " + username);
-        }
-        user.setIsBanned(false);
-        return userRepository.save(user);
+    public UserResponse banUser(String username) {
+        User user = userRepository.findByUsername(username).orElseThrow(
+                () -> new UsernameNotFoundException(String.format(UserUtil.USER_NOT_FOUND_TEMPLATE, username)));
+        user.setBanned(true);
+        return modelMapper.map(userRepository.save(user), UserResponse.class);
     }
 
     @Override
-    public User addCurrency(String username, long currency) {
-        User user = userRepository.findUserByUsername(username);
-        if (user == null) {
-            throw new UsernameNotFoundException("There is no account with username: " + username);
-        }
-        user.setCurrency(user.getCurrency() + currency);
-        return userRepository.save(user);
+    public UserResponse unbanUser(String username) {
+        User user = userRepository.findByUsername(username).orElseThrow(
+                () -> new UsernameNotFoundException(String.format(UserUtil.USER_NOT_FOUND_TEMPLATE, username)));
+        user.setBanned(false);
+        return modelMapper.map(userRepository.save(user), UserResponse.class);
+    }
+
+    @Override
+    public UserResponse addCurrency(String username, BigDecimal currency) {
+        User user = userRepository.findByUsername(username).orElseThrow(
+                () -> new UsernameNotFoundException(String.format(UserUtil.USER_NOT_FOUND_TEMPLATE, username)));
+        user.setCurrency(user.getCurrency().add(currency));
+        return modelMapper.map(userRepository.save(user), UserResponse.class);
     }
 }

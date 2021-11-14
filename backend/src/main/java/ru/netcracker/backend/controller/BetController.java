@@ -6,12 +6,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.annotation.SubscribeMapping;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import ru.netcracker.backend.exception.ValidationException;
 import ru.netcracker.backend.model.Bet;
 import ru.netcracker.backend.requests.BetRequest;
 import ru.netcracker.backend.responses.BetResponse;
+import ru.netcracker.backend.responses.SyncResponse;
 import ru.netcracker.backend.service.BetService;
 
 @Controller

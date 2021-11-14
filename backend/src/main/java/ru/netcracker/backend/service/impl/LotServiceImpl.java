@@ -10,7 +10,6 @@ import ru.netcracker.backend.repository.AuctionRepository;
 import ru.netcracker.backend.repository.LotRepository;
 import ru.netcracker.backend.responses.LotResponse;
 import ru.netcracker.backend.service.LotService;
-import ru.netcracker.backend.util.AuctionUtil;
 import ru.netcracker.backend.util.LotUtil;
 
 import java.util.List;
@@ -20,13 +19,11 @@ import java.util.stream.Collectors;
 @Transactional
 public class LotServiceImpl implements LotService {
     private final LotRepository lotRepository;
-    private final AuctionRepository auctionRepository;
     private final ModelMapper modelMapper;
 
     @Autowired
     public LotServiceImpl(LotRepository lotRepository, AuctionRepository auctionRepository, ModelMapper modelMapper) {
         this.lotRepository = lotRepository;
-        this.auctionRepository = auctionRepository;
         this.modelMapper = modelMapper;
     }
 
@@ -45,16 +42,16 @@ public class LotServiceImpl implements LotService {
 
     @Override
     public LotResponse updateLot(Long id, Lot lot) {
-        Lot lotToUpdate = lotRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException(String.format(LotUtil.LOT_NOT_FOUND_MSG_TEMPLATE, id)));
+        Lot lotToUpdate = lotRepository
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(LotUtil.LOT_NOT_FOUND_MSG_TEMPLATE, id)));
         lot.setId(lotToUpdate.getId());
         return modelMapper.map(lotRepository.save(lot), LotResponse.class);
     }
 
     @Override
     public void deleteLot(Long id) {
-        lotRepository.delete(lotRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException(String.format(LotUtil.LOT_NOT_FOUND_MSG_TEMPLATE, id))));
+        lotRepository.deleteById(id);
     }
 
     @Override

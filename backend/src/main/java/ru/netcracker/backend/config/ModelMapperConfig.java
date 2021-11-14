@@ -27,7 +27,10 @@ public class ModelMapperConfig {
     private void auctionMapperConfiguration() {
         modelMapper.createTypeMap(AuctionRequest.class, Auction.class)
                 .addMappings(
-                        mapper -> mapper.skip(Auction::setId));
+                        mapper -> {
+                            mapper.skip(Auction::setId);
+                            mapper.skip(Auction::setCreator);
+                        });
 
         modelMapper.createTypeMap(LotRequest.class, Lot.class)
                 .addMappings(

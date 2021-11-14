@@ -44,7 +44,7 @@ public class AuthServiceImpl implements AuthService {
     private String senderName;
 
     private final String HELLO_MSG_TEMPLATE = "Dear [[name]],<br>";
-    private final String BYE_MSG_TEMPLATE = "Thank you,<br>" + senderName + ".";
+    private final String BYE_MSG_TEMPLATE = "Thank you,<br> %s.";
 
     @Autowired
     public AuthServiceImpl(
@@ -61,17 +61,15 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public JwtResponse authenticateUser(User user) {
-        Authentication authentication =
-                authenticationProvider.authenticate(
-                        new UsernamePasswordAuthenticationToken(
-                                user.getUsername(), user.getPassword()));
+        Authentication authentication = authenticationProvider
+                .authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         MyUserDetails userDetails = (MyUserDetails) authentication.getPrincipal();
-        List<String> roles =
-                userDetails.getAuthorities().stream()
-                        .map(GrantedAuthority::getAuthority)
-                        .collect(Collectors.toList());
+        List<String> roles = userDetails
+                .getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
 
         String jwt = jwtUtil.generateJwtToken(userDetails);
         return new JwtResponse(userDetails.getId(), jwt, userDetails.getUsername(), roles);
@@ -102,17 +100,15 @@ public class AuthServiceImpl implements AuthService {
 
     private void sendVerificationEmail(User user, String siteURL)
             throws MessagingException, UnsupportedEncodingException {
-        MimeMessage message =
-                buildMimeMessage(user)
-                        .setSubject("Please verify your registration")
-                        .setMethodURL(String.format(
-                                "%s/verify?username=%s&code=%s",
-                                siteURL, user.getUsername(), user.getVerificationCode()))
-                        .setContent(generateContent(
-                                "Please click the link below to verify your registration:<br>"
-                                        + "<h3><a href=\"[[URL]]\" target=\"_self\">VERIFY</a></h3>"
-                                        + "Thank you,<br>"))
-                        .build();
+        MimeMessage message = buildMimeMessage(user)
+                .setSubject("Please verify your registration")
+                .setMethodURL(String.format(
+                        "%s/verify?username=%s&code=%s",
+                        siteURL, user.getUsername(), user.getVerificationCode()))
+                .setContent(generateContent(
+                        "Please click the link below to verify your registration:<br>"
+                                + "<h3><a href=\"[[URL]]\" target=\"_self\">VERIFY</a></h3>"))
+                .build();
         javaMailSender.send(message);
     }
 
@@ -121,7 +117,7 @@ public class AuthServiceImpl implements AuthService {
         Optional<User> userOptional = userRepository.findByUsername(username);
         if (userOptional.isPresent() &&
                 userOptional.get().getVerificationCode().equals(verificationCode) &&
-                userOptional.get().isEnabled()) {
+                !userOptional.get().isEnabled()) {
             User user = userOptional.get();
             user.setEnabled(true);
             userRepository.save(user);
@@ -140,16 +136,15 @@ public class AuthServiceImpl implements AuthService {
             user.setRestoreCode(RandomString.make(64));
             userRepository.save(user);
 
-            MimeMessage message =
-                    buildMimeMessage(user)
-                            .setSubject("Password recover")
-                            .setMethodURL(String.format(
-                                    "%s/restore?username=%s&code=%s",
-                                    siteURL, user.getUsername(), user.getRestoreCode()))
-                            .setContent(generateContent(
-                                    "Please click the link below to restore your password:<br>"
-                                            + "<h3><a href=\"[[URL]]\" target=\"_self\">VERIFY</a></h3>"))
-                            .build();
+            MimeMessage message = buildMimeMessage(user)
+                    .setSubject("Password recover")
+                    .setMethodURL(String.format(
+                            "%s/restore?username=%s&code=%s",
+                            siteURL, user.getUsername(), user.getRestoreCode()))
+                    .setContent(generateContent(
+                            "Please click the link below to restore your password:<br>"
+                                    + "<h3><a href=\"[[URL]]\" target=\"_self\">VERIFY</a></h3>"))
+                    .build();
             javaMailSender.send(message);
         }
     }
@@ -165,20 +160,19 @@ public class AuthServiceImpl implements AuthService {
             user.setPassword(encoder.encode(password));
             userRepository.save(user);
 
-            MimeMessage message =
-                    buildMimeMessage(user)
-                            .setSubject("Password recover")
-                            .setContent(generateContent(
-                                    "Here is your new password:<br><h3>"
+            MimeMessage message = buildMimeMessage(user)
+                    .setSubject("Password recover")
+                    .setContent(generateContent(
+                            "Here is your new password:<br><h3>"
                                     + password
                                     + "</h3>"))
-                            .build();
+                    .build();
             javaMailSender.send(message);
         }
     }
 
     private String generateContent(String content) {
-        return HELLO_MSG_TEMPLATE + content + BYE_MSG_TEMPLATE;
+        return HELLO_MSG_TEMPLATE + content + String.format(BYE_MSG_TEMPLATE, senderName);
     }
 
     private MimeMessageBuilder buildMimeMessage(User to) {

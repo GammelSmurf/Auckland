@@ -1,5 +1,6 @@
 package ru.netcracker.backend.service.impl;
 
+import lombok.Builder;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -10,9 +11,9 @@ import ru.netcracker.backend.model.Log;
 import ru.netcracker.backend.repository.LogRepository;
 import ru.netcracker.backend.responses.LogResponse;
 import ru.netcracker.backend.service.LogService;
+import ru.netcracker.backend.util.ConsoleColors;
 import ru.netcracker.backend.util.LogLevel;
 
-import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -51,23 +52,21 @@ public class LogServiceImpl implements LogService {
     public void log(LogLevel level, Auction auction) {
         switch (level) {
             case AUCTION_BET:
-                sendAuctionLogToWebSocket(auction.getId(),
-                        addLog(level, auction, String.format(
-                                LOG_BET_MSG_TEMPLATE,
-                                auction.getBet().getUser().getUsername(),
-                                auction.getBet().getCurrentBank().toPlainString())));
+                sendAuctionLogToWs(
+                        auction.getId(),
+                        addLog(level, auction,
+                                String.format(LOG_BET_MSG_TEMPLATE, auction.getBet().getUser().getUsername(), auction.getBet().getCurrentBank().toPlainString())));
                 break;
             case AUCTION_STATUS_CHANGE:
-                sendAuctionLogToWebSocket(auction.getId(),
-                        addLog(level, auction, String.format(
-                                LOG_CHANGE_MSG_TEMPLATE,
-                                auction.getStatus())));
+                sendAuctionLogToWs(
+                        auction.getId(),
+                        addLog(level, auction, String.format(LOG_CHANGE_MSG_TEMPLATE, auction.getStatus())));
                 break;
             case AUCTION_WINNER:
-                sendAuctionLogToWebSocket(auction.getId(),
-                        addLog(level, auction, String.format(LOG_WINNER_MSG_TEMPLATE,
-                                auction.getBet().getUser().getUsername(),
-                                auction.getBet().getLot().getName())));
+                sendAuctionLogToWs(
+                        auction.getId(),
+                        addLog(level, auction,
+                                String.format(LOG_WINNER_MSG_TEMPLATE, auction.getCurrentLot().getWinner().getUsername(), auction.getCurrentLot().getName())));
                 break;
         }
     }
@@ -75,19 +74,17 @@ public class LogServiceImpl implements LogService {
     private Log addLog(LogLevel level, Auction auction, String msg) {
         Log log = new Log();
         log.setAuction(auction);
-        log.setLogMessage(
-                generateMainString(level, msg));
+        log.setLogMessage(generateMainString(level, msg));
         log.setLogTime(LocalDateTime.now());
 
         return logRepository.save(log);
     }
 
-    private void sendAuctionLogToWebSocket(Long auctionId, Log log) {
-        System.out.println(log.getLogMessage());
-        sendObjectToWebSocket(auctionId, modelMapper.map(log, LogResponse.class));
+    private void sendAuctionLogToWs(Long auctionId, Log log) {
+        sendObjectToWs(auctionId, modelMapper.map(log, LogResponse.class));
     }
 
-    private void sendObjectToWebSocket(Long auctionId, Object obj) {
+    private void sendObjectToWs(Long auctionId, Object obj) {
         template.convertAndSend(String.format(WEB_SOCKET_PATH_TEMPLATE, auctionId), obj);
     }
 

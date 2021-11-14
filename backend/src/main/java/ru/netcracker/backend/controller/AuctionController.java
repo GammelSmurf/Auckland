@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.netcracker.backend.exception.auction.NoLotsException;
+import ru.netcracker.backend.exception.auction.NotCorrectStatusException;
 import ru.netcracker.backend.model.Auction;
 import ru.netcracker.backend.requests.AuctionRequest;
 import ru.netcracker.backend.requests.SubscribeRequest;
@@ -45,15 +46,15 @@ public class AuctionController {
 
     @PostMapping
     public ResponseEntity<AuctionResponse> createAuction(@RequestBody AuctionRequest auctionRequest) {
-        AuctionResponse auctionResponse = auctionService.createAuction(
-                modelMapper.map(auctionRequest, Auction.class));
+        AuctionResponse auctionResponse = auctionService
+                .createAuction(auctionRequest.getUsername(), modelMapper.map(auctionRequest, Auction.class));
 
         log.info("created auction: {}", auctionRequest);
         return new ResponseEntity<>(auctionResponse, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}/available")
-    public ResponseEntity<Void> makeAuctionAvailable(@PathVariable long id) throws NoLotsException {
+    public ResponseEntity<Void> makeAuctionAvailable(@PathVariable long id) throws NoLotsException, NotCorrectStatusException {
         auctionService.makeAuctionWaiting(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -77,7 +78,7 @@ public class AuctionController {
     }
 
     @PostMapping("/subscribe")
-    public ResponseEntity<UserResponse> subscribe(@PathVariable SubscribeRequest subscribeRequest) {
+    public ResponseEntity<UserResponse> subscribe(@RequestBody SubscribeRequest subscribeRequest) {
         UserResponse userResponse = auctionService.subscribe(
                 subscribeRequest.getUsername(), subscribeRequest.getAuctionId());
         log.info("user: {} subscribed to auction with id: {}", userResponse.getUsername(), subscribeRequest.getAuctionId());

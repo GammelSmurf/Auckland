@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.netcracker.backend.exception.ValidationException;
+import ru.netcracker.backend.responses.SyncResponse;
 import ru.netcracker.backend.service.BetService;
 
 @RestController
@@ -18,13 +19,8 @@ public class SyncController {
         this.betService = betService;
     }
 
-    @GetMapping("/sync/before/{id}")
-    public String syncBeforeRun(@PathVariable Long id) throws ValidationException {
-        return betService.syncBeforeRun(id);
-    }
-
-    @GetMapping("/sync/after/{id}")
-    public String syncAfterRun(@PathVariable Long id) throws ValidationException {
-        return betService.syncAfterRun(id);
+    @GetMapping("/{id}")
+    public SyncResponse sync(@PathVariable Long id) throws ValidationException {
+        return betService.sync(id);
     }
 }

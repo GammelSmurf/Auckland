@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.netcracker.backend.model.User;
 import ru.netcracker.backend.repository.UserRepository;
-import ru.netcracker.backend.responses.LotResponse;
 import ru.netcracker.backend.responses.UserResponse;
 import ru.netcracker.backend.service.UserService;
 import ru.netcracker.backend.util.UserUtil;
@@ -38,24 +37,27 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse banUser(String username) {
-        User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new UsernameNotFoundException(String.format(UserUtil.USER_NOT_FOUND_TEMPLATE, username)));
+        User user = userRepository
+                .findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException(String.format(UserUtil.USER_NOT_FOUND_TEMPLATE, username)));
         user.setBanned(true);
         return modelMapper.map(userRepository.save(user), UserResponse.class);
     }
 
     @Override
     public UserResponse unbanUser(String username) {
-        User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new UsernameNotFoundException(String.format(UserUtil.USER_NOT_FOUND_TEMPLATE, username)));
+        User user = userRepository
+                .findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException(String.format(UserUtil.USER_NOT_FOUND_TEMPLATE, username)));
         user.setBanned(false);
         return modelMapper.map(userRepository.save(user), UserResponse.class);
     }
 
     @Override
     public UserResponse addCurrency(String username, BigDecimal currency) {
-        User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new UsernameNotFoundException(String.format(UserUtil.USER_NOT_FOUND_TEMPLATE, username)));
+        User user = userRepository
+                .findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException(String.format(UserUtil.USER_NOT_FOUND_TEMPLATE, username)));
         user.setCurrency(user.getCurrency().add(currency));
         return modelMapper.map(userRepository.save(user), UserResponse.class);
     }

@@ -50,16 +50,19 @@ public class User {
     private Lot lot;
 
     @OneToMany(
-            mappedBy = "user",
+            mappedBy = "creator",
             fetch = FetchType.LAZY,
             orphanRemoval = true,
             cascade = CascadeType.ALL)
     @JsonBackReference
-    private Set<Auction> subscribes = new HashSet<>(0);
+    private Set<Auction> ownAuctions = new HashSet<>(0);
 
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
     @JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     private Set<Role> roles = new HashSet<>();
+
+    @ManyToMany(mappedBy = "subscribers")
+    private Set<Auction> subscribedAuctions = new HashSet<>();
 }

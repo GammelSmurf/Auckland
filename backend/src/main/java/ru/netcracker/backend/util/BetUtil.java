@@ -10,10 +10,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class BetUtil {
-    public static final String BET_NOT_FOUND_TEMPLATE = "Bet with auction id: %d was not found";
     public static final String RETURN_TIME_MSG_PATTERN = "dd HH-mm-ss";
-    public static final String TIME_ZONE = "Europe/Moscow";
-    public static final String RETURN_NULL_DATA_MSG = "00 00-00-00";
 
     private BetUtil() {
     }
@@ -21,8 +18,7 @@ public class BetUtil {
     public static void validate(Auction auction, BigDecimal lotBank, User user)
             throws BankLessThanMinException, BankLessThanOldException, BankLessThanStepException,
             LotTimeExpiredException, NoCurrencyException, NotSubscribedException {
-
-        if (user.getSubscribes().isEmpty() || !user.getSubscribes().contains(auction)) {
+        if (user.getSubscribedAuctions().isEmpty() || !user.getSubscribedAuctions().contains(auction)) {
             throw new NotSubscribedException("The user is not subscribed to the auction");
         }
 
@@ -59,6 +55,6 @@ public class BetUtil {
     }
 
     private static boolean isLess(BigDecimal a, BigDecimal b) {
-        return a.compareTo(b) == -1;
+        return a.compareTo(b) < 0;
     }
 }

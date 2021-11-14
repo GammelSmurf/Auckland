@@ -27,6 +27,7 @@ public class Lot {
     private LocalDateTime endTime;
 
     private boolean finished = false;
+    private BigDecimal winBank;
 
     @OneToOne(mappedBy = "lot")
     private Bet bet;

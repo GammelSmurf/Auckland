@@ -26,8 +26,8 @@ public class RedirectController implements ErrorController {
 
     @GetMapping("/verify")
     public ResponseEntity<String> verifyUser(
-            @Param("code") String code, @Param("username") String username) {
-        if (authService.verify(code, username)) {
+            @Param("username") String username, @Param("code") String code) {
+        if (authService.verify(username, code)) {
             return ResponseEntity.ok("User verified");
         } else {
             return ResponseEntity.badRequest().body("User not verified");
@@ -36,9 +36,9 @@ public class RedirectController implements ErrorController {
 
     @GetMapping("/recover")
     public ResponseEntity<Void> recoverPassword(
-            @Param("code") String code, @Param("username") String username)
+            @Param("username") String username, @Param("code") String code)
             throws MessagingException, UnsupportedEncodingException {
-        authService.generateNewPassword(code, username);
+        authService.generateNewPassword(username, code);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

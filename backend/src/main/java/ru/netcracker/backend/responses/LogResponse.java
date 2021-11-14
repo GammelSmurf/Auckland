@@ -1,11 +1,10 @@
 package ru.netcracker.backend.responses;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.netcracker.backend.util.JsonLocalDateTime;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Data
@@ -14,6 +13,6 @@ import java.time.LocalDateTime;
 public class LogResponse {
     private String logMessage;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonLocalDateTime
     private LocalDateTime logTime;
 }

@@ -1,6 +1,5 @@
 package ru.netcracker.backend.service.impl;
 
-import lombok.Builder;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -11,7 +10,6 @@ import ru.netcracker.backend.model.Log;
 import ru.netcracker.backend.repository.LogRepository;
 import ru.netcracker.backend.responses.LogResponse;
 import ru.netcracker.backend.service.LogService;
-import ru.netcracker.backend.util.ConsoleColors;
 import ru.netcracker.backend.util.LogLevel;
 
 import java.time.LocalDateTime;

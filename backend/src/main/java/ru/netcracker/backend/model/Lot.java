@@ -5,7 +5,6 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Entity
@@ -35,7 +34,8 @@ public class Lot {
     @OneToOne(mappedBy = "currentLot")
     private Auction auctionLot;
 
-    @OneToOne
+    @ManyToOne
+    @JoinColumn(name = "winner_id")
     private User winner;
 
     @ManyToOne

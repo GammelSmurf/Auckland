@@ -7,7 +7,9 @@ import net.bytebuddy.utility.RandomString;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -46,8 +48,13 @@ public class User {
     @OneToOne(mappedBy = "user")
     private Bet bet;
 
-    @OneToOne(mappedBy = "winner")
-    private Lot lot;
+    @OneToMany(
+            mappedBy = "winner",
+            fetch = FetchType.EAGER,
+            orphanRemoval = true,
+            cascade = CascadeType.ALL)
+    @JsonBackReference
+    private List<Lot> lots = new ArrayList<>(0);
 
     @OneToMany(
             mappedBy = "creator",

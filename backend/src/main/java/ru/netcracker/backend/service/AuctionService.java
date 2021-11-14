@@ -1,11 +1,9 @@
 package ru.netcracker.backend.service;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import ru.netcracker.backend.exception.auction.NoLotsException;
 import ru.netcracker.backend.exception.auction.NotCorrectStatusException;
 import ru.netcracker.backend.model.Auction;
-import ru.netcracker.backend.model.User;
 import ru.netcracker.backend.responses.AuctionResponse;
 import ru.netcracker.backend.responses.UserResponse;
 

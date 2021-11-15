@@ -84,7 +84,6 @@ public class AuthServiceImpl implements AuthService {
         Set<Role> roles = new HashSet<>();
         roles.add(Role.USER);
         user.setRoles(roles);
-
         sendVerificationEmail(userRepository.save(user), siteURL);
     }
 

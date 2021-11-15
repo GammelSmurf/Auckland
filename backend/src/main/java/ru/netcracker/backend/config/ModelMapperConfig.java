@@ -16,11 +16,9 @@ public class ModelMapperConfig {
 
     @Bean
     public ModelMapper modelMapper() {
-        if (modelMapper == null) {
-            modelMapper = new ModelMapper();
-            modelMapper.getConfiguration().setFieldMatchingEnabled(true);
-            auctionMapperConfiguration();
-        }
+        modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setFieldMatchingEnabled(true);
+        auctionMapperConfiguration();
         return modelMapper;
     }
 

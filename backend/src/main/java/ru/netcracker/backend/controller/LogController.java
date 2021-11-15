@@ -11,13 +11,13 @@ import ru.netcracker.backend.service.LogService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/auctions/logs")
+@RequestMapping("/api/auction/logs")
 @CrossOrigin("*")
-public class AuctionLogsController {
+public class LogController {
     private final LogService logService;
 
     @Autowired
-    public AuctionLogsController(LogService logService) {
+    public LogController(LogService logService) {
         this.logService = logService;
     }
 

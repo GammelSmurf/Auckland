@@ -82,10 +82,10 @@ public class BetServiceImpl implements BetService {
         bet.setCurrentBank(lotBank);
         bet.getLot().setEndTime(boostEndTime(bet));
         bet.setUser(user);
-        betRepository.save(bet);
+        bet.setAuction(auction);
 
         auction.setBet(bet);
-        return auctionRepository.save(auction).getBet();
+        return betRepository.save(bet);
     }
 
     private LocalDateTime boostEndTime(Bet oldBet) {
@@ -129,12 +129,19 @@ public class BetServiceImpl implements BetService {
     }
 
     public SyncResponse handleLotFinished(Auction auction, LocalDateTime currentDate) {
-        makeFinished(auction);
+        auction.getCurrentLot().setFinished(true);
+        if (auction.getBet() != null) {
+            auction.getCurrentLot().setWinner(auction.getBet().getUser());
+            auction.getCurrentLot().setWinBank(auction.getBet().getCurrentBank());
+            auction.setBet(null);
+        }
+
         if (AuctionUtil.getAnotherLot(auction).isEmpty()) {
             auction.setStatus(AuctionStatus.FINISHED);
             auctionRepository.save(auction);
+
             logWinnerIfExists(auction);
-            logService.log(LogLevel.AUCTION_STATUS_CHANGE, auctionRepository.save(auction));
+            logService.log(LogLevel.AUCTION_STATUS_CHANGE, auction);
             return getSync(auction, currentDate, false, false);
         } else {
             logWinnerIfExists(auction);
@@ -148,16 +155,6 @@ public class BetServiceImpl implements BetService {
         }
     }
 
-    private void makeFinished(Auction auction) {
-        auction.getCurrentLot().setFinished(true);
-        if (auction.getBet() != null) {
-            auction.getCurrentLot().setWinner(auction.getBet().getUser());
-            auction.getCurrentLot().setWinBank(auction.getBet().getCurrentBank());
-            auction.setBet(null);
-        }
-        lotRepository.save(auction.getCurrentLot());
-    }
-
     private Auction setAndSaveAnotherLot(Auction auction, LocalDateTime currentDate) {
         auction.setCurrentLot(AuctionUtil.getAnotherLot(auction)
                 .orElseThrow());
@@ -169,7 +166,6 @@ public class BetServiceImpl implements BetService {
         auction.getCurrentLot()
                 .setEndTime(currentDate
                         .plus(auction.getLotDuration().getSecond(), ChronoUnit.SECONDS));
-        lotRepository.save(auction.getCurrentLot());
     }
 
     private SyncResponse getSync(Auction auction, LocalDateTime currentDate, boolean changed, boolean until) {

@@ -49,20 +49,24 @@ public class AuctionServiceImpl implements AuctionService {
     }
 
     @Override
-    public AuctionResponse createAuction(String username, Auction auction) {
+    public AuctionResponse createAuction(Auction auction) {
+        return modelMapper.map(auctionRepository.save(updateCreator(auction)), AuctionResponse.class);
+    }
+
+    private Auction updateCreator(Auction auction) {
         auction.setCreator(userRepository
-                .findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException(String.format(UserUtil.USER_NOT_FOUND_TEMPLATE, username))));
-        return modelMapper.map(auctionRepository.save(auction), AuctionResponse.class);
+                .findByUsername(auction.getCreator().getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException(String.format(UserUtil.USER_NOT_FOUND_TEMPLATE, auction.getCreator().getUsername()))));
+        return auction;
     }
 
     @Override
     public AuctionResponse updateAuction(Long id, Auction auction) {
-        Auction auctionToUpdate = auctionRepository
+        auction.setId(auctionRepository
                 .findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(AuctionUtil.AUCTION_NOT_FOUND_TEMPLATE, id)));
-        auction.setId(auctionToUpdate.getId());
-        return modelMapper.map(auctionRepository.save(auction), AuctionResponse.class);
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(AuctionUtil.AUCTION_NOT_FOUND_TEMPLATE, id)))
+                .getId());
+        return modelMapper.map(auctionRepository.save(updateCreator(auction)), AuctionResponse.class);
     }
 
     @Override

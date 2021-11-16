@@ -12,7 +12,7 @@ import java.util.List;
 public interface AuctionService {
     List<AuctionResponse> getAllAuctions(Pageable pageable);
 
-    AuctionResponse createAuction(String username, Auction auction);
+    AuctionResponse createAuction(Auction auction);
 
     AuctionResponse updateAuction(Long id, Auction auction);
 

@@ -36,7 +36,7 @@ class DtoTests {
         auctionRequest.setBeginDate(LocalDateTime.parse("2021-12-07 14:00:00", f1));
         auctionRequest.setBoostTime(LocalTime.parse("00:02:00", f2));
         auctionRequest.setLotDuration(LocalTime.parse("00:02:00", f2));
-        auctionRequest.setUsername("TEST");
+        auctionRequest.setCreatorUsername("TEST");
 
         Auction auction = modelMapper.map(auctionRequest, Auction.class);
 

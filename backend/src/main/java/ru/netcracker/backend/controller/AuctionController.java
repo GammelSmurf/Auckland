@@ -47,7 +47,7 @@ public class AuctionController {
     @PostMapping
     public ResponseEntity<AuctionResponse> createAuction(@RequestBody AuctionRequest auctionRequest) {
         AuctionResponse auctionResponse = auctionService
-                .createAuction(auctionRequest.getUsername(), modelMapper.map(auctionRequest, Auction.class));
+                .createAuction(modelMapper.map(auctionRequest, Auction.class));
 
         log.info("created auction: {}", auctionRequest);
         return new ResponseEntity<>(auctionResponse, HttpStatus.CREATED);

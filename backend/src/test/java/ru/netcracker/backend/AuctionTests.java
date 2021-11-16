@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -25,6 +26,7 @@ import ru.netcracker.backend.exception.ValidationException;
 import ru.netcracker.backend.model.Auction;
 import ru.netcracker.backend.repository.AuctionRepository;
 import ru.netcracker.backend.repository.UserRepository;
+import ru.netcracker.backend.requests.AuctionRequest;
 import ru.netcracker.backend.responses.BetResponse;
 import ru.netcracker.backend.responses.LogResponse;
 import ru.netcracker.backend.responses.SyncResponse;
@@ -35,6 +37,7 @@ import ru.netcracker.backend.util.ConsoleColors;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -50,6 +53,9 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 public class AuctionTests {
     @LocalServerPort
     private Integer port;
+
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Autowired
     private BetService betService;
@@ -155,6 +161,22 @@ public class AuctionTests {
 
         Thread.sleep(TIME_MILLIS_DELAY_BEFORE_START * 2);
         printSync(betService.sync(TEST_AUCTION_ID));
+    }
+
+    @Test
+    public void testUpdatedAuction() {
+        AuctionRequest auctionRequest = new AuctionRequest();
+        auctionRequest.setCreatorUsername(TEST_USERNAME_1);
+        auctionRequest.setBeginDate(LocalDateTime.now());
+        auctionRequest.setBoostTime(LocalTime.now());
+        auctionRequest.setUsersLimit(5);
+        auctionRequest.setDescription("desc");
+        auctionRequest.setName("AUCTION");
+        Auction auction = modelMapper.map(auctionRequest, Auction.class);
+
+        System.out.println(auction.getCreator() != null);
+
+        auctionService.updateAuction(TEST_AUCTION_ID, auction);
     }
 
     public void printSync(SyncResponse syncResponse) {

@@ -17,7 +17,7 @@ public class AuctionRequest {
   private String description;
 
   private Integer usersLimit;
-  private String username;
+  private String creatorUsername;
 
   @JsonLocalDateTime
   private LocalDateTime beginDate;

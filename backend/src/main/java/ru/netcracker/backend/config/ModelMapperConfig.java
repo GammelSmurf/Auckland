@@ -1,6 +1,8 @@
 package ru.netcracker.backend.config;
 
 import org.modelmapper.ModelMapper;
+import org.modelmapper.spi.MatchingStrategy;
+import org.springframework.boot.autoconfigure.web.servlet.WebMvcProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import ru.netcracker.backend.model.Auction;
@@ -25,10 +27,7 @@ public class ModelMapperConfig {
     private void auctionMapperConfiguration() {
         modelMapper.createTypeMap(AuctionRequest.class, Auction.class)
                 .addMappings(
-                        mapper -> {
-                            mapper.skip(Auction::setId);
-                            mapper.skip(Auction::setCreator);
-                        });
+                        mapper -> mapper.skip(Auction::setId));
 
         modelMapper.createTypeMap(LotRequest.class, Lot.class)
                 .addMappings(

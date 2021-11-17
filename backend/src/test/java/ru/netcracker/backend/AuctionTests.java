@@ -34,6 +34,7 @@ import ru.netcracker.backend.service.AuctionService;
 import ru.netcracker.backend.service.BetService;
 import ru.netcracker.backend.util.ConsoleColors;
 
+import javax.validation.constraints.NotNull;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -110,13 +111,13 @@ public class AuctionTests {
                 String.format("/auction/state/%d", TEST_AUCTION_ID),
                 new StompFrameHandler() {
                     @Override
-                    @NonNull
-                    public Type getPayloadType(@NonNull StompHeaders headers) {
+                    @NotNull
+                    public Type getPayloadType(@NotNull StompHeaders headers) {
                         return BetResponse.class;
                     }
 
                     @Override
-                    public void handleFrame(@NonNull StompHeaders headers, Object payload) {
+                    public void handleFrame(@NotNull StompHeaders headers, Object payload) {
                         System.out.println("Received message: " + payload);
                     }
                 });

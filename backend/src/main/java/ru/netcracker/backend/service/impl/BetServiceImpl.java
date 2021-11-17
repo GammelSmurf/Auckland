@@ -174,18 +174,12 @@ public class BetServiceImpl implements BetService {
                         : formatTime(auction.getCurrentLot().getEndTime(), currentDate),
                 modelMapper.map(auction.getCurrentLot(), LotResponse.class),
                 auction.getStatus(),
+                (auction.getBet() != null) ? auction.getBet().getCurrentBank() : null,
                 changed,
                 until);
     }
 
     private String formatTime(LocalDateTime a, LocalDateTime b) {
-        return DurationFormatUtils.formatDuration(Math.abs(getTime(a, b).toMillis()), BetUtil.RETURN_TIME_MSG_PATTERN);
-    }
-
-    private Duration getTime(LocalDateTime a, LocalDateTime b) {
-        return (a == null)
-                ? Duration.ZERO
-                : Duration.between(a, b);
-
+        return DurationFormatUtils.formatDuration(Math.abs(Duration.between(a, b).toMillis()), BetUtil.RETURN_TIME_MSG_PATTERN);
     }
 }

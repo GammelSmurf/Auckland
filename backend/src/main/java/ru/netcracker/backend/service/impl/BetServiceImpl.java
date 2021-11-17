@@ -170,8 +170,9 @@ public class BetServiceImpl implements BetService {
 
     private SyncResponse getSync(Auction auction, LocalDateTime currentDate, boolean changed, boolean until) {
         return new SyncResponse(
-                until ? formatTime(auction.getBeginDate(), currentDate)
-                        : formatTime(auction.getCurrentLot().getEndTime(), currentDate),
+                (auction.getStatus().equals(AuctionStatus.RUNNING))
+                        ? formatTime(auction.getCurrentLot().getEndTime(), currentDate)
+                        : formatTime(auction.getBeginDate(), currentDate),
                 modelMapper.map(auction.getCurrentLot(), LotResponse.class),
                 auction.getStatus(),
                 (auction.getBet() != null) ? auction.getBet().getCurrentBank() : null,

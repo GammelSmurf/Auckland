@@ -1,5 +1,6 @@
 package ru.netcracker.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
 

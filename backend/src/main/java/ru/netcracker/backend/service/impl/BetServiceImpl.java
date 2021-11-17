@@ -170,15 +170,16 @@ public class BetServiceImpl implements BetService {
 
     private SyncResponse getSync(Auction auction, LocalDateTime currentDate, boolean changed, boolean until) {
         return new SyncResponse(
-                DurationFormatUtils.formatDuration(Math.abs(getTime(auction, currentDate).toMillis()), BetUtil.RETURN_TIME_MSG_PATTERN),
+                until ? formatTime(auction.getBeginDate(), currentDate)
+                        : formatTime(auction.getCurrentLot().getEndTime(), currentDate),
                 modelMapper.map(auction.getCurrentLot(), LotResponse.class),
                 auction.getStatus(),
                 changed,
                 until);
     }
 
-    private Duration getTime(Auction auction, LocalDateTime currentDate) {
-        return getTime(auction.getCurrentLot().getEndTime(), currentDate);
+    private String formatTime(LocalDateTime a, LocalDateTime b) {
+        return DurationFormatUtils.formatDuration(Math.abs(getTime(a, b).toMillis()), BetUtil.RETURN_TIME_MSG_PATTERN);
     }
 
     private Duration getTime(LocalDateTime a, LocalDateTime b) {

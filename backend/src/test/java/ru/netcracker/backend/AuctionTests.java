@@ -165,6 +165,51 @@ public class AuctionTests {
     }
 
     @Test
+    public void testAuk() throws InterruptedException {
+        session.subscribe(
+                String.format("/auction/state/%d", TEST_AUCTION_ID),
+                new StompFrameHandler() {
+                    @Override
+                    @NotNull
+                    public Type getPayloadType(@NotNull StompHeaders headers) {
+                        return BetResponse.class;
+                    }
+
+                    @Override
+                    public void handleFrame(@NotNull StompHeaders headers, Object payload) {
+                        System.out.println("Received message: " + payload);
+                    }
+                });
+        session.subscribe(
+                String.format("/auction/logs/%d", TEST_AUCTION_ID),
+                new StompFrameHandler() {
+                    @Override
+                    public Type getPayloadType(@NonNull StompHeaders headers) {
+                        return LogResponse.class;
+                    }
+
+                    @Override
+                    public void handleFrame(@NonNull StompHeaders headers, Object payload) {
+                        System.out.println("Received log message: " + payload);
+                    }
+                });
+
+        auctionService.subscribe(TEST_USERNAME_1, TEST_AUCTION_ID);
+        auctionService.subscribe(TEST_USERNAME_2, TEST_AUCTION_ID);
+
+        auctionService.makeAuctionWaiting(TEST_AUCTION_ID);
+        Auction auction = auctionRepository.findById(TEST_AUCTION_ID).get();
+        auction.setBeginDate(LocalDateTime.now()
+                .plus(5, ChronoUnit.SECONDS));
+        auctionRepository.save(auction);
+
+
+        printSync(betService.sync(TEST_AUCTION_ID));
+        Thread.sleep(TIME_MILLIS_DELAY_BEFORE_START);
+        printSync(betService.sync(TEST_AUCTION_ID));
+    }
+
+    @Test
     public void testUpdatedAuction() {
         AuctionRequest auctionRequest = new AuctionRequest();
         auctionRequest.setCreatorUsername(TEST_USERNAME_1);

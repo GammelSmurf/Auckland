@@ -4,14 +4,17 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import ru.netcracker.backend.exception.user.UsernameNotFoundException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import ru.netcracker.backend.model.Auction;
 import ru.netcracker.backend.model.Lot;
+import ru.netcracker.backend.model.Message;
 import ru.netcracker.backend.repository.UserRepository;
 import ru.netcracker.backend.requests.AuctionRequest;
 import ru.netcracker.backend.requests.LotRequest;
+import ru.netcracker.backend.requests.MessageRequest;
 import ru.netcracker.backend.responses.AuctionResponse;
 import ru.netcracker.backend.responses.LotResponse;
+import ru.netcracker.backend.responses.MessageResponse;
 
 @Configuration
 public class ModelMapperConfig {
@@ -60,5 +63,22 @@ public class ModelMapperConfig {
                             mapper.map(Auction::getSubscribersCount, AuctionResponse::setUsersCount);
                             mapper.map(Auction::getLikesCount, AuctionResponse::setUserLikes);
                         });
+
+        modelMapper.createTypeMap(MessageRequest.class, Message.class)
+            .setPostConverter(context->{
+                context.getDestination().setSender(
+                    userRepository
+                            .findByUsername(context.getSource().getSenderUsername())
+                            .orElseThrow(() -> new UsernameNotFoundException(context.getSource().getSenderUsername())));
+                    return context.getDestination();
+
+            });
+        modelMapper.createTypeMap(Message.class, MessageResponse.class)
+                .setPostConverter(context->{
+                    context.getDestination().setUsername(
+                            context.getSource().getSender().getUsername());
+                    return context.getDestination();
+                });
+
     }
 }

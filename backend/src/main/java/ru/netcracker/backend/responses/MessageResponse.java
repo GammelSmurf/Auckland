@@ -1,12 +1,21 @@
 package ru.netcracker.backend.responses;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import ru.netcracker.backend.util.JsonLocalDateTime;
 
-@Getter
-@Setter
+import java.time.LocalDateTime;
+
+@Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class MessageResponse {
+    private Long id;
+
+    private String username;
+
+    @JsonLocalDateTime
+    private LocalDateTime dateTimeMessage;
+
     private String message;
+
 }

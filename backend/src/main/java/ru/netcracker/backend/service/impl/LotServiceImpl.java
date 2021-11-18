@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 public class LotServiceImpl implements LotService {
     private final LotRepository lotRepository;
     private final ModelMapper modelMapper;
@@ -28,7 +28,6 @@ public class LotServiceImpl implements LotService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<LotResponse> getAllLots() {
         return lotRepository.findAll().stream()
                 .map(lot -> modelMapper.map(lot, LotResponse.class))
@@ -36,11 +35,13 @@ public class LotServiceImpl implements LotService {
     }
 
     @Override
+    @Transactional
     public LotResponse createLot(Lot lot) {
         return modelMapper.map(lotRepository.save(lot), LotResponse.class);
     }
 
     @Override
+    @Transactional
     public LotResponse updateLot(Long id, Lot lot) {
         Lot lotToUpdate = lotRepository
                 .findById(id)
@@ -50,12 +51,12 @@ public class LotServiceImpl implements LotService {
     }
 
     @Override
+    @Transactional
     public void deleteLot(Long id) {
         lotRepository.deleteById(id);
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<LotResponse> getLotsByAuctionId(Long auctionId) {
         return lotRepository.findAllByAuction_Id(auctionId).stream()
                 .map(lot -> modelMapper.map(lot, LotResponse.class))

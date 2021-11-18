@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 public class LogServiceImpl implements LogService {
     private final LogRepository logRepository;
     private final SimpMessagingTemplate template;
@@ -39,7 +39,6 @@ public class LogServiceImpl implements LogService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<LogResponse> getAuctionLogs(Long auctionId) {
         return logRepository.findAllByAuction_Id(auctionId).stream()
                 .map(log -> modelMapper.map(log, LogResponse.class))
@@ -47,6 +46,7 @@ public class LogServiceImpl implements LogService {
     }
 
     @Override
+    @Transactional
     public void log(LogLevel level, Auction auction) {
         switch (level) {
             case AUCTION_BET:

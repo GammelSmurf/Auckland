@@ -4,11 +4,11 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.netcracker.backend.exception.auction.NoLotsException;
 import ru.netcracker.backend.exception.auction.NotCorrectStatusException;
+import ru.netcracker.backend.exception.user.UsernameNotFoundException;
 import ru.netcracker.backend.model.Auction;
 import ru.netcracker.backend.model.AuctionStatus;
 import ru.netcracker.backend.model.Lot;
@@ -26,7 +26,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 public class AuctionServiceImpl implements AuctionService {
     private final AuctionRepository auctionRepository;
     private final UserRepository userRepository;
@@ -40,7 +40,6 @@ public class AuctionServiceImpl implements AuctionService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<AuctionResponse> getAllAuctions(Pageable pageable) {
         return auctionRepository
                 .findAll(pageable).stream()
@@ -49,27 +48,23 @@ public class AuctionServiceImpl implements AuctionService {
     }
 
     @Override
+    @Transactional
     public AuctionResponse createAuction(Auction auction) {
-        return modelMapper.map(auctionRepository.save(updateCreator(auction)), AuctionResponse.class);
-    }
-
-    private Auction updateCreator(Auction auction) {
-        auction.setCreator(userRepository
-                .findByUsername(auction.getCreator().getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException(String.format(UserUtil.USER_NOT_FOUND_TEMPLATE, auction.getCreator().getUsername()))));
-        return auction;
+        return modelMapper.map(auctionRepository.save(auction), AuctionResponse.class);
     }
 
     @Override
+    @Transactional
     public AuctionResponse updateAuction(Long id, Auction auction) {
         auction.setId(auctionRepository
                 .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(AuctionUtil.AUCTION_NOT_FOUND_TEMPLATE, id)))
                 .getId());
-        return modelMapper.map(auctionRepository.save(updateCreator(auction)), AuctionResponse.class);
+        return modelMapper.map(auctionRepository.save(auction), AuctionResponse.class);
     }
 
     @Override
+    @Transactional
     public void deleteAuction(Long id) {
         Auction auction = auctionRepository
                 .findById(id)
@@ -78,7 +73,6 @@ public class AuctionServiceImpl implements AuctionService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public AuctionResponse getAuctionById(Long id) {
         return modelMapper.map(
                 auctionRepository
@@ -88,6 +82,7 @@ public class AuctionServiceImpl implements AuctionService {
     }
 
     @Override
+    @Transactional
     public void makeAuctionWaiting(Long id) throws NoLotsException, NotCorrectStatusException {
         Auction auction = auctionRepository
                 .findById(id)
@@ -111,6 +106,7 @@ public class AuctionServiceImpl implements AuctionService {
     }
 
     @Override
+    @Transactional
     public UserResponse subscribe(String username, Long auctionId) {
         User user = userRepository
                 .findByUsername(username)

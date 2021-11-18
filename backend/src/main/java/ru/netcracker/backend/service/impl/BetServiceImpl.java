@@ -33,7 +33,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 public class BetServiceImpl implements BetService {
     private final BetRepository betRepository;
     private final UserRepository userRepository;
@@ -54,6 +54,7 @@ public class BetServiceImpl implements BetService {
     }
 
     @Override
+    @Transactional
     public BetResponse makeBet(String username, Long auctionId, BigDecimal betBank) throws ValidationException {
         User user = userRepository
                 .findByUsername(username)
@@ -96,6 +97,7 @@ public class BetServiceImpl implements BetService {
     }
 
     @Override
+    @Transactional
     public SyncResponse sync(Long auctionId) throws NotCorrectStatusException {
         Auction auction = auctionRepository
                 .findById(auctionId)

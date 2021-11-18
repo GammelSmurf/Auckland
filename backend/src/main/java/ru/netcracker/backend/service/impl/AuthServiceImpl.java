@@ -31,7 +31,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 public class AuthServiceImpl implements AuthService {
     private final AuthenticationProvider authenticationProvider;
     private final JwtUtil jwtUtil;
@@ -60,6 +60,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public JwtResponse authenticateUser(User user) {
         Authentication authentication = authenticationProvider
                 .authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
@@ -76,6 +77,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public void createUser(User user, String siteURL)
             throws EmailExistsException, UserExistsException, MessagingException, UnsupportedEncodingException {
         UserUtil.validate(user, userRepository);
@@ -88,7 +90,6 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public void sendVerificationEmail(String username, String siteURL)
             throws MessagingException, UnsupportedEncodingException {
         Optional<User> userOptional = userRepository.findByUsername(username);
@@ -112,6 +113,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public boolean verify(String username, String verificationCode) {
         Optional<User> userOptional = userRepository.findByUsername(username);
         if (userOptional.isPresent() &&
@@ -127,6 +129,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public void sendChangePasswordRequestToUserEmail(String username, String siteURL)
             throws MessagingException, UnsupportedEncodingException {
         Optional<User> userOptional = userRepository.findByUsername(username);
@@ -149,6 +152,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public void generateNewPassword(String username, String restoreCode)
             throws MessagingException, UnsupportedEncodingException {
         Optional<User> userOptional = userRepository.findByUsername(username);

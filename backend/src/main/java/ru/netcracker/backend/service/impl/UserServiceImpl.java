@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
@@ -28,7 +28,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<UserResponse> getUsers(){
         return userRepository.findAll().stream()
                 .map(user -> modelMapper.map(user, UserResponse.class))
@@ -36,6 +35,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserResponse banUser(String username) {
         User user = userRepository
                 .findByUsername(username)
@@ -45,6 +45,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserResponse unbanUser(String username) {
         User user = userRepository
                 .findByUsername(username)
@@ -54,6 +55,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserResponse addCurrency(String username, BigDecimal currency) {
         User user = userRepository
                 .findByUsername(username)

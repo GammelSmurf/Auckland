@@ -37,12 +37,15 @@ public class Auction {
     private Integer usersLimit;
 
     @OneToOne(mappedBy = "auction")
+    @JsonBackReference
     private Bet bet;
 
     @OneToOne(mappedBy = "auction")
+    @JsonBackReference
     private Log log;
 
     @OneToOne
+    @JsonBackReference
     private Lot currentLot;
 
     @OneToMany(

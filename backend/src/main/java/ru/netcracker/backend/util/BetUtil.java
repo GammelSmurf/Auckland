@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class BetUtil {
-    public static final String RETURN_TIME_MSG_PATTERN = "dd HH-mm-ss";
+    public static final String RETURN_TIME_MSG_PATTERN = "ss";
 
     private BetUtil() {
     }

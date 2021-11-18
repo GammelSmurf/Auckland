@@ -182,7 +182,7 @@ public class BetServiceImpl implements BetService {
                 until);
     }
 
-    private String formatTime(LocalDateTime a, LocalDateTime b) {
-        return DurationFormatUtils.formatDuration(Math.abs(Duration.between(a, b).toMillis()), BetUtil.RETURN_TIME_MSG_PATTERN);
+    private Long formatTime(LocalDateTime a, LocalDateTime b) {
+        return Math.abs(Duration.between(a, b).toSeconds());
     }
 }

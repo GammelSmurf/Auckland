@@ -167,7 +167,7 @@ public class BetServiceImpl implements BetService {
     private void setNewEndTime(Auction auction, LocalDateTime currentDate) {
         auction.getCurrentLot()
                 .setEndTime(currentDate
-                        .plus(auction.getLotDuration().getSecond(), ChronoUnit.SECONDS));
+                        .plus(auction.getLotDuration().toNanoOfDay(), ChronoUnit.NANOS));
     }
 
     private SyncResponse getSync(Auction auction, LocalDateTime currentDate, boolean changed, boolean until) {
@@ -182,7 +182,7 @@ public class BetServiceImpl implements BetService {
                 until);
     }
 
-    private String formatTime(LocalDateTime a, LocalDateTime b) {
-        return DurationFormatUtils.formatDuration(Math.abs(Duration.between(a, b).toMillis()), BetUtil.RETURN_TIME_MSG_PATTERN);
+    private Long formatTime(LocalDateTime a, LocalDateTime b) {
+        return Math.abs(Duration.between(a, b).toSeconds());
     }
 }

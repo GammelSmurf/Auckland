@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 @Setter
 @AllArgsConstructor
 public class SyncResponse {
-    String timeUntil;
+    Long timeUntil;
     LotResponse currentLot;
     AuctionStatus auctionStatus;
     BigDecimal currentBank;

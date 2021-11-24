@@ -37,13 +37,13 @@ public class AuctionController {
         return auctionService.getAllAuctions(pageable);
     }
 
-    @GetMapping("/filter/sub/{username}")
-    public List<AuctionResponse> getAllSubscribedAuctions(@PathVariable(name = "username") String username, Pageable pageable) {
+    @GetMapping("/sub")
+    public List<AuctionResponse> getAllSubscribedAuctions(@RequestParam("username") String username, Pageable pageable) {
         return auctionService.getAllSubscribedAuctions(username, pageable);
     }
 
-    @GetMapping("/filter/own/{username}")
-    public List<AuctionResponse> getAllOwnAuctions(@PathVariable(name = "username") String username, Pageable pageable) {
+    @GetMapping("/own")
+    public List<AuctionResponse> getAllOwnAuctions(@RequestParam("username") String username, Pageable pageable) {
         return auctionService.getAllOwnAuctions(username, pageable);
     }
 

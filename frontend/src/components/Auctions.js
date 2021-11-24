@@ -13,13 +13,14 @@ const Auctions = (props) => {
     const currentUser = AuthService.getCurrentUser();
 
     const values = {
-        userId: currentUser.id,
+        username: currentUser.username,
         aucName: "Auction name",
         aucDescription: "Lorem Ipsum - это текст-\"рыба\", часто используемый в печати и вэб-дизайне. Lorem Ipsum является стандартной \"рыбой\" для текстов на латинице с начала XVI века. В то время некий безымянный печатник создал большую коллекцию размеров и форм шрифтов, используя Lorem Ipsum для распечатки образцов. Lorem Ipsum не только успешно пережил без заметных изменений пять веков, но и перешагнул в электронный дизайн.",
         usersLimit: 100,
         beginDate: "",
         lotDuration: "00:30:00",
-        boostTime: "00:00:10"
+        boostTime: "00:00:10",
+        status: 'DRAFT'
     }
 
     const parseMinDate = () => {
@@ -40,11 +41,10 @@ const Auctions = (props) => {
         AuctionService.getAllAuctions().then(
             (response) => {
                 let dataPrev = [];
-                console.log(response)
                 response.data.forEach(item => {
                     dataPrev.push(
                         {
-                            id: item.id, name: item.name, beginDate: parseDateInfo(item.beginDate), participants: item.usersLimit, likesCount: item.userLikes, usersCount: item.usersCount
+                            id: item.id, name: item.name, beginDate: parseDateInfo(item.beginDate), participants: item.usersLimit, likesCount: item.userLikes, usersCount: item.usersCount, status: item.status
                         }
                     )
                 })
@@ -79,6 +79,10 @@ const Auctions = (props) => {
     }, {
         dataField: 'likesCount',
         text: 'Likes',
+        sort: true
+    }, {
+        dataField: 'status',
+        text: 'Status',
         sort: true
     }];
 

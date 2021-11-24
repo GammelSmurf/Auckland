@@ -3,20 +3,16 @@ import React from "react";
 
 
 const EditAucForm = (props) => {
-
-    const parseConfigDate = () => {
-        return props.auction.beginDate.split(' ').join('T');
-    }
-
     return (
         <div className="configBlock">
             <Form.Group>
-                <FormControl required type="datetime-local" step="1" min={parseConfigDate()} defaultValue={parseConfigDate()} onChange={props.handleChange("beginDate")}/>
+                <FormControl required type="datetime-local" step="1" defaultValue={props.auction.beginDate} onChange={props.handleChange("beginDate")}/>
                 <Form.Control.Feedback type="invalid">
                     The value cannot be empty
                 </Form.Control.Feedback>
             </Form.Group>
-            <div className="mt-5 mb-5">
+            <div className="mt-3 mb-5">
+                <h5>Settings</h5>
                 <Form.Group>
                     <InputGroup>
                         <InputGroup.Text>Member limit</InputGroup.Text>

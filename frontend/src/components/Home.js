@@ -5,16 +5,19 @@ import AuthService from "../services/AuthService";
 
 const Home = () => {
     const [message, setMessage] = useState('');
+
     useEffect(() => {
         HomeService.getHello().then(
             (response) => {
-                setMessage(response.data)
-            })
+                setMessage(response.data);
+            });
     })
     const currentUser = AuthService.getCurrentUser();
+
+
     return (
         <header className='App-header'>
-            <h3>Sprint №3. Auction page</h3>
+            <h3>Sprint №4. Auction logic</h3>
             <img src={logo} className='App-logo' alt='logo' />
             <p>
                 {message}

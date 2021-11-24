@@ -48,6 +48,22 @@ public class AuctionServiceImpl implements AuctionService {
     }
 
     @Override
+    public List<AuctionResponse> getAllSubscribedAuctions(String username, Pageable pageable) {
+        return auctionRepository
+                .findBySubscribers_Username(username, pageable).stream()
+                .map(auction -> modelMapper.map(auction, AuctionResponse.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AuctionResponse> getAllOwnAuctions(String username, Pageable pageable) {
+        return auctionRepository
+                .findByCreator_Username(username, pageable).stream()
+                .map(auction -> modelMapper.map(auction, AuctionResponse.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     @Transactional
     public AuctionResponse createAuction(Auction auction) {
         return modelMapper.map(auctionRepository.save(auction), AuctionResponse.class);

@@ -10,6 +10,10 @@ import java.util.List;
 public interface AuctionService {
     List<AuctionResponse> getAllAuctions(Pageable pageable);
 
+    List<AuctionResponse> getAllSubscribedAuctions(String username, Pageable pageable);
+
+    List<AuctionResponse> getAllOwnAuctions(String username, Pageable pageable);
+
     AuctionResponse createAuction(Auction auction);
 
     AuctionResponse updateAuction(Long id, Auction auction);

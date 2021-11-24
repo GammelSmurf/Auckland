@@ -158,10 +158,6 @@ public class AuctionTests {
 
         Thread.sleep(TIME_MILLIS_DELAY_BEFORE_START * 2);
         printSync(betService.sync(TEST_AUCTION_ID));
-        betService.makeBet(TEST_USERNAME_2, TEST_AUCTION_ID, new BigDecimal(10000));
-
-        Thread.sleep(TIME_MILLIS_DELAY_BEFORE_START * 4);
-        printSync(betService.sync(TEST_AUCTION_ID));
 
         Thread.sleep(TIME_MILLIS_DELAY_BEFORE_START * 2);
         printSync(betService.sync(TEST_AUCTION_ID));

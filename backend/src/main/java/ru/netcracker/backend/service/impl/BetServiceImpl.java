@@ -144,7 +144,7 @@ public class BetServiceImpl implements BetService {
         if (auction.getBet() != null) {
             auction.getCurrentLot().setWinner(auction.getBet().getUser());
             auction.getCurrentLot().setWinBank(auction.getBet().getCurrentBank());
-            auction.setBet(null);
+            betRepository.delete(auction.getBet());
         }
 
         if (AuctionUtil.getAnotherLot(auction).isEmpty()) {

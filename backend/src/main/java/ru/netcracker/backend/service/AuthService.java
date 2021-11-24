@@ -1,7 +1,5 @@
 package ru.netcracker.backend.service;
 
-import ru.netcracker.backend.exception.user.EmailExistsException;
-import ru.netcracker.backend.exception.user.UserExistsException;
 import ru.netcracker.backend.model.User;
 import ru.netcracker.backend.responses.JwtResponse;
 
@@ -11,8 +9,7 @@ import java.io.UnsupportedEncodingException;
 public interface AuthService {
     JwtResponse authenticateUser(User user);
 
-    void createUser(User user, String siteURL)
-            throws EmailExistsException, UserExistsException, MessagingException, UnsupportedEncodingException;
+    void createUser(User user, String siteURL) throws MessagingException, UnsupportedEncodingException;
 
     void sendVerificationEmail(String username, String siteURL) throws MessagingException, UnsupportedEncodingException;
 

@@ -10,8 +10,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class BetUtil {
-    public static final String RETURN_TIME_MSG_PATTERN = "ss";
-
     private BetUtil() {
     }
 
@@ -26,29 +24,21 @@ public class BetUtil {
             throw new LotTimeExpiredException("Lot time is expired");
         }
 
-        if (isLess(
-                user.getCurrency(),
-                lotBank)) {
+        if (isLess(user.getCurrency(), lotBank)) {
             throw new NoCurrencyException("User don't have enough money");
         }
 
-        if (isLess(
-                lotBank,
-                auction.getCurrentLot().getMinBank())) {
+        if (isLess(lotBank, auction.getCurrentLot().getMinBank())) {
             throw new BankLessThanMinException(String.format("Bank is less than minimum: %f", auction.getCurrentLot().getMinBank()));
         }
 
         if (auction.getBet() != null) {
             Bet bet = auction.getBet();
-            if (isLess(
-                    lotBank,
-                    bet.getCurrentBank())) {
+            if (isLess(lotBank, bet.getCurrentBank())) {
                 throw new BankLessThanOldException(String.format("Bank is less than the old one: %f", bet.getCurrentBank()));
             }
 
-            if (isLess(
-                    lotBank.subtract(bet.getCurrentBank()),
-                    auction.getCurrentLot().getStep())) {
+            if (isLess(lotBank.subtract(bet.getCurrentBank()), auction.getCurrentLot().getStep())) {
                 throw new BankLessThanStepException(String.format("Bet step is less than the minimal one: %f", auction.getCurrentLot().getStep()));
             }
         }

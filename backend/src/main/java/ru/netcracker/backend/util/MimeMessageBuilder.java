@@ -11,7 +11,7 @@ import javax.mail.internet.MimeMessage;
 import java.io.UnsupportedEncodingException;
 
 public class MimeMessageBuilder {
-    private JavaMailSender mailSender;
+    private final JavaMailSender mailSender;
     private String fromAddress;
     private String toAddress;
     private String senderName;

@@ -23,13 +23,11 @@ public class LogServiceImpl implements LogService {
     private final SimpMessagingTemplate template;
     private final ModelMapper modelMapper;
 
-    private final String LOG_SEP = "\u0020";
-
-    private final String WEB_SOCKET_PATH_TEMPLATE = "/auction/logs/%d";
-
-    private final String LOG_BET_MSG_TEMPLATE = "%s повысил ставку до %s";
-    private final String LOG_CHANGE_MSG_TEMPLATE = "Статус аукциона изменился на %s";
-    private final String LOG_WINNER_MSG_TEMPLATE = "%s выиграл лот \"%s\"";
+    private static final String WEB_SOCKET_PATH_TEMPLATE = "/auction/logs/%d";
+    private static final String LOG_BET_MSG_TEMPLATE = "%s повысил ставку до %s";
+    private static final String LOG_CHANGE_MSG_TEMPLATE = "Статус аукциона изменился на %s";
+    private static final String LOG_WINNER_MSG_TEMPLATE = "%s выиграл лот \"%s\"";
+    private static final String LOG_SEP = "\u0020";
 
     @Autowired
     public LogServiceImpl(LogRepository logRepository, SimpMessagingTemplate template, ModelMapper modelMapper) {

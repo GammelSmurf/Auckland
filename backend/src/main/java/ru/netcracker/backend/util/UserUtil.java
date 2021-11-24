@@ -12,8 +12,7 @@ public class UserUtil {
     private UserUtil() {
     }
 
-    public static void validate(User user, UserRepository userRepository)
-            throws EmailExistsException, UserExistsException {
+    public static void validate(User user, UserRepository userRepository) {
         if (userRepository.existsByEmail(user.getEmail()))
             throw new EmailExistsException(String.format(EMAIL_NOT_FOUND_TEMPLATE, user.getEmail()));
         if (userRepository.existsByUsername(user.getUsername()))

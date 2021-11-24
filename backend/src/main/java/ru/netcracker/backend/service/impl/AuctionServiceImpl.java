@@ -81,12 +81,17 @@ public class AuctionServiceImpl implements AuctionService {
                 AuctionResponse.class);
     }
 
+    /**
+     * Change auction status to waiting from draft and set the first lot.
+     * Can be called only being in the draft status.
+     * @param auctionId Auction id
+     */
     @Override
     @Transactional
-    public void makeAuctionWaiting(Long id) throws NoLotsException, NotCorrectStatusException {
+    public void makeAuctionWaiting(Long auctionId) {
         Auction auction = auctionRepository
-                .findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(AuctionUtil.AUCTION_NOT_FOUND_TEMPLATE, id)));
+                .findById(auctionId)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(AuctionUtil.AUCTION_NOT_FOUND_TEMPLATE, auctionId)));
         switch (auction.getStatus()) {
             case DRAFT:
                 Optional<Lot> lotOptional = AuctionUtil.getAnotherLot(auction);
@@ -95,9 +100,10 @@ public class AuctionServiceImpl implements AuctionService {
                     auction.setCurrentLot(lotOptional.get());
                     auctionRepository.save(auction);
                 } else {
-                    throw new NoLotsException("Auction must have lots before waiting status");
+                    throw new NoLotsException();
                 }
                 break;
+            case WAITING:
             case RUNNING:
             case FINISHED:
             default:

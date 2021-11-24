@@ -12,12 +12,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.netcracker.backend.exception.user.EmailExistsException;
-import ru.netcracker.backend.exception.user.UserExistsException;
 import ru.netcracker.backend.model.Role;
 import ru.netcracker.backend.model.User;
-import ru.netcracker.backend.responses.JwtResponse;
 import ru.netcracker.backend.repository.UserRepository;
+import ru.netcracker.backend.responses.JwtResponse;
 import ru.netcracker.backend.security.JwtUtil;
 import ru.netcracker.backend.security.MyUserDetails;
 import ru.netcracker.backend.service.AuthService;
@@ -27,7 +25,10 @@ import ru.netcracker.backend.util.UserUtil;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.UnsupportedEncodingException;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,8 +44,8 @@ public class AuthServiceImpl implements AuthService {
     @Value("${Auckland.mail.senderName}")
     private String senderName;
 
-    private final String HELLO_MSG_TEMPLATE = "Dear [[name]],<br>";
-    private final String BYE_MSG_TEMPLATE = "Thank you,<br> %s.";
+    private static final String HELLO_MSG_TEMPLATE = "Dear [[name]],<br>";
+    private static final String BYE_MSG_TEMPLATE = "Thank you,<br> %s.";
 
     @Autowired
     public AuthServiceImpl(
@@ -78,8 +79,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public void createUser(User user, String siteURL)
-            throws EmailExistsException, UserExistsException, MessagingException, UnsupportedEncodingException {
+    public void createUser(User user, String siteURL) throws MessagingException, UnsupportedEncodingException {
         UserUtil.validate(user, userRepository);
         user.setPassword(encoder.encode(user.getPassword()));
 
@@ -90,16 +90,14 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void sendVerificationEmail(String username, String siteURL)
-            throws MessagingException, UnsupportedEncodingException {
+    public void sendVerificationEmail(String username, String siteURL) throws MessagingException, UnsupportedEncodingException {
         Optional<User> userOptional = userRepository.findByUsername(username);
         if (userOptional.isPresent()) {
             sendVerificationEmail(userOptional.get(), siteURL);
         }
     }
 
-    private void sendVerificationEmail(User user, String siteURL)
-            throws MessagingException, UnsupportedEncodingException {
+    private void sendVerificationEmail(User user, String siteURL) throws MessagingException, UnsupportedEncodingException {
         MimeMessage message = buildMimeMessage(user)
                 .setSubject("Please verify your registration")
                 .setMethodURL(String.format(
@@ -130,8 +128,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public void sendChangePasswordRequestToUserEmail(String username, String siteURL)
-            throws MessagingException, UnsupportedEncodingException {
+    public void sendChangePasswordRequestToUserEmail(String username, String siteURL) throws MessagingException, UnsupportedEncodingException {
         Optional<User> userOptional = userRepository.findByUsername(username);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
@@ -153,8 +150,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public void generateNewPassword(String username, String restoreCode)
-            throws MessagingException, UnsupportedEncodingException {
+    public void generateNewPassword(String username, String restoreCode) throws MessagingException, UnsupportedEncodingException {
         Optional<User> userOptional = userRepository.findByUsername(username);
         if (userOptional.isPresent() &&
                 userOptional.get().getRestoreCode().equals(restoreCode)) {

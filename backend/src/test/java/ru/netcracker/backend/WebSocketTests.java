@@ -30,7 +30,6 @@ import ru.netcracker.backend.responses.LogResponse;
 import ru.netcracker.backend.service.AuctionService;
 import ru.netcracker.backend.service.BetService;
 import ru.netcracker.backend.service.LogService;
-import ru.netcracker.backend.util.LogLevel;
 
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
@@ -41,15 +40,14 @@ import java.util.concurrent.TimeoutException;
 
 import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.RefreshMode.AFTER_EACH_TEST_METHOD;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Sql({"/test-data.sql"})
 @AutoConfigureEmbeddedDatabase(refresh = AFTER_EACH_TEST_METHOD)
 public class WebSocketTests {
-    @LocalServerPort private Integer port;
+    @LocalServerPort
+    private Integer port;
 
     private final long TEST_AUCTION_ID = 1;
     private final String TEST_USERNAME = "test";
@@ -84,7 +82,7 @@ public class WebSocketTests {
     @Test
     @Disabled
     public void testConnection() {
-        assertTrue(session.isConnected());
+        Assertions.assertTrue(session.isConnected());
     }
 
     private void connectToWS() throws ExecutionException, InterruptedException, TimeoutException {
@@ -92,7 +90,8 @@ public class WebSocketTests {
                 webSocketStompClient
                         .connect(
                                 String.format(WEB_SOCKET_ENDPOINT_TEMPLATE, port),
-                                new StompSessionHandlerAdapter() {})
+                                new StompSessionHandlerAdapter() {
+                                })
                         .get(1, SECONDS);
     }
 
@@ -146,7 +145,7 @@ public class WebSocketTests {
         Thread.sleep(1000);
         session.send(String.format("/app/play/%d", TEST_AUCTION_ID), betRequest);
 
-        assertEquals(betResponse, blockingStateQueue.poll(1, SECONDS));
+        Assertions.assertEquals(betResponse, blockingStateQueue.poll(1, SECONDS));
     }
 
     @Test

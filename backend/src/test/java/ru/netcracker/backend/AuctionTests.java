@@ -160,6 +160,9 @@ public class AuctionTests {
         printSync(betService.sync(TEST_AUCTION_ID));
         betService.makeBet(TEST_USERNAME_2, TEST_AUCTION_ID, new BigDecimal(10000));
 
+        Thread.sleep(TIME_MILLIS_DELAY_BEFORE_START * 4);
+        printSync(betService.sync(TEST_AUCTION_ID));
+
         Thread.sleep(TIME_MILLIS_DELAY_BEFORE_START * 2);
         printSync(betService.sync(TEST_AUCTION_ID));
     }
@@ -227,7 +230,7 @@ public class AuctionTests {
 
     public void printSync(SyncResponse syncResponse) {
         System.out.println(ConsoleColors.GREEN +
-                (syncResponse.getUntil() ? "duration_until: " : "duration_after: ") + syncResponse.getTimeUntil() +
+                "time unitl: " + syncResponse.getTimeUntil() +
                 ", current_lot: " + syncResponse.getCurrentLot().getName() +
                 ", status: " + syncResponse.getAuctionStatus() +
                 ", changed: " + syncResponse.getChanged() +

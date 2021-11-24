@@ -11,7 +11,7 @@ public interface AuthService {
 
     void createUser(User user, String siteURL) throws MessagingException, UnsupportedEncodingException;
 
-    void sendVerificationEmail(String username, String siteURL) throws MessagingException, UnsupportedEncodingException;
+    void sendVerificationLinkToUserEmail(String username, String siteURL) throws MessagingException, UnsupportedEncodingException;
 
     boolean verify(String username, String verificationCode);
 

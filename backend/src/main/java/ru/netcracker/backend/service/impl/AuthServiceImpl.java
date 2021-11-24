@@ -90,7 +90,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void sendVerificationEmail(String username, String siteURL) throws MessagingException, UnsupportedEncodingException {
+    public void sendVerificationLinkToUserEmail(String username, String siteURL) throws MessagingException, UnsupportedEncodingException {
         Optional<User> userOptional = userRepository.findByUsername(username);
         if (userOptional.isPresent()) {
             sendVerificationEmail(userOptional.get(), siteURL);

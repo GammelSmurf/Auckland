@@ -58,6 +58,14 @@ public class AuthController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @PostMapping("/send/verification")
+    public ResponseEntity<Void> sendVerificationEmail(
+            @RequestParam("username") String username, HttpServletRequest request)
+            throws MessagingException, UnsupportedEncodingException {
+        authService.sendVerificationLinkToUserEmail(username, getSiteURL(request));
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     private String getSiteURL(HttpServletRequest request) {
         String siteURL = request.getRequestURL().toString();
         return siteURL.replace(request.getServletPath(), "");

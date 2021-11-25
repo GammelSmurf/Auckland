@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from "react";
-import {Col, Container, Row, Button, InputGroup, FormControl, Form} from "react-bootstrap";
+import {Col, Container, Row, Button, InputGroup, FormControl, Form, Spinner} from "react-bootstrap";
 
 import AuctionService from "../services/AuctionService";
 import LotService from "../services/LotService";
@@ -10,54 +10,163 @@ import EditAucForm from "./EditAucForm";
 import AuthService from "../services/AuthService";
 import EditLotModal from "./EditLotModal";
 import ModalDialog from "./ModalDialog";
+import SocketService from "../services/SocketService";
+import BetService from "../services/BetService";
 
 const Auction = (props) => {
     const [validated, setValidated] = useState(false);
     const [auction, setAuction] = useState({});
     const [lots, setLots] = useState([]);
     const [onEdit, setOnEdit] = useState(false);
-    const [aucDateTime, setAucDateTime] = useState("");
+    const [strTimer, setStrTimer] = useState(null);
     const currentUser = AuthService.getCurrentUser();
     const [values, setValues] = useState({});
     const [isLotModalActive, setIsLotModalActive] = useState(false);
     const [currentLot, setCurrentLot] = useState({});
     const [isModalDeleteAuction, setIsModalDeleteAuction] = useState(false);
     const [isModalDeleteLot, setIsModalDeleteLot] = useState(false);
+    const [isModalStartCountDown, setIsModalStartCountDown] = useState(false);
+    const [status, setStatus] = useState('');
+    const [logs, setLogs] = useState([]);
+    const [finishTime, setFinishTime] = useState('');
+    const [currentPrice, setCurrentPrice] = useState('');
+    const [bet, setBet] = useState();
 
     const lotSection = useRef(null);
 
+    const addZeroBefore = (n) => {
+        return (n < 10 ? '0' : '') + n;
+    }
+
+    const formatDate = (date) => {
+        return `${date.getFullYear()}-${addZeroBefore(date.getMonth() + 1)}-${addZeroBefore(date.getDate())}T${addZeroBefore(date.getHours())}:${addZeroBefore(date.getMinutes())}:${addZeroBefore(date.getSeconds())}`;
+    }
+
+    const parseDateToDisplay = (inputDate) => {
+        const date = new Date(inputDate);
+        const options = {
+            month: 'long', day: 'numeric',
+            hour: '2-digit', minute: '2-digit', second: '2-digit'
+        };
+        const dateTimeFormat = new Intl.DateTimeFormat('ru-RU', options).format;
+        return dateTimeFormat(date);
+    }
+
+    const parseAuctionDate = (inputDate) => {
+        return formatDate(new Date(inputDate));
+    }
+
+    const parseResponseDate = (inputDate) => {
+        return formatDate(new Date(inputDate)).split('T').join(' ');
+    }
+
+    const changeLogs = (response) => {
+        // TEMPORARY SOLUTION
+        setFinishTime(parseDateToDisplay(response.logTime));
+        //
+        let lsLogs = JSON.parse(localStorage.getItem("logs"));
+        lsLogs.push(response);
+        localStorage.setItem("logs", JSON.stringify(lsLogs));
+        setLogs(lsLogs);
+    }
+
+    const onBetChange = (e) => {
+        setBet(e.target.value);
+    }
+
+    const setWebsocketConnection = (auctionId) => {
+        SocketService.connect(auctionId);
+        SocketService.addLoggerHandler(response => changeLogs(response));
+        SocketService.addBetHandler(response => setCurrentPrice(response.currentBank))
+    }
+
     useEffect(() => {
+        setWebsocketConnection(props.match.params.id);
+        let timer;
         AuctionService.getAuction(props.match.params.id).then(
             (response) => {
-                setAuction(response.data)
-                setAucDateTime(parseDisplayDate(response.data.beginDate))
+                setStatus(response.data.status);
+                switch (response.data.status) {
+                    case 'DRAFT':
+                        setStrTimer(parseDateToDisplay(response.data.beginDate));
+                        break;
+                    case 'WAITING':
+                        BetService.getTime(response.data.id).then(
+                            (syncResponse) => timer = activateTimer(syncResponse.data.timeUntil, response.data.id)
+                        );
+                        break;
+                    case 'RUNNING':
+                        BetService.getTime(response.data.id).then(
+                            (response) => timer = activateTimer(response.data.timeUntil, response.data.id)
+                        );
+                        break;
+                    case 'FINISHED':
+                        break;
+                }
+                setAuction({...response.data, beginDate: parseAuctionDate(response.data.beginDate)});
                 setValues({
-                    userId: currentUser.id,
+                    username: currentUser.username,
                     aucId: response.data.id,
                     aucName: response.data.name,
                     aucDescription: response.data.description,
                     usersLimit: response.data.usersLimit,
-                    beginDate: response.data.beginDate,
+                    beginDate: parseResponseDate(response.data.beginDate),
                     lotDuration: response.data.lotDuration,
-                    boostTime: response.data.boostTime
+                    boostTime: response.data.boostTime,
+                    status: response.data.status
                 });
                 LotService.getLotsByAuctionId(response.data.id).then(
                     (response) => {
-                        let dataPrev = [];
-                        response.data.forEach(item => {
-                            dataPrev.push(
-                                item
-                            )
-                        })
-                        setLots(dataPrev);
+                        setLots(response.data);
+                        response.data.length > 0 && setFinishTime(parseDateToDisplay(response.data.at(-1).endTime));
                     }
                 );
+                AuctionService.getAuctionLogs(response.data.id).then(
+                    response => {
+                        setLogs(response.data);
+                        localStorage.setItem("logs", JSON.stringify(response.data));
+                    }
+                )
             }
         );
+        return () => clearInterval(timer);
     }, []);
 
+    const activateTimer = (inputSeconds, auctionId) => {
+        let time = inputSeconds;
+        const timer = setInterval(function () {
+            const hours = time / 3600 % 60;
+            const minutes = time / 60 % 60;
+            const seconds = time % 60;
+            if (time <= 0) {
+                clearInterval(timer);
+                BetService.getTime(auctionId).then(
+                    (response) => {
+                        console.log('Sync')
+                        console.log(response)
+                        if(status !== response.data.auctionStatus){
+                            setStatus(response.data.auctionStatus);
+                        }
+                        if(response.data.auctionStatus !== 'FINISHED'){
+                            activateTimer(response.data.timeUntil, auctionId);
+                        }
+                    }
+                );
+            } else {
+                setStrTimer(`${addZeroBefore(Math.trunc(hours))}:${addZeroBefore(Math.trunc(minutes))}:${addZeroBefore(seconds)}`);
+            }
+            --time;
+        }, 1000);
+        return timer;
+    }
+
+    const handleStartCountdown = () => {
+        AuctionService.setStatusWaiting(auction.id).then(() => window.location.reload());
+    }
+
     const setDefaultLotValues = (currentLot) => {
-        setValues({...values,
+        setValues({
+            ...values,
             lotId: currentLot.id,
             lotName: currentLot.name,
             lotDescription: currentLot.description,
@@ -72,17 +181,20 @@ const Auction = (props) => {
     }
 
     const handleDeleteAuction = () => {
-        AuctionService.deleteAuction(auction.id).then(()=>props.history.push("/auctions"));
+        AuctionService.deleteAuction(auction.id).then(() => props.history.push("/auctions"));
     }
 
     const handleLotSubmit = () => {
-
-        if(currentLot.id){
-            LotService.updateLot(values).then(() => {handleLotModalClose(); window.location.reload()});
-        }
-        else{
-            console.log(values)
-            LotService.createLot(values).then(() => {handleLotModalClose(); window.location.reload()});
+        if (currentLot.id) {
+            LotService.updateLot(values).then(() => {
+                handleLotModalClose();
+                window.location.reload()
+            });
+        } else {
+            LotService.createLot(values).then(() => {
+                handleLotModalClose();
+                window.location.reload()
+            });
         }
     }
 
@@ -95,27 +207,26 @@ const Auction = (props) => {
     }
 
     const handleDeleteLot = (id) => {
-        LotService.deleteLot(id).then(()=>{window.location.reload();})
-    }
-
-    const parseDisplayDate = (date) => {
-        const dateTime = new Date(date);
-        const options = {month: 'long', day: 'numeric',
-            hour: '2-digit', minute: '2-digit', second: '2-digit'};
-        const dateTimeFormat = new Intl.DateTimeFormat('ru-RU', options).format;
-        return dateTimeFormat(dateTime);
+        LotService.deleteLot(id).then(() => {
+            window.location.reload();
+        })
     }
 
     const handleChange = (name) => (e) => {
-        setValues({ ...values, [name]: e.target.value });
+        let value;
+        if (name === "beginDate") {
+            value = parseResponseDate(e.target.value);
+        } else {
+            value = e.target.value;
+        }
+        setValues({...values, [name]: value});
     };
 
     const handleSubmit = (event) => {
         const form = event.currentTarget;
         if (form.checkValidity() === false) {
             setValidated(true);
-        }
-        else{
+        } else {
             AuctionService.updateAuction(values).then(() => window.location.reload());
             setOnEdit(false);
         }
@@ -123,7 +234,7 @@ const Auction = (props) => {
         event.stopPropagation();
     }
 
-    return(
+    return (
         <Container>
             <div className="wrapper">
                 <Form noValidate validated={validated} onSubmit={handleSubmit}>
@@ -135,33 +246,40 @@ const Auction = (props) => {
                                         <Form.Group>
                                             <InputGroup>
                                                 <InputGroup.Text>Name</InputGroup.Text>
-                                                <FormControl required defaultValue={auction.name} onChange={handleChange("aucName")}/>
+                                                <FormControl required defaultValue={auction.name}
+                                                             onChange={handleChange("aucName")}/>
                                             </InputGroup>
                                             <Form.Control.Feedback type="invalid">
                                                 The value cannot be empty
                                             </Form.Control.Feedback>
                                         </Form.Group>
                                         :
-                                        <h3><FontAwesomeIcon icon={faArrowLeft} color="#FFCA2C" size="sm" onClick={handleBack} style={{cursor: "hand"}}/> {auction.name}</h3>}
+                                        <h3><FontAwesomeIcon icon={faArrowLeft} color="#FFCA2C" size="sm"
+                                                             onClick={handleBack}
+                                                             style={{cursor: "hand"}}/> {auction.name}</h3>}
                                 </div>
                             </Col>
                             <Col xs={12} md={4}>
                                 <div style={{textAlign: "center"}}>
-                                    <h5><span style={{borderBottom: "2px solid #9434B3"}}>{auction.status}</span></h5>
+                                    <h5><span style={{borderBottom: "2px solid #9434B3"}}>{status}</span>
+                                    </h5>
                                 </div>
                             </Col>
                             <Col xs={12} md={4}>
                                 <div style={{textAlign: "right"}}>
-                                    <Button variant="warning" style={{marginRight: "10px"}} onClick={()=>lotSection.current.scrollIntoView()}>See lots</Button>
-                                    {onEdit ?
-                                        <Button type="submit" >Save</Button>
-                                        :
-                                        <>
-                                            <Button variant="warning" onClick={handleEdit} style={{marginRight: "10px"}}>Edit</Button>
-                                            <Button variant="secondary" onClick={() => setIsModalDeleteAuction(true)}>Delete</Button>
-                                            <Button type="submit" style={{display: "none"}} />
-                                        </>
-                                    }
+                                    <Button variant="warning" style={{marginRight: "10px"}}
+                                            onClick={() => () => lotSection.current.scrollIntoView()}>See lots</Button>
+                                    {status === 'DRAFT' && (onEdit ?
+                                            <Button type="submit">Save</Button>
+                                            :
+                                            <>
+                                                <Button variant="warning" onClick={handleEdit}
+                                                        style={{marginRight: "10px"}}>Edit</Button>
+                                                <Button variant="secondary"
+                                                        onClick={() => setIsModalDeleteAuction(true)}>Delete</Button>
+                                                <Button type="submit" style={{display: "none"}}/>
+                                            </>
+                                    )}
                                 </div>
                             </Col>
                         </Row>
@@ -171,48 +289,72 @@ const Auction = (props) => {
                                     <h5>Description</h5>
                                     {onEdit ?
                                         <Form.Group>
-                                            <FormControl as="textarea" rows={9} defaultValue={auction.description} onChange={handleChange("aucDescription")} style={{resize: "none"}}/>
+                                            <FormControl as="textarea" rows={9} defaultValue={auction.description}
+                                                         onChange={handleChange("aucDescription")}
+                                                         style={{resize: "none"}}/>
                                         </Form.Group> :
                                         <p>{auction.description}</p>}
                                 </div>
                                 <div className="auctionBlock mt-3" style={{height: "300px"}}>
                                     <h5>Logger</h5>
                                     <div>
-                                        <p>User повысил ставку до 1800 </p>
-                                        <p>User повысил ставку до 1800</p>
-                                        <p>User повысил ставку до 1800</p>
-                                        <p>User повысил ставку до 1800</p>
-                                        <p>User повысил ставку до 1800</p>
+                                        {logs.map(log =>
+                                            <p key={log.id}>{log.logMessage} <span><b>({log.logTime})</b></span></p>
+                                        )}
                                     </div>
                                 </div>
                             </Col>
                             <Col xs={12} md={4}>
                                 <div style={{textAlign: "center"}}>
-                                    <h5>Auction starts in</h5>
-                                    {onEdit ? <EditAucForm auction={auction} handleChange={handleChange}/>
-                                        :
-                                        <h1>{aucDateTime}</h1>}
+                                    {(status === 'DRAFT' || status === 'WAITING') &&
+                                        <>
+                                            <h5>Auction starts in</h5>
+                                            {onEdit ? <EditAucForm auction={auction} handleChange={handleChange}/>
+                                                :
+                                                <>
+                                                    {strTimer ? <h1>{strTimer}</h1> :
+                                                        <Spinner animation="border" role="status"/>}
+                                                </>}
+                                        </>
+                                    }
+                                    {status === 'RUNNING' &&
+                                        <>
+                                            <h5>Lot is over in</h5>
+                                            {strTimer ? <h1>{strTimer}</h1> :
+                                                <Spinner animation="border" role="status"/>}
+                                        </>
+                                    }
+                                    {status === 'FINISHED' &&
+                                        <>
+                                            <h5>Auction ended in</h5>
+                                            <h1>{finishTime}</h1>
+                                        </>
+                                    }
                                     <div className="mt-1">
                                         <LotCarousel lots={lots}/>
                                     </div>
                                     <div className="mt-1">
-                                        {!onEdit && <Button variant="warning" style={{marginTop: "20px", padding: "10px 30px"}}>
-                                            Start countdown
-                                        </Button>}
+                                        {status === 'DRAFT' && (!onEdit &&
+                                            <Button variant="warning"
+                                                    style={{marginTop: "20px", padding: "10px 30px"}}
+                                                    onClick={() => setIsModalStartCountDown(true)}>
+                                                Start countdown
+                                            </Button>)}
                                     </div>
-                                    {/*<div style={{marginTop: "10px"}}>
-                                <h5>Current price</h5>
-                                <h1>10000 $</h1>
-                                <InputGroup>
-                                    <InputGroup.Text>$</InputGroup.Text>
-                                    <FormControl aria-label="Amount (to the nearest dollar)"
-                                                 placeholder="Enter the amount"/>
-                                    <InputGroup.Text>.00</InputGroup.Text>
-                                </InputGroup>
-                                <Button variant="warning" style={{marginTop: "20px", padding: "10px 30px"}}>
-                                    Make a bet
-                                </Button>
-                            </div>*/}
+                                    {status === 'RUNNING' &&
+                                    <div style={{marginTop: "10px"}}>
+                                        <h5>Current price</h5>
+                                        <h1>{currentPrice}$</h1>
+                                        <InputGroup>
+                                            <InputGroup.Text>$</InputGroup.Text>
+                                            <FormControl aria-label="Amount (to the nearest dollar)"
+                                                         placeholder="Enter the amount" onChange={onBetChange}/>
+                                            <InputGroup.Text>.00</InputGroup.Text>
+                                        </InputGroup>
+                                        <Button onClick={() => SocketService.sendBet(auction.id, currentUser.username, bet)} variant="warning" style={{marginTop: "20px", padding: "10px 30px"}}>
+                                            Make a bet
+                                        </Button>
+                                    </div>}
                                 </div>
                             </Col>
                             <Col xs={12} md={4}>
@@ -225,28 +367,46 @@ const Auction = (props) => {
                         </Row>
                     </div>
                     <Row>
-                        <div ref={lotSection} style={{paddingTop:"100px"}}>
+                        <div ref={lotSection} style={{paddingTop: "100px"}}>
                             <div>
                                 <div style={{width: "50%", textAlign: "left", display: "inline-block"}}>
                                     <h3>Lots</h3>
                                 </div>
                                 <div style={{width: "50%", textAlign: "right", display: "inline-block"}}>
-                                    <Button variant="warning" onClick={() => {setIsLotModalActive(true); setCurrentLot({})}}>Add lot</Button>
+                                    {status === 'DRAFT' &&
+                                    <Button variant="warning" onClick={() => {
+                                        setIsLotModalActive(true);
+                                        setCurrentLot({})
+                                    }}>Add lot</Button>
+                                    }
                                 </div>
                             </div>
                             {lots.map(lot =>
                                 <div key={lot.id} className="auctionBlock mt-4" style={{height: "300px"}}>
                                     <div style={{width: "30%", display: "inline-block"}}>
-                                        <img src={lot.picture} style={{width: "100%", maxHeight: "260px"}}/>
+                                        <img alt="No image" src={lot.picture}
+                                             style={{width: "100%", maxHeight: "260px"}}/>
                                     </div>
 
                                     <div style={{width: "70%", float: "right", padding: "20px"}}>
                                         <h5>{lot.name}</h5>
                                         <p>{lot.description}</p>
                                         <div style={{textAlign: "right"}}>
-                                        <Button variant="warning" style={{marginRight: "10px"}} onClick={() => {setCurrentLot(lot); setDefaultLotValues(lot); setIsLotModalActive(true)}}>Edit</Button>
-                                        <Button variant="secondary" onClick={()=>{setCurrentLot(lot);setIsModalDeleteLot(true)}}>Delete</Button>
-                                    </div>
+                                            {status === 'DRAFT' &&
+                                            <>
+                                                <Button variant="warning" style={{marginRight: "10px"}}
+                                                        onClick={() => {
+                                                            setCurrentLot(lot);
+                                                            setDefaultLotValues(lot);
+                                                            setIsLotModalActive(true)
+                                                        }}>Edit</Button>
+                                                <Button variant="secondary" onClick={() => {
+                                                    setCurrentLot(lot);
+                                                    setIsModalDeleteLot(true)
+                                                }}>Delete</Button>
+                                            </>
+                                            }
+                                        </div>
 
                                     </div>
                                 </div>
@@ -254,13 +414,21 @@ const Auction = (props) => {
                         </div>
                     </Row>
                 </Form>
-                <EditLotModal show={isLotModalActive} hide={handleLotModalClose} lot={currentLot} handleChange={handleChange} handleLotSubmit={handleLotSubmit}/>
+                <EditLotModal show={isLotModalActive} hide={handleLotModalClose} lot={currentLot}
+                              handleChange={handleChange} handleLotSubmit={handleLotSubmit}/>
             </div>
-            <ModalDialog show={isModalDeleteAuction} hide={() => setIsModalDeleteAuction(false)} title={"Delete auction"} body={"Do you really want to delete this auction"} action={handleDeleteAuction}/>
-            <ModalDialog show={isModalDeleteLot} hide={() => setIsModalDeleteLot(false)} title={"Delete lot"} body={"Do you really want to delete lot " + currentLot.name + " ?"} action={() => handleDeleteLot(currentLot.id)}/>
+            <ModalDialog show={isModalDeleteAuction} hide={() => setIsModalDeleteAuction(false)}
+                         title={"Delete auction"} body={"Do you really want to delete this auction"}
+                         action={handleDeleteAuction}/>
+            <ModalDialog show={isModalDeleteLot} hide={() => setIsModalDeleteLot(false)} title={"Delete lot"}
+                         body={"Do you really want to delete lot " + currentLot.name + " ?"}
+                         action={() => handleDeleteLot(currentLot.id)}/>
+            <ModalDialog show={isModalStartCountDown} hide={() => setIsModalStartCountDown(false)}
+                         title={"Start countdown"}
+                         body={"The auction status will be changed to \'WAITING\' and you will not be able to change settings or add / delete lots!"}
+                         action={handleStartCountdown}/>
         </Container>
 
     )
 }
-
 export default Auction;

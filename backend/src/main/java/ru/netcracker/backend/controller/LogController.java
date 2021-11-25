@@ -1,10 +1,7 @@
 package ru.netcracker.backend.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.netcracker.backend.responses.LogResponse;
 import ru.netcracker.backend.service.LogService;
 
@@ -21,8 +18,8 @@ public class LogController {
         this.logService = logService;
     }
 
-    @GetMapping
-    public List<LogResponse> getAuctionLogs(long auctionId) {
+    @GetMapping("/{id}")
+    public List<LogResponse> getAuctionLogs(@PathVariable(name = "id") Long auctionId) {
         return logService.getAuctionLogs(auctionId);
     }
 }

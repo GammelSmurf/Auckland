@@ -14,7 +14,7 @@ const LotCarousel = (props) => {
                                 className="d-block w-100"
                                 src={lot.picture}
                                 height="300"
-                                //alt="First slide"
+                                //alt="No image"
                                 style={{filter: "brightness(60%)"}}
                             />
                         </div>

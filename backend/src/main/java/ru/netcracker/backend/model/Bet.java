@@ -1,5 +1,6 @@
 package ru.netcracker.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,12 +19,15 @@ public class Bet {
     private BigDecimal currentBank = new BigDecimal(0);
 
     @OneToOne
+    @JsonBackReference
     private Auction auction;
 
     @OneToOne
+    @JsonBackReference
     private Lot lot;
 
     @OneToOne
+    @JsonBackReference
     private User user;
 
     public Bet() {

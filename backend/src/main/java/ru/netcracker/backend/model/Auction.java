@@ -57,6 +57,7 @@ public class Auction {
     private List<Lot> lots = new ArrayList<>(0);
 
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "user_id", nullable = false)
     private User creator;
 
@@ -74,6 +75,7 @@ public class Auction {
             inverseJoinColumns = @JoinColumn(name = "user_id"))
     private Set<User> userLikes = new HashSet<>();
 
+    @JsonBackReference
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(
             name = "subscriptions",

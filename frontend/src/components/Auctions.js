@@ -5,6 +5,7 @@ import BootStrapTable from 'react-bootstrap-table-next';
 import ToolkitProvider,{Search} from 'react-bootstrap-table2-toolkit';
 import AuthService from "../services/AuthService";
 import ModalDialog from "./ModalDialog";
+import LotService from "../services/LotService";
 
 const Auctions = (props) => {
     const [data, setData] = useState([]);
@@ -12,15 +13,23 @@ const Auctions = (props) => {
     const {SearchBar} = Search;
     const currentUser = AuthService.getCurrentUser();
 
-    const values = {
+    const defAucValues = {
         username: currentUser.username,
-        aucName: "Auction name",
-        aucDescription: "Lorem Ipsum - это текст-\"рыба\", часто используемый в печати и вэб-дизайне. Lorem Ipsum является стандартной \"рыбой\" для текстов на латинице с начала XVI века. В то время некий безымянный печатник создал большую коллекцию размеров и форм шрифтов, используя Lorem Ipsum для распечатки образцов. Lorem Ipsum не только успешно пережил без заметных изменений пять веков, но и перешагнул в электронный дизайн.",
+        name: "Auction name",
+        description: "Lorem Ipsum - это текст-\"рыба\", часто используемый в печати и вэб-дизайне. Lorem Ipsum является стандартной \"рыбой\" для текстов на латинице с начала XVI века. В то время некий безымянный печатник создал большую коллекцию размеров и форм шрифтов, используя Lorem Ipsum для распечатки образцов. Lorem Ipsum не только успешно пережил без заметных изменений пять веков, но и перешагнул в электронный дизайн.",
         usersLimit: 100,
         beginDate: "",
         lotDuration: "00:30:00",
         boostTime: "00:00:10",
         status: 'DRAFT'
+    }
+
+    const defLotValues = {
+        name: 'Example lot',
+        description: 'Lorem Ipsum - это текст-\"рыба\", часто используемый в печати и вэб-дизайне. Lorem Ipsum является стандартной \"рыбой\" для текстов на латинице с начала XVI века. В то время некий безымянный печатник создал большую коллекцию размеров и форм шрифтов, используя Lorem Ipsum для распечатки образцов. Lorem Ipsum не только успешно пережил без заметных изменений пять веков, но и перешагнул в электронный дизайн.',
+        minBank: '100',
+        step: '10',
+        picture: 'https://artworld.ru/images/cms/content/catalog3/ivan_shishkin_copy_kamskij_kartina_maslom_pejzazh_utro_v_sosnovom_lesu_1889_is200201_2.jpg'
     }
 
     const parseMinDate = () => {
@@ -93,8 +102,13 @@ const Auctions = (props) => {
     };
 
     const createAuction = () => {
-        values.beginDate = parseMinDate();
-        AuctionService.createAuction(values).then((response) => props.history.push("/auctions/" + response.data.id));
+        defAucValues.beginDate = parseMinDate();
+        AuctionService.createAuction(defAucValues).then(
+            (response) => {
+                LotService.createLot({...defLotValues, aucId: response.data.id}).then(
+                    () => props.history.push("/auctions/" + response.data.id)
+                )
+            });
     }
 
     const handleModalAddClose = () => {setIsModalAddActive(false)};

@@ -16,7 +16,7 @@ const EditAucForm = (props) => {
                 <Form.Group>
                     <InputGroup>
                         <InputGroup.Text>Member limit</InputGroup.Text>
-                        <Form.Control required type="number" min="1" max="100" defaultValue="100" onChange={props.handleChange("usersLimit")}/>
+                        <Form.Control required type="number" min="1" max="100" defaultValue={props.auction.usersLimit} onChange={props.handleChange("usersLimit")}/>
                     </InputGroup>
                     <Form.Control.Feedback type="invalid">
                         The value must be between 1 and 100

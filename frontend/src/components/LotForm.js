@@ -4,12 +4,12 @@ import React from "react";
 const LotForm = (props) => {
     return (
             <div style={{overflow: "hidden", minHeight: "400px", padding: "3px"}}>
-                <div className="lotFormAnim">
+                <div className="basicAnim">
                     <Form.Group>
                         <Form.Label>
                             Name
                         </Form.Label>
-                        <Form.Control required defaultValue={props.lot.name} onChange={props.handleChange("lotName")}/>
+                        <Form.Control required defaultValue={props.lot.name} onChange={props.handleChange("name")}/>
                         <Form.Control.Feedback type="invalid">
                             The value cannot be empty
                         </Form.Control.Feedback>
@@ -18,7 +18,7 @@ const LotForm = (props) => {
                         <Form.Label>
                             Description
                         </Form.Label>
-                        <Form.Control as="textarea" rows={4} required defaultValue={props.lot.description} onChange={props.handleChange("lotDescription")}/>
+                        <Form.Control as="textarea" rows={4} required defaultValue={props.lot.description} onChange={props.handleChange("description")}/>
                         <Form.Control.Feedback type="invalid">
                             The value cannot be empty
                         </Form.Control.Feedback>

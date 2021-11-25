@@ -16,9 +16,9 @@ const getAuction = (id) => {
 const createAuction = (values) =>{
     return axios
         .post(API_URL, {
-            name: values.aucName,
+            name: values.name,
             creatorUsername: values.username,
-            description: values.aucDescription,
+            description: values.description,
             beginDate: values.beginDate,
             lotDuration: values.lotDuration,
             boostTime: values.boostTime,
@@ -42,10 +42,10 @@ const deleteAuction = (id) => {
 
 const updateAuction = (values) =>{
     return axios
-        .put(API_URL + values.aucId, {
-            name: values.aucName,
+        .put(API_URL + values.id, {
+            name: values.name,
             creatorUsername: values.username,
-            description: values.aucDescription,
+            description: values.description,
             beginDate: values.beginDate,
             lotDuration: values.lotDuration,
             boostTime: values.boostTime,

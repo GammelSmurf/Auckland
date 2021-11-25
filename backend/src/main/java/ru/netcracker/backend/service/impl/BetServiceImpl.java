@@ -3,6 +3,7 @@ package ru.netcracker.backend.service.impl;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,10 +20,7 @@ import ru.netcracker.backend.responses.LotResponse;
 import ru.netcracker.backend.responses.SyncResponse;
 import ru.netcracker.backend.service.BetService;
 import ru.netcracker.backend.service.LogService;
-import ru.netcracker.backend.util.AuctionUtil;
-import ru.netcracker.backend.util.BetUtil;
-import ru.netcracker.backend.util.LogLevel;
-import ru.netcracker.backend.util.UserUtil;
+import ru.netcracker.backend.util.*;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -119,14 +117,14 @@ public class BetServiceImpl implements BetService {
         LocalDateTime currentDate = LocalDateTime.now();
         switch (auction.getStatus()) {
             case WAITING:
-                if (currentDate.isAfter(auction.getBeginDate())) {
+                if (currentDate.isAfter(auction.getBeginDate()) || currentDate.isEqual(auction.getBeginDate())) {
                     auction.setStatus(AuctionStatus.RUNNING);
                     setNewEndTime(auction, currentDate);
                     logService.log(LogLevel.AUCTION_STATUS_CHANGE, auctionRepository.save(auction));
                 }
                 return getSync(auction, currentDate, false);
             case RUNNING:
-                if (currentDate.isAfter(auction.getCurrentLot().getEndTime())) {
+                if (currentDate.isAfter(auction.getCurrentLot().getEndTime()) || currentDate.isEqual(auction.getCurrentLot().getEndTime())) {
                     return handleLotFinished(auction, currentDate);
                 } else {
                     return getSync(auction, currentDate, false);

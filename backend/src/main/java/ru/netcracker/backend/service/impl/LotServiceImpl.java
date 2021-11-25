@@ -42,12 +42,15 @@ public class LotServiceImpl implements LotService {
 
     @Override
     @Transactional
-    public LotResponse updateLot(Long id, Lot lot) {
-        Lot lotToUpdate = lotRepository
+    public LotResponse updateLot(Long id, Lot newLot) {
+        Lot oldLot = lotRepository
                 .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(LotUtil.LOT_NOT_FOUND_MSG_TEMPLATE, id)));
-        lot.setId(lotToUpdate.getId());
-        return modelMapper.map(lotRepository.save(lot), LotResponse.class);
+        oldLot.setName(newLot.getName());
+        oldLot.setDescription(newLot.getDescription());
+        oldLot.setMinBank(newLot.getMinBank());
+        oldLot.setPicture(newLot.getPicture());
+        return modelMapper.map(lotRepository.save(oldLot), LotResponse.class);
     }
 
     @Override

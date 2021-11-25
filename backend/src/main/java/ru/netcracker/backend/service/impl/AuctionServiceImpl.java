@@ -71,12 +71,17 @@ public class AuctionServiceImpl implements AuctionService {
 
     @Override
     @Transactional
-    public AuctionResponse updateAuction(Long id, Auction auction) {
-        auction.setId(auctionRepository
+    public AuctionResponse updateAuction(Long id, Auction newAuction) {
+        Auction oldAuction = auctionRepository
                 .findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(AuctionUtil.AUCTION_NOT_FOUND_TEMPLATE, id)))
-                .getId());
-        return modelMapper.map(auctionRepository.save(auction), AuctionResponse.class);
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(AuctionUtil.AUCTION_NOT_FOUND_TEMPLATE, id)));
+        oldAuction.setName(newAuction.getName());
+        oldAuction.setDescription(newAuction.getDescription());
+        oldAuction.setUsersLimit(newAuction.getUsersLimit());
+        oldAuction.setBeginDate(newAuction.getBeginDate());
+        oldAuction.setLotDuration(newAuction.getLotDuration());
+        oldAuction.setBoostTime(newAuction.getBoostTime());
+        return modelMapper.map(auctionRepository.save(oldAuction), AuctionResponse.class);
     }
 
     @Override
@@ -100,6 +105,7 @@ public class AuctionServiceImpl implements AuctionService {
     /**
      * Change auction status to waiting from draft and set the first lot.
      * Can be called only being in the draft status.
+     *
      * @param auctionId Auction id
      */
     @Override

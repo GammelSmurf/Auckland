@@ -13,6 +13,7 @@ import ru.netcracker.backend.service.LotService;
 import ru.netcracker.backend.util.LotUtil;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -56,7 +57,12 @@ public class LotServiceImpl implements LotService {
     @Override
     @Transactional
     public void deleteLot(Long id) {
-        lotRepository.deleteById(id);
+        Optional<Lot> lotOptional = lotRepository.findById(id);
+        if (lotOptional.isPresent()) {
+            Lot lot = lotOptional.get();
+            lot.getAuction().getLots().remove(lot);
+            lotRepository.delete(lot);
+        }
     }
 
     @Override

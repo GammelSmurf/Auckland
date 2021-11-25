@@ -19,6 +19,7 @@ const Auction = (props) => {
     const [onEdit, setOnEdit] = useState(false);
     const [strTimer, setStrTimer] = useState(null);
     const currentUser = AuthService.getCurrentUser();
+    const [isSubscribed, setIsSubscribed] = useState(false);
     const [aucValues, setAucValues] = useState({});
     const [lotValues, setLotValues] = useState({});
     const [isLotModalActive, setIsLotModalActive] = useState(false);
@@ -26,6 +27,7 @@ const Auction = (props) => {
     const [isModalDeleteAuction, setIsModalDeleteAuction] = useState(false);
     const [isModalDeleteLot, setIsModalDeleteLot] = useState(false);
     const [isModalStartCountDown, setIsModalStartCountDown] = useState(false);
+    const [isModalSubscribe, setIsModalSubscribe] = useState(false);
     const [status, setStatus] = useState('');
     const [logs, setLogs] = useState([]);
     const [finishTime, setFinishTime] = useState('');
@@ -69,7 +71,9 @@ const Auction = (props) => {
         let timer;
         AuctionService.getAuction(props.match.params.id).then(
             (response) => {
+                console.log(response.data)
                 setStatus(response.data.status);
+                setIsSubscribed(response.data.subscribers.some(user=>user.id === currentUser.id));
                 switch (response.data.status) {
                     case 'DRAFT':
                         setStrTimer(parseDateToDisplay(response.data.beginDate));
@@ -215,6 +219,14 @@ const Auction = (props) => {
         event.stopPropagation();
     }
 
+    const handleSubscribe = () => {
+        AuctionService.subscribe({username: currentUser.username, auctionId: auction.id}).then(()=>
+        {
+            setIsModalSubscribe(false);
+            setIsSubscribed(true);
+        });
+    }
+
     return (
         <Container>
             <div className="wrapper">
@@ -248,6 +260,8 @@ const Auction = (props) => {
                             </Col>
                             <Col xs={12} md={4}>
                                 <div style={{textAlign: "right"}}>
+                                    {isSubscribed && <div><h5 className='basicAnim'>You are subscribed!</h5></div>}
+                                    {(status === 'WAITING' && currentUser.id !== auction.creatorId && !isSubscribed) && <Button variant="warning" style={{marginRight: "10px"}} onClick={()=>setIsModalSubscribe(true)}>Subscribe</Button>}
                                     <Button variant="warning" style={{marginRight: "10px"}}
                                             onClick={() => lotSection.current.scrollIntoView()}>See lots</Button>
                                     {status === 'DRAFT' && (onEdit ?
@@ -332,7 +346,7 @@ const Auction = (props) => {
                                                          placeholder="Enter the amount" onChange={onBetChange}/>
                                             <InputGroup.Text>.00</InputGroup.Text>
                                         </InputGroup>
-                                        <Button onClick={() => SocketService.sendBet(auction.id, currentUser.username, bet)} variant="warning" style={{marginTop: "20px", padding: "10px 30px"}}>
+                                        <Button onClick={() => console.log('Bet onClick')} variant="warning" style={{marginTop: "20px", padding: "10px 30px"}}>
                                             Make a bet
                                         </Button>
                                     </div>}
@@ -411,6 +425,10 @@ const Auction = (props) => {
                          title={"Start countdown"}
                          body={"The auction status will be changed to \'WAITING\' and you will not be able to change settings or add / delete lots!"}
                          action={handleStartCountdown}/>
+            <ModalDialog show={isModalSubscribe} hide={() => setIsModalSubscribe(false)}
+                         title={"Subscribe"}
+                         body={`Do you want to subscribe on auction ${auction.name}?`}
+                         action={handleSubscribe}/>
         </Container>
 
     )

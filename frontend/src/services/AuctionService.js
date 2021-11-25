@@ -72,9 +72,21 @@ const setStatusWaiting = (id) => {
 }
 
 const getAuctionLogs = (auctionId) => {
-    return axios.get(API_URL_LOGS + auctionId, { headers: authHeader() }).then(response => {
+    return axios.get(API_URL_LOGS + auctionId, {headers: authHeader()}).then(response => {
         return response
     });
 }
 
-export default {getAllAuctions, getAuction, deleteAuction, createAuction, updateAuction, setStatusWaiting, getAuctionLogs};
+const subscribe = (values) =>{
+    return axios
+        .post(API_URL + 'subscribe', {
+            username: values.username,
+            auctionId: values.auctionId
+        }, {headers: authHeader()})
+        .then(response => {
+            return response
+        });
+};
+
+
+export default {getAllAuctions, getAuction, deleteAuction, createAuction, updateAuction, setStatusWaiting, getAuctionLogs, subscribe};

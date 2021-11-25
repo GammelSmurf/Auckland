@@ -11,6 +11,7 @@ import AuthService from "../services/AuthService";
 import EditLotModal from "./EditLotModal";
 import ModalDialog from "./ModalDialog";
 import BetService from "../services/BetService";
+import SockJsClient from 'react-stomp';
 
 const Auction = (props) => {
     const [validated, setValidated] = useState(false);
@@ -33,7 +34,7 @@ const Auction = (props) => {
     const [finishTime, setFinishTime] = useState('');
     const [currentPrice, setCurrentPrice] = useState('');
     const [bet, setBet] = useState();
-    const [client, setClient] = useState(null);
+    const client = useRef(null);
 
     const lotSection = useRef(null);
 
@@ -107,6 +108,9 @@ const Auction = (props) => {
                     (response) => {
                         setLots(response.data);
                         response.data.length > 0 && setFinishTime(parseDateToDisplay(response.data.at(-1).endTime));
+                        // TEMPORARY
+                        setCurrentPrice(response.data[0].minBank);
+                        //
                     }
                 );
                 AuctionService.getAuctionLogs(response.data.id).then(
@@ -227,8 +231,29 @@ const Auction = (props) => {
         });
     }
 
+    const onReceiveWebSocketMessage = (response) => {
+        console.log('Log')
+        console.log(response)
+        if(response.currentBank){
+            setCurrentPrice(response.currentBank)
+        }
+        else{
+            setFinishTime(parseDateToDisplay(response.logTime));
+            setLogs(logs.concat(response));
+        }
+    }
+
+    const handleSendBet = () => {
+        console.log(client)
+        client.current.sendMessage('/app/play/'+auction.id, JSON.stringify({username: currentUser.username, currentBank: bet}));
+    }
+
     return (
         <Container>
+            <SockJsClient url='http://localhost:8080/ws'
+                          topics={['/auction/logs/' + auction.id, '/auction/state/' + auction.id]}
+                          onMessage={(msg) => onReceiveWebSocketMessage(msg)}
+                          ref={client} />
             <div className="wrapper">
                 <Form noValidate validated={validated} onSubmit={handleSubmit}>
                     <div style={{height: "100%"}}>
@@ -263,7 +288,7 @@ const Auction = (props) => {
                                     {isSubscribed && <div><h5 className='basicAnim'>You are subscribed!</h5></div>}
                                     {(status === 'WAITING' && currentUser.id !== auction.creatorId && !isSubscribed) && <Button variant="warning" style={{marginRight: "10px"}} onClick={()=>setIsModalSubscribe(true)}>Subscribe</Button>}
                                     <Button variant="warning" style={{marginRight: "10px"}}
-                                            onClick={() => lotSection.current.scrollIntoView()}>See lots</Button>
+                                            onClick={() => handleSendBet() /*lotSection.current.scrollIntoView()*/}>See lots</Button>
                                     {status === 'DRAFT' && (onEdit ?
                                             <Button type="submit">Save</Button>
                                             :

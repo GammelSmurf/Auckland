@@ -1,10 +1,9 @@
 import {Carousel} from "react-bootstrap";
-import React from "react";
+import React, {useState} from "react";
 
 
 const LotCarousel = (props) => {
-
-
+    //const [imgURL, setImgURL] = useState();
     return(
             <Carousel>
                 {props.lots.map(lot =>
@@ -14,8 +13,9 @@ const LotCarousel = (props) => {
                                 className="d-block w-100"
                                 src={lot.picture}
                                 height="300"
-                                //alt="No image"
-                                style={{filter: "brightness(60%)"}}
+                                alt="No image"
+                                style={{filter: "brightness(60%)", objectFit: "cover"}}
+                                onError={(e)=>e.target.src = 'https://st3.depositphotos.com/23594922/31822/v/600/depositphotos_318221368-stock-illustration-missing-picture-page-for-website.jpg'}
                             />
                         </div>
                         <div style={{position: "absolute", top: 0, left: "15%", right: "15%"}}>

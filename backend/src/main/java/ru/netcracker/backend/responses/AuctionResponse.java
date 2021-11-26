@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.netcracker.backend.model.AuctionStatus;
 import ru.netcracker.backend.model.Lot;
+import ru.netcracker.backend.model.User;
 import ru.netcracker.backend.util.JsonLocalDateTime;
 import ru.netcracker.backend.util.JsonLocalTime;
 
@@ -20,12 +21,13 @@ public class AuctionResponse {
     private long id;
     private String name;
     private String description;
+    private Long creatorId;
 
     private int usersLimit;
     private int usersCount;
     private int userLikes;
-    private long userId;
     private Set<Lot> lots;
+    private Set<UserResponse> subscribers;
 
     @JsonLocalDateTime
     private LocalDateTime beginDate;

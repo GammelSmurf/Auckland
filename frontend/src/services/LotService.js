@@ -14,16 +14,16 @@ const getLotsByAuctionId = (id) => {
 const createLot = (values) =>{
     return axios
         .post(API_URL, {
-            name: values.lotName,
-            description: values.lotDescription,
+            name: values.name,
+            description: values.description,
             minBank: values.minBank,
             step: values.step,
             picture: values.picture,
             auctionId: values.aucId
 
         }, {headers: authHeader()})
-        .then(() => {
-
+        .then((response) => {
+            return response;
         });
 };
 
@@ -39,14 +39,13 @@ const updateLot = (values) =>{
     console.log("LotService")
     console.log(values)
     return axios
-        .put(API_URL + values.lotId, {
-            name: values.lotName,
-            description: values.lotDescription,
+        .put(API_URL + values.id, {
+            name: values.name,
+            description: values.description,
             minBank: values.minBank,
             step: values.step,
             picture: values.picture,
             auctionId: values.aucId
-
         }, {headers: authHeader()})
         .then(response => {
             console.log("Update lot response:")

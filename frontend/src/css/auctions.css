@@ -3,7 +3,7 @@
     font-weight: 500;
 }
 
-.lotFormAnim {
+.basicAnim {
     animation-duration: 1s;
     animation-name: lotFormAnimation;
 }

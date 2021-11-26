@@ -4,18 +4,21 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.netcracker.backend.model.Lot;
 import ru.netcracker.backend.requests.LotRequest;
 import ru.netcracker.backend.responses.LotResponse;
 import ru.netcracker.backend.service.LotService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/lot")
 @CrossOrigin("*")
 @Slf4j
+@Validated
 public class LotController {
     private final LotService lotService;
     private final ModelMapper modelMapper;
@@ -36,7 +39,7 @@ public class LotController {
     }
 
     @PostMapping
-    public ResponseEntity<LotResponse> createLot(@RequestBody LotRequest lotRequest) {
+    public ResponseEntity<LotResponse> createLot(@Valid @RequestBody LotRequest lotRequest) {
         LotResponse lotResponse = lotService.createLot(
                 modelMapper.map(lotRequest, Lot.class));
 
@@ -46,7 +49,7 @@ public class LotController {
 
     @PutMapping("/{id}")
     public ResponseEntity<LotResponse> updateLot(
-            @PathVariable long id, @RequestBody LotRequest lotRequest) {
+            @PathVariable long id, @Valid @RequestBody LotRequest lotRequest) {
         LotResponse lotResponse = lotService.updateLot(id,
                 modelMapper.map(lotRequest, Lot.class));
 

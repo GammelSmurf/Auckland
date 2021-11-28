@@ -3,7 +3,6 @@ package ru.netcracker.backend.service.impl;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +19,10 @@ import ru.netcracker.backend.responses.LotResponse;
 import ru.netcracker.backend.responses.SyncResponse;
 import ru.netcracker.backend.service.BetService;
 import ru.netcracker.backend.service.LogService;
-import ru.netcracker.backend.util.*;
+import ru.netcracker.backend.util.AuctionUtil;
+import ru.netcracker.backend.util.BetUtil;
+import ru.netcracker.backend.util.LogLevel;
+import ru.netcracker.backend.util.UserUtil;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -46,15 +48,6 @@ public class BetServiceImpl implements BetService {
         this.modelMapper = modelMapper;
     }
 
-    /**
-     * Make a bet with boosted time according to the rules set when creating the auction.
-     * Can be called only being in the running status.
-     *
-     * @param username  Username of the user who makes a bet
-     * @param auctionId Auction id
-     * @param betBank   Bet amount
-     * @return {@link BetResponse}
-     */
     @Override
     @Transactional
     public BetResponse makeBet(String username, Long auctionId, BigDecimal betBank) {
@@ -92,22 +85,6 @@ public class BetServiceImpl implements BetService {
                         .getBoostTime().getNano(), ChronoUnit.NANOS);
     }
 
-    /**
-     * Synchronize the auction process.
-     * <p>
-     * Changes the auction status from waiting to running
-     * and updates the end time of the first lot in accordance with lot duration in {@link Auction}
-     * if the auction start time has passed.
-     * <p>
-     * Sets the next lot (sets winner and winning amount if present),
-     * if the end time of the current lot has expired.
-     * <p>
-     * Changes the auction status from running to finished (sets winner and winning amount if present),
-     * if the end time of the current lot has expired and there are no others left.
-     *
-     * @param auctionId Auction id
-     * @return {@link SyncResponse}
-     */
     @Override
     @Transactional
     public SyncResponse sync(Long auctionId) {
@@ -122,15 +99,15 @@ public class BetServiceImpl implements BetService {
                     setNewEndTime(auction, currentDate);
                     logService.log(LogLevel.AUCTION_STATUS_CHANGE, auctionRepository.save(auction));
                 }
-                return getSync(auction, currentDate, false);
+                return generateSyncResponse(auction, currentDate, false);
             case RUNNING:
                 if (currentDate.isAfter(auction.getCurrentLot().getEndTime()) || currentDate.isEqual(auction.getCurrentLot().getEndTime())) {
                     return handleLotFinished(auction, currentDate);
                 } else {
-                    return getSync(auction, currentDate, false);
+                    return generateSyncResponse(auction, currentDate, false);
                 }
             case FINISHED:
-                return getSync(auction, currentDate, false);
+                return generateSyncResponse(auction, currentDate, false);
             case DRAFT:
             default:
                 throw new NotCorrectStatusException(auction);
@@ -151,10 +128,10 @@ public class BetServiceImpl implements BetService {
 
             logWinnerIfExists(auction);
             logService.log(LogLevel.AUCTION_STATUS_CHANGE, auction);
-            return getSync(auction, currentDate, false);
+            return generateSyncResponse(auction, currentDate, false);
         } else {
             logWinnerIfExists(auction);
-            return getSync(setAndSaveAnotherLot(auction, currentDate), currentDate, true);
+            return generateSyncResponse(setAndSaveAnotherLot(auction, currentDate), currentDate, true);
         }
     }
 
@@ -177,7 +154,7 @@ public class BetServiceImpl implements BetService {
                         .plus(auction.getLotDuration().toNanoOfDay(), ChronoUnit.NANOS));
     }
 
-    private SyncResponse getSync(Auction auction, LocalDateTime currentDate, boolean changed) {
+    private SyncResponse generateSyncResponse(Auction auction, LocalDateTime currentDate, boolean changed) {
         return new SyncResponse(
                 getDurationInSec(auction, currentDate),
                 modelMapper.map(auction.getCurrentLot(), LotResponse.class),

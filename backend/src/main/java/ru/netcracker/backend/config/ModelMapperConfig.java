@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import ru.netcracker.backend.model.Auction;
+import ru.netcracker.backend.model.Bet;
 import ru.netcracker.backend.model.Lot;
 import ru.netcracker.backend.model.Message;
 import ru.netcracker.backend.repository.UserRepository;
@@ -13,8 +14,12 @@ import ru.netcracker.backend.requests.AuctionRequest;
 import ru.netcracker.backend.requests.LotRequest;
 import ru.netcracker.backend.requests.MessageRequest;
 import ru.netcracker.backend.responses.AuctionResponse;
+import ru.netcracker.backend.responses.BetResponse;
 import ru.netcracker.backend.responses.LotResponse;
 import ru.netcracker.backend.responses.MessageResponse;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 @Configuration
 public class ModelMapperConfig {
@@ -65,20 +70,26 @@ public class ModelMapperConfig {
                         });
 
         modelMapper.createTypeMap(MessageRequest.class, Message.class)
-            .setPostConverter(context->{
-                context.getDestination().setSender(
-                    userRepository
-                            .findByUsername(context.getSource().getSenderUsername())
-                            .orElseThrow(() -> new UsernameNotFoundException(context.getSource().getSenderUsername())));
+                .setPostConverter(context -> {
+                    context.getDestination().setSender(
+                            userRepository
+                                    .findByUsername(context.getSource().getSenderUsername())
+                                    .orElseThrow(() -> new UsernameNotFoundException(context.getSource().getSenderUsername())));
                     return context.getDestination();
 
-            });
+                });
+
         modelMapper.createTypeMap(Message.class, MessageResponse.class)
-                .setPostConverter(context->{
+                .setPostConverter(context -> {
                     context.getDestination().setUsername(
                             context.getSource().getSender().getUsername());
                     return context.getDestination();
                 });
 
+        modelMapper.createTypeMap(Bet.class, BetResponse.class)
+                .setPostConverter(context -> {
+                    context.getDestination().setSecondsUntil(Math.abs(Duration.between(context.getSource().getLot().getEndTime(), LocalDateTime.now()).toSeconds()));
+                    return context.getDestination();
+                });
     }
 }

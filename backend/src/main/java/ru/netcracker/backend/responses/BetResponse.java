@@ -11,4 +11,5 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class BetResponse {
     private BigDecimal currentBank;
+    private Long secondsUntil;
 }

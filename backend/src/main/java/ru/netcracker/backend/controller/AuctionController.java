@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.netcracker.backend.exception.auction.NoLotsException;
 import ru.netcracker.backend.exception.auction.NotCorrectStatusException;
@@ -16,12 +17,15 @@ import ru.netcracker.backend.responses.AuctionResponse;
 import ru.netcracker.backend.responses.UserResponse;
 import ru.netcracker.backend.service.AuctionService;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/auctions")
 @CrossOrigin("*")
 @Slf4j
+@Validated
 public class AuctionController {
     private final ModelMapper modelMapper;
     private final AuctionService auctionService;
@@ -38,12 +42,12 @@ public class AuctionController {
     }
 
     @GetMapping("/sub")
-    public List<AuctionResponse> getAllSubscribedAuctions(@RequestParam("username") String username, Pageable pageable) {
+    public List<AuctionResponse> getAllSubscribedAuctions(@NotBlank @RequestParam("username") String username, Pageable pageable) {
         return auctionService.getAllSubscribedAuctions(username, pageable);
     }
 
     @GetMapping("/own")
-    public List<AuctionResponse> getAllOwnAuctions(@RequestParam("username") String username, Pageable pageable) {
+    public List<AuctionResponse> getAllOwnAuctions(@NotBlank @RequestParam("username") String username, Pageable pageable) {
         return auctionService.getAllOwnAuctions(username, pageable);
     }
 
@@ -55,7 +59,7 @@ public class AuctionController {
     }
 
     @PostMapping
-    public ResponseEntity<AuctionResponse> createAuction(@RequestBody AuctionRequest auctionRequest) {
+    public ResponseEntity<AuctionResponse> createAuction(@Valid @RequestBody AuctionRequest auctionRequest) {
         AuctionResponse auctionResponse = auctionService
                 .createAuction(modelMapper.map(auctionRequest, Auction.class));
 
@@ -71,7 +75,7 @@ public class AuctionController {
 
     @PutMapping("/{id}")
     public ResponseEntity<AuctionResponse> updateAuction(
-            @PathVariable Long id, @RequestBody AuctionRequest auctionRequest) {
+            @PathVariable Long id, @Valid @RequestBody AuctionRequest auctionRequest) {
         AuctionResponse auctionResponse = auctionService.updateAuction(
                 id, modelMapper.map(auctionRequest, Auction.class));
 
@@ -88,7 +92,7 @@ public class AuctionController {
     }
 
     @PostMapping("/subscribe")
-    public ResponseEntity<UserResponse> subscribe(@RequestBody SubscribeRequest subscribeRequest) {
+    public ResponseEntity<UserResponse> subscribe(@Valid @RequestBody SubscribeRequest subscribeRequest) {
         UserResponse userResponse = auctionService.subscribe(
                 subscribeRequest.getUsername(), subscribeRequest.getAuctionId());
         log.info("user: {} subscribed to auction with id: {}", userResponse.getUsername(), subscribeRequest.getAuctionId());

@@ -13,6 +13,8 @@ import ru.netcracker.backend.service.AuthService;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.io.UnsupportedEncodingException;
 
 @RestController
@@ -28,7 +30,7 @@ public class AuthController {
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<?> generateToken(@RequestBody AuthRequest authRequest) {
+    public ResponseEntity<?> generateToken(@Valid @RequestBody AuthRequest authRequest) {
         return new ResponseEntity<>((authService.authenticateUser(
                 new User(
                         authRequest.getUsername(),
@@ -39,7 +41,7 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<String> createUser(
-            @RequestBody AuthRequest authRequest, HttpServletRequest request)
+            @Valid @RequestBody AuthRequest authRequest, HttpServletRequest request)
             throws UserExistsException, MessagingException, UnsupportedEncodingException,
             EmailExistsException {
         authService.createUser(new User(
@@ -52,7 +54,7 @@ public class AuthController {
 
     @PostMapping("/password/change")
     public ResponseEntity<Void> passwordChangeRequest(
-            @RequestParam("username") String username, HttpServletRequest request)
+            @NotBlank @RequestParam("username") String username, HttpServletRequest request)
             throws MessagingException, UnsupportedEncodingException {
         authService.sendChangePasswordRequestToUserEmail(username, getSiteURL(request));
         return new ResponseEntity<>(HttpStatus.OK);
@@ -60,7 +62,7 @@ public class AuthController {
 
     @PostMapping("/send/verification")
     public ResponseEntity<Void> sendVerificationEmail(
-            @RequestParam("username") String username, HttpServletRequest request)
+            @NotBlank @RequestParam("username") String username, HttpServletRequest request)
             throws MessagingException, UnsupportedEncodingException {
         authService.sendVerificationLinkToUserEmail(username, getSiteURL(request));
         return new ResponseEntity<>(HttpStatus.OK);

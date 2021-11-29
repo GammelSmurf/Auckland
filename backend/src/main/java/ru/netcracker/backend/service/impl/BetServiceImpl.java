@@ -49,7 +49,7 @@ public class BetServiceImpl implements BetService {
 
     @Scheduled(fixedDelay = 1000)
     @Transactional
-    public void cancelTransactions() {
+    public void handleCancelTransactions() {
         for (Transaction tx : transactionRepository.findAllByTransactionStatus(TransactionStatus.CANCEL)) {
             tx.getUser().addCurrency(tx.getCurrentBank());
             transactionRepository.delete(tx);

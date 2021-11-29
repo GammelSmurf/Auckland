@@ -18,7 +18,9 @@ import ru.netcracker.backend.repository.UserRepository;
 import ru.netcracker.backend.responses.AuctionResponse;
 import ru.netcracker.backend.responses.UserResponse;
 import ru.netcracker.backend.service.AuctionService;
+import ru.netcracker.backend.service.LogService;
 import ru.netcracker.backend.util.AuctionUtil;
+import ru.netcracker.backend.util.LogLevel;
 import ru.netcracker.backend.util.UserUtil;
 
 import java.util.List;
@@ -30,12 +32,14 @@ import java.util.stream.Collectors;
 public class AuctionServiceImpl implements AuctionService {
     private final AuctionRepository auctionRepository;
     private final UserRepository userRepository;
+    private final LogService logService;
     private final ModelMapper modelMapper;
 
     @Autowired
-    public AuctionServiceImpl(AuctionRepository auctionRepository, UserRepository userRepository, ModelMapper modelMapper) {
+    public AuctionServiceImpl(AuctionRepository auctionRepository, UserRepository userRepository, LogService logService, ModelMapper modelMapper) {
         this.auctionRepository = auctionRepository;
         this.userRepository = userRepository;
+        this.logService = logService;
         this.modelMapper = modelMapper;
     }
 
@@ -102,12 +106,6 @@ public class AuctionServiceImpl implements AuctionService {
                 AuctionResponse.class);
     }
 
-    /**
-     * Change auction status to waiting from draft and set the first lot.
-     * Can be called only being in the draft status.
-     *
-     * @param auctionId Auction id
-     */
     @Override
     @Transactional
     public void makeAuctionWaiting(Long auctionId) {
@@ -120,7 +118,7 @@ public class AuctionServiceImpl implements AuctionService {
                 if (lotOptional.isPresent()) {
                     auction.setStatus(AuctionStatus.WAITING);
                     auction.setCurrentLot(lotOptional.get());
-                    auctionRepository.save(auction);
+                    logService.log(LogLevel.AUCTION_STATUS_CHANGE, auctionRepository.save(auction));
                 } else {
                     throw new NoLotsException();
                 }

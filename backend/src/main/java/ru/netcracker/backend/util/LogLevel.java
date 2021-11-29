@@ -4,6 +4,7 @@ public enum LogLevel {
     AUCTION_BET("-Bet-"),
     AUCTION_STATUS_CHANGE("-Status change-"),
     AUCTION_WINNER("-Winner-"),
+    AUCTION_NO_WINNER("-No Winner-"),
     DEBUG("-Debug-");
 
     private final String text;

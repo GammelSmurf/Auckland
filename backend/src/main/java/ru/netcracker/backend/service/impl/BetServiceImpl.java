@@ -157,6 +157,8 @@ public class BetServiceImpl implements BetService {
     private void logWinnerIfExists(Auction auction) {
         if (auction.getCurrentLot().getWinner() != null) {
             logService.log(LogLevel.AUCTION_WINNER, auction);
+        } else {
+            logService.log(LogLevel.AUCTION_NO_WINNER, auction);
         }
     }
 

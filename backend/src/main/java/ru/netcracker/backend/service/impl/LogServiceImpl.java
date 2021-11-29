@@ -27,6 +27,7 @@ public class LogServiceImpl implements LogService {
     private static final String LOG_BET_MSG_TEMPLATE = "%s повысил ставку до %s";
     private static final String LOG_CHANGE_MSG_TEMPLATE = "Статус аукциона изменился на %s";
     private static final String LOG_WINNER_MSG_TEMPLATE = "%s выиграл лот \"%s\"";
+    private static final String LOG_NO_WINNER_MSG_TEMPLATE = "Никто не выиграл лот \"%s\"";
     private static final String LOG_SEP = "\u0020";
 
     @Autowired
@@ -63,6 +64,11 @@ public class LogServiceImpl implements LogService {
                         auction.getId(),
                         addLog(level, auction,
                                 String.format(LOG_WINNER_MSG_TEMPLATE, auction.getCurrentLot().getWinner().getUsername(), auction.getCurrentLot().getName())));
+                break;
+            case AUCTION_NO_WINNER:
+                sendAuctionLogToWs(auction.getId(),
+                        addLog(level, auction,
+                                String.format(LOG_NO_WINNER_MSG_TEMPLATE, auction.getCurrentLot().getName())));
                 break;
         }
     }

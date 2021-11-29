@@ -72,4 +72,12 @@ public class User {
 
     @ManyToMany(mappedBy = "subscribers")
     private Set<Auction> subscribedAuctions = new HashSet<>();
+
+    public void subtractCurrency(BigDecimal currency) {
+        this.currency = this.currency.subtract(currency);
+    }
+
+    public void addCurrency(BigDecimal currency) {
+        this.currency = this.currency.add(currency);
+    }
 }

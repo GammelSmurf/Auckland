@@ -40,9 +40,9 @@ public class Auction {
     @JsonBackReference
     private Bet bet;
 
-    @OneToOne(mappedBy = "auction")
+    @OneToMany(mappedBy = "auction")
     @JsonBackReference
-    private Log log;
+    private Set<Log> log = new HashSet<>();
 
     @OneToOne
     @JsonBackReference

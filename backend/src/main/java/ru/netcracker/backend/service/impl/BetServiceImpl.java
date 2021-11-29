@@ -3,16 +3,15 @@ package ru.netcracker.backend.service.impl;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.netcracker.backend.exception.auction.NotCorrectStatusException;
-import ru.netcracker.backend.model.Auction;
-import ru.netcracker.backend.model.AuctionStatus;
-import ru.netcracker.backend.model.Bet;
-import ru.netcracker.backend.model.User;
+import ru.netcracker.backend.model.*;
 import ru.netcracker.backend.repository.AuctionRepository;
 import ru.netcracker.backend.repository.BetRepository;
+import ru.netcracker.backend.repository.TransactionRepository;
 import ru.netcracker.backend.repository.UserRepository;
 import ru.netcracker.backend.responses.BetResponse;
 import ru.netcracker.backend.responses.LotResponse;
@@ -28,6 +27,8 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -35,17 +36,28 @@ public class BetServiceImpl implements BetService {
     private final BetRepository betRepository;
     private final UserRepository userRepository;
     private final AuctionRepository auctionRepository;
+    private final TransactionRepository transactionRepository;
     private final LogService logService;
     private final ModelMapper modelMapper;
 
     @Autowired
     public BetServiceImpl(BetRepository betRepository, UserRepository userRepository, AuctionRepository auctionRepository,
-                          LogService logService, ModelMapper modelMapper) {
+                          TransactionRepository transactionRepository, LogService logService, ModelMapper modelMapper) {
         this.betRepository = betRepository;
         this.userRepository = userRepository;
         this.auctionRepository = auctionRepository;
+        this.transactionRepository = transactionRepository;
         this.logService = logService;
         this.modelMapper = modelMapper;
+    }
+
+    @Scheduled(fixedDelay = 1000)
+    @Transactional
+    public void cancelTransactions() {
+        for (Transaction tx : transactionRepository.findAllByTransactionStatus(TransactionStatus.CANCEL)) {
+            tx.getUser().addCurrency(tx.getCurrentBank());
+            transactionRepository.delete(tx);
+        }
     }
 
     @Override
@@ -64,9 +76,11 @@ public class BetServiceImpl implements BetService {
                         ? auction.getBet()
                         : new Bet(auction);
                 bet.setCurrentBank(betBank);
-                bet.getLot().setEndTime(boostEndTime(bet));
+                user.subtractCurrency(betBank);
                 bet.setUser(user);
+                bet.getLot().setEndTime(boostEndTime(bet));
                 bet.setAuction(auction);
+                bet.getTransactions().add(transactionRepository.save(new Transaction(bet)));
                 auction.setBet(bet);
                 logService.log(LogLevel.AUCTION_BET, bet.getAuction());
                 return modelMapper.map(betRepository.save(bet), BetResponse.class);
@@ -119,6 +133,14 @@ public class BetServiceImpl implements BetService {
         if (auction.getBet() != null) {
             auction.getCurrentLot().setWinner(auction.getBet().getUser());
             auction.getCurrentLot().setWinBank(auction.getBet().getCurrentBank());
+
+            auction.getBet().getTransactions().stream()
+                    .max(Comparator.comparing(Transaction::getDatetime))
+                    .ifPresent(tx -> tx.setTransactionStatus(TransactionStatus.DONE));
+            auction.getBet().getTransactions().stream()
+                    .filter(tx -> !tx.getTransactionStatus().equals(TransactionStatus.DONE))
+                    .forEach(tx -> tx.setTransactionStatus(TransactionStatus.CANCEL));
+
             betRepository.delete(auction.getBet());
         }
 

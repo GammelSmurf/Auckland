@@ -6,6 +6,8 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "bet")
@@ -29,6 +31,9 @@ public class Bet {
     @OneToOne
     @JsonBackReference
     private User user;
+
+    @OneToMany
+    private Set<Transaction> transactions = new HashSet<>();
 
     public Bet() {
     }

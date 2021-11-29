@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository
                 .findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException(String.format(UserUtil.USER_NOT_FOUND_TEMPLATE, username)));
-        user.setCurrency(user.getCurrency().add(currency));
+        user.addCurrency(currency);
         return modelMapper.map(userRepository.save(user), UserResponse.class);
     }
 }

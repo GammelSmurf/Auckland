@@ -18,6 +18,6 @@ public class Log {
     private String logMessage;
     private LocalDateTime logTime;
 
-    @OneToOne
+    @ManyToOne
     private Auction auction;
 }

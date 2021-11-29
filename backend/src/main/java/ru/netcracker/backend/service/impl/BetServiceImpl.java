@@ -9,10 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.netcracker.backend.exception.auction.NotCorrectStatusException;
 import ru.netcracker.backend.model.*;
-import ru.netcracker.backend.repository.AuctionRepository;
-import ru.netcracker.backend.repository.BetRepository;
-import ru.netcracker.backend.repository.TransactionRepository;
-import ru.netcracker.backend.repository.UserRepository;
+import ru.netcracker.backend.repository.*;
 import ru.netcracker.backend.responses.BetResponse;
 import ru.netcracker.backend.responses.LotResponse;
 import ru.netcracker.backend.responses.SyncResponse;
@@ -28,7 +25,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
-import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -96,7 +92,7 @@ public class BetServiceImpl implements BetService {
         return oldBet.getLot()
                 .getEndTime()
                 .plus(oldBet.getAuction()
-                        .getBoostTime().getNano(), ChronoUnit.NANOS);
+                        .getBoostTime().toNanoOfDay(), ChronoUnit.NANOS);
     }
 
     @Override
@@ -146,6 +142,7 @@ public class BetServiceImpl implements BetService {
 
         if (AuctionUtil.getAnotherLot(auction).isEmpty()) {
             auction.setStatus(AuctionStatus.FINISHED);
+            auction.setEndDate(currentDate);
             auctionRepository.save(auction);
 
             logWinnerIfExists(auction);

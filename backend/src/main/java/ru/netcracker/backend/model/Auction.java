@@ -28,6 +28,7 @@ public class Auction {
     private String description;
 
     private LocalDateTime beginDate;
+    private LocalDateTime endDate;
     private LocalTime lotDuration;
 
     @Enumerated(EnumType.STRING)

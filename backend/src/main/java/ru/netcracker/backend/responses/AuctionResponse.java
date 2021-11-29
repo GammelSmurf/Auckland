@@ -31,6 +31,8 @@ public class AuctionResponse {
 
     @JsonLocalDateTime
     private LocalDateTime beginDate;
+    @JsonLocalDateTime
+    private LocalDateTime endDate;
 
     @JsonLocalTime
     private LocalTime lotDuration;

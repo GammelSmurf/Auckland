@@ -11,7 +11,7 @@ import javax.validation.constraints.Size;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthRequest {
+public class SignUpRequest {
     @NotBlank(message="Username should not be blank")
     @Size(min=3,max=250)
     private String username;
@@ -20,8 +20,8 @@ public class AuthRequest {
     @Size(min=3,max=255)
     private String password;
 
-    @NotBlank(message="Email should not be blank")
-    @Size(min=3,max=255)
-    @Pattern(regexp = "^(.+)@(\\\\S+)$")
+    @NotBlank(message = "Email should not be blank")
+    @Size(min = 3, max = 255)
+    @Pattern(regexp = "^([a-z0-9_-]+\\.)*[a-z0-9_-]+@[a-z0-9_-]+(\\.[a-z0-9_-]+)*\\.[a-z]{2,6}$")
     private String email;
 }

@@ -8,7 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.netcracker.backend.exception.user.EmailExistsException;
 import ru.netcracker.backend.exception.user.UserExistsException;
 import ru.netcracker.backend.model.User;
-import ru.netcracker.backend.requests.AuthRequest;
+import ru.netcracker.backend.requests.SignInRequest;
+import ru.netcracker.backend.requests.SignUpRequest;
 import ru.netcracker.backend.service.AuthService;
 
 import javax.mail.MessagingException;
@@ -30,25 +31,25 @@ public class AuthController {
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<?> generateToken(@Valid @RequestBody AuthRequest authRequest) {
+    public ResponseEntity<?> generateToken(@Valid @RequestBody SignInRequest signInRequest) {
         return new ResponseEntity<>((authService.authenticateUser(
                 new User(
-                        authRequest.getUsername(),
-                        authRequest.getPassword(),
-                        authRequest.getEmail()))),
+                        signInRequest.getUsername(),
+                        signInRequest.getPassword()
+                        ))),
                 HttpStatus.OK);
     }
 
     @PostMapping("/signup")
     public ResponseEntity<String> createUser(
-            @Valid @RequestBody AuthRequest authRequest, HttpServletRequest request)
+            @Valid @RequestBody SignUpRequest signUpRequest, HttpServletRequest request)
             throws UserExistsException, MessagingException, UnsupportedEncodingException,
             EmailExistsException {
         authService.createUser(new User(
-                authRequest.getUsername(),
-                authRequest.getPassword(),
-                authRequest.getEmail()), getSiteURL(request));
-        log.info("created user: {}", authRequest);
+                signUpRequest.getUsername(),
+                signUpRequest.getPassword(),
+                signUpRequest.getEmail()), getSiteURL(request));
+        log.info("created user: {}", signUpRequest);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

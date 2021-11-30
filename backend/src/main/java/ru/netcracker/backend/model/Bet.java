@@ -33,6 +33,7 @@ public class Bet {
     private User user;
 
     @OneToMany
+    @JoinColumn(name="bet_id")
     private Set<Transaction> transactions = new HashSet<>();
 
     public Bet() {

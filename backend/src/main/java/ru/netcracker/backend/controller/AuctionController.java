@@ -51,6 +51,11 @@ public class AuctionController {
         return auctionService.getAllOwnAuctions(username, pageable);
     }
 
+    @GetMapping("/search")
+    public List<AuctionResponse> getAuctionByKeyword(@NotBlank @RequestParam("keyword") String keyword, Pageable pageable) {
+        return auctionService.searchAuctions(keyword, pageable);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<AuctionResponse> getAuction(@PathVariable(name = "id") Long id) {
         AuctionResponse auctionResponse = auctionService.getAuctionById(id);

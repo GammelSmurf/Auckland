@@ -14,6 +14,8 @@ public interface AuctionService {
 
     List<AuctionResponse> getAllOwnAuctions(String username, Pageable pageable);
 
+    List<AuctionResponse> searchAuctions(String keyword, Pageable pageable);
+
     AuctionResponse createAuction(Auction auction);
 
     AuctionResponse updateAuction(Long id, Auction auction);

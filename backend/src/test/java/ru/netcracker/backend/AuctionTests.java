@@ -226,7 +226,7 @@ public class AuctionTests {
 
     public void printSync(SyncResponse syncResponse) {
         System.out.println(ConsoleColors.GREEN +
-                "time unitl: " + syncResponse.getTimeUntil() +
+                "time unitl: " + syncResponse.getSecondsUntil() +
                 ", current_lot: " + syncResponse.getCurrentLot().getName() +
                 ", status: " + syncResponse.getAuctionStatus() +
                 ", changed: " + syncResponse.getChanged() +

@@ -133,12 +133,12 @@ public class BetServiceImpl implements BetService {
             auction.getBet().getTransactions().stream()
                     .max(Comparator.comparing(Transaction::getDatetime))
                     .ifPresent(tx -> tx.setTransactionStatus(TransactionStatus.DONE));
-            auction.getBet().getTransactions().stream()
-                    .filter(tx -> !tx.getTransactionStatus().equals(TransactionStatus.DONE))
-                    .forEach(tx -> tx.setTransactionStatus(TransactionStatus.CANCEL));
 
             betRepository.delete(auction.getBet());
         }
+        auction.getBet().getTransactions().stream()
+                .filter(tx -> !tx.getTransactionStatus().equals(TransactionStatus.DONE))
+                .forEach(tx -> tx.setTransactionStatus(TransactionStatus.CANCEL));
 
         if (AuctionUtil.getAnotherLot(auction).isEmpty()) {
             auction.setStatus(AuctionStatus.FINISHED);

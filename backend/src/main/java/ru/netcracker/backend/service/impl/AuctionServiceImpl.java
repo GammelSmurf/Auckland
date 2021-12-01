@@ -7,6 +7,7 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.netcracker.backend.exception.auction.NoLotsException;
+import ru.netcracker.backend.exception.auction.NotCorrectBeginDateException;
 import ru.netcracker.backend.exception.auction.NotCorrectStatusException;
 import ru.netcracker.backend.exception.user.UsernameNotFoundException;
 import ru.netcracker.backend.model.Auction;
@@ -23,6 +24,7 @@ import ru.netcracker.backend.util.AuctionUtil;
 import ru.netcracker.backend.util.LogLevel;
 import ru.netcracker.backend.util.UserUtil;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -120,9 +122,13 @@ public class AuctionServiceImpl implements AuctionService {
         Auction auction = auctionRepository
                 .findById(auctionId)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(AuctionUtil.AUCTION_NOT_FOUND_TEMPLATE, auctionId)));
+        LocalDateTime currentDate = LocalDateTime.now();
         switch (auction.getStatus()) {
             case DRAFT:
                 Optional<Lot> lotOptional = AuctionUtil.getAnotherLot(auction);
+                if(currentDate.isAfter(auction.getBeginDate())){
+                    throw new NotCorrectBeginDateException();
+                }
                 if (lotOptional.isPresent()) {
                     auction.setStatus(AuctionStatus.WAITING);
                     auction.setCurrentLot(lotOptional.get());

@@ -1,9 +1,9 @@
 import {Carousel} from "react-bootstrap";
-import React, {useState} from "react";
+import React from "react";
 
 
 const LotCarousel = (props) => {
-    //const [imgURL, setImgURL] = useState();
+
     return(
             <Carousel>
                 {props.lots.map(lot =>
@@ -19,7 +19,9 @@ const LotCarousel = (props) => {
                             />
                         </div>
                         <div style={{position: "absolute", top: 0, left: "15%", right: "15%"}}>
-                            <h3 style={{color: "white"}}>{lot.minBank} $</h3>
+                            {props.status === 'FINISHED' ?
+                            <h3 style={{color: "white"}}>{'Winner: ' + (lot.winner ? lot.winner.username : 'nobody')}</h3> :
+                                <h3 style={{color: "white"}}>{'Opening price: ' + lot.minBank} $</h3>}
                         </div>
                         <Carousel.Caption>
                             <h3>{lot.name}</h3>

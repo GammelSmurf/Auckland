@@ -21,7 +21,8 @@ public class AuctionResponse {
     private long id;
     private String name;
     private String description;
-    private Long creatorId;
+    private UserResponse creator;
+    private LotResponse currentLot;
 
     private int usersLimit;
     private int usersCount;

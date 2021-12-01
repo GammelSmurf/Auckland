@@ -19,6 +19,7 @@ public class LotResponse {
     private String picture;
     private Long auctionId;
     private Boolean finished;
+    private UserResponse winner;
 
     @JsonLocalDateTime
     private LocalDateTime endTime;

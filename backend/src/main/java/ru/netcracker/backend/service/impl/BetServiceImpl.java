@@ -47,15 +47,6 @@ public class BetServiceImpl implements BetService {
         this.modelMapper = modelMapper;
     }
 
-    @Scheduled(fixedDelay = 1000)
-    @Transactional
-    public void handleCancelTransactions() {
-        for (Transaction tx : transactionRepository.findAllByTransactionStatus(TransactionStatus.CANCEL)) {
-            tx.getUser().addCurrency(tx.getCurrentBank());
-            transactionRepository.delete(tx);
-        }
-    }
-
     @Override
     @Transactional
     public BetResponse makeBet(String username, Long auctionId, BigDecimal betBank) {
@@ -135,7 +126,10 @@ public class BetServiceImpl implements BetService {
                     .ifPresent(tx -> tx.setTransactionStatus(TransactionStatus.DONE));
             auction.getBet().getTransactions().stream()
                     .filter(tx -> !tx.getTransactionStatus().equals(TransactionStatus.DONE))
-                    .forEach(tx -> tx.setTransactionStatus(TransactionStatus.CANCEL));
+                    .forEach(tx -> {
+                        tx.getUser().addCurrency(tx.getCurrentBank());
+                        transactionRepository.delete(tx);
+                    });
 
             betRepository.delete(auction.getBet());
         }

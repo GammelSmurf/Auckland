@@ -6,9 +6,9 @@ const EditAucForm = (props) => {
     return (
         <div className="configBlock">
             <Form.Group>
-                <FormControl required type="datetime-local" step="1" defaultValue={props.auction.beginDate} onChange={props.handleChange("beginDate")}/>
+                <FormControl required type="datetime-local" step="1" defaultValue={props.auction.beginDate} min={props.minDate} onChange={props.handleChange("beginDate")}/>
                 <Form.Control.Feedback type="invalid">
-                    The value cannot be empty
+                    Auction's begin date must be in the future
                 </Form.Control.Feedback>
             </Form.Group>
             <div className="mt-3 mb-5">

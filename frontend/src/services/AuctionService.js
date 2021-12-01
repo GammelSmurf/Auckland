@@ -65,10 +65,8 @@ const setStatusWaiting = (id) => {
 
         }, {headers: authHeader()})
         .then(response => {
-            console.log("Change auctions status:")
-            console.log(response)
             return response
-        });
+        })
 }
 
 const getAuctionLogs = (auctionId) => {

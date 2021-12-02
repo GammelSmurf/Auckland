@@ -11,9 +11,9 @@ public interface MessageService {
 
     List<MessageResponse> getMessagesByAuction(Long auctionId);
 
-    //void deleteMessage(Long messageId);
+    void deleteMessage(Long messageId);
 
     MessageResponse addMessage(Message message);
 
-    //MessageResponse getMessageById(Long messageId);
+    void deleteOldChats();
 }

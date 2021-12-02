@@ -9,6 +9,7 @@ import ru.netcracker.backend.repository.MessageRepository;
 import ru.netcracker.backend.responses.MessageResponse;
 import ru.netcracker.backend.service.MessageService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,5 +36,15 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public MessageResponse addMessage(Message message) {
         return modelMapper.map(messageRepository.save(message), MessageResponse.class);
+    }
+
+    @Override
+    public void deleteMessage(Long messageId) {
+        messageRepository.deleteById(messageId);
+    }
+
+    @Override
+    public void deleteOldChats() {
+        messageRepository.deleteOldChats(LocalDateTime.now().minusDays(7));
     }
 }

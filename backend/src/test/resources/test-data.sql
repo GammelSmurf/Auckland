@@ -173,3 +173,13 @@ values ('Борис Аникин родился в Ленинграде. В 1966
 insert into lots (description, min_bank, name, picture, step, auction_id, finished)
 values ('Борис Аникин родился в Ленинграде. В 1966 году поступил в Академию Художеств, которую окончил в 1974 году. Член Союза художников с 1982 года. Проиллюстрировал более 150 книг, которые можно найти практически в каждом российском доме. Многие из произведений художника находятся не только в частных коллекциях, но и в собраниях ведущих галерей Европы и Америки. Художник удостоен многих премий и дипломов художественных издательств и журналов.',
         3500,'Зимний лес','https://barcaffe.ru/wp-content/uploads/2020/01/xudozhnik_aleksej_anikin_01.jpg', 1, 1, false);
+
+--Add Categories
+insert into categories (name)
+values ('ART');
+insert into categories (name)
+values ('ENTERTAINMENT');
+insert into categories (name)
+values ('SCIENCE');
+insert into categories (name)
+values ('LIFE');

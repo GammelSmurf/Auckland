@@ -5,18 +5,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import ru.netcracker.backend.model.Auction;
-import ru.netcracker.backend.model.Bet;
-import ru.netcracker.backend.model.Lot;
-import ru.netcracker.backend.model.Message;
+import ru.netcracker.backend.model.*;
 import ru.netcracker.backend.repository.UserRepository;
 import ru.netcracker.backend.requests.AuctionRequest;
 import ru.netcracker.backend.requests.LotRequest;
 import ru.netcracker.backend.requests.MessageRequest;
-import ru.netcracker.backend.responses.AuctionResponse;
-import ru.netcracker.backend.responses.BetResponse;
-import ru.netcracker.backend.responses.LotResponse;
-import ru.netcracker.backend.responses.MessageResponse;
+import ru.netcracker.backend.requests.TagRequest;
+import ru.netcracker.backend.responses.*;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -35,6 +30,7 @@ public class ModelMapperConfig {
     public ModelMapper modelMapper() {
         modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setFieldMatchingEnabled(true);
+        modelMapper.getConfiguration().setAmbiguityIgnored(true);
         auctionMapperConfiguration();
         return modelMapper;
     }
@@ -91,5 +87,18 @@ public class ModelMapperConfig {
                     context.getDestination().setSecondsUntil(Math.abs(Duration.between(context.getSource().getLot().getEndTime(), LocalDateTime.now()).toSeconds()));
                     return context.getDestination();
                 });
+
+        modelMapper.createTypeMap(TagRequest.class, Tag.class)
+                .addMappings(
+                        mapper -> mapper.skip(Tag::setId));
+
+        modelMapper.createTypeMap(Tag.class, TagResponse.class)
+                .addMappings(
+                        mapper -> {
+                            mapper.map(src -> src.getAuction().getId(), TagResponse::setAuctionId);
+                            mapper.map(src -> src.getCategory().getId(), TagResponse::setCategoryId);
+                        });
+
+        modelMapper.createTypeMap(Category.class, CategoryResponse.class);
     }
 }

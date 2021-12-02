@@ -62,11 +62,12 @@ public class Auction {
     @JoinColumn(name = "user_id", nullable = false)
     private User creator;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "auctions_tags",
-            joinColumns = @JoinColumn(name = "auction_id"),
-            inverseJoinColumns = @JoinColumn(name = "tag_id"))
+    @OneToMany(
+            mappedBy = "auction",
+            fetch = FetchType.EAGER,
+            orphanRemoval = true,
+            cascade = CascadeType.ALL)
+    @JsonBackReference
     private Set<Tag> tags = new HashSet<>();
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -83,6 +84,14 @@ public class Auction {
             joinColumns = @JoinColumn(name = "auction_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
     private Set<User> subscribers = new HashSet<>();
+
+    @JsonBackReference
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "auction_categories",
+            joinColumns = @JoinColumn(name = "auction_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id"))
+    private Set<Category> categories = new HashSet<>();
 
     public int getLikesCount() {
         return getUserLikes().size();

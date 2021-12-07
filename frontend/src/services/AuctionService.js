@@ -86,5 +86,26 @@ const subscribe = (values) =>{
         });
 };
 
+const addCategory = (values) => {
+    return axios
+        .post(API_URL + 'category/add', {
+            auctionId: values.auctionId,
+            categoryId: values.categoryId
+        }, {headers: authHeader()})
+        .then(response => {
+            return response
+        });
+}
 
-export default {getAllAuctions, getAuction, deleteAuction, createAuction, updateAuction, setStatusWaiting, getAuctionLogs, subscribe};
+const removeCategory = (values) => {
+    return axios
+        .post(API_URL + 'category/remove', {
+            auctionId: values.auctionId,
+            categoryId: values.categoryId
+        }, {headers: authHeader()})
+        .then(response => {
+            return response
+        });
+}
+
+export default {getAllAuctions, getAuction, deleteAuction, createAuction, updateAuction, setStatusWaiting, getAuctionLogs, subscribe, addCategory, removeCategory};

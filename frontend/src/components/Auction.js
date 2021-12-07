@@ -1,6 +1,7 @@
 import React, {useEffect, useRef, useState} from "react";
-import {Button, Col, Container, Form, FormControl, InputGroup, Row, Spinner} from "react-bootstrap";
+import {Button, Col, Container, Form, FormControl, InputGroup, Row, Spinner, Tabs} from "react-bootstrap";
 import confetti from 'canvas-confetti';
+import { addResponseMessage } from 'react-chat-widget';
 
 import AuctionService from "../services/AuctionService";
 import LotService from "../services/LotService";
@@ -13,7 +14,12 @@ import EditLotModal from "./EditLotModal";
 import ModalDialog from "./ModalDialog";
 import BetService from "../services/BetService";
 import SockJsClient from 'react-stomp';
+import Categories from "./Categories";
 import Chat from "./Chat";
+import MessageService from "../services/MessageService";
+import {animateScroll} from "react-scroll";
+import {Tab} from "bootstrap";
+import Members from "./Members";
 
 const Auction = (props) => {
     const [validated, setValidated] = useState(false);
@@ -39,6 +45,8 @@ const Auction = (props) => {
     const [bet, setBet] = useState();
     const [creator, setCreator] = useState({});
     const [errorMessage, setErrorMessage] = useState('');
+    const [chatMessages, setChatMessages] = useState([]);
+    const [members, setMembers] = useState([]);
 
     const client = useRef(null);
     const timerId = useRef(null);
@@ -69,6 +77,15 @@ const Auction = (props) => {
 
     const parseResponseDate = (inputDate) => {
         return formatDate(new Date(inputDate)).split('T').join(' ');
+    }
+
+    const parseMessageTime = (inputDate) => {
+        const date = new Date(inputDate);
+        const options = {
+            hour: '2-digit', minute: '2-digit'
+        };
+        const dateTimeFormat = new Intl.DateTimeFormat('ru-RU', options).format;
+        return dateTimeFormat(date);
     }
 
     const getLots = (aucId) => {
@@ -124,11 +141,16 @@ const Auction = (props) => {
     }
 
     const onReceiveWebSocketMessage = (response) => {
+        if(response.username){
+            console.log('Chat', response)
+            setChatMessages(chatMessages.concat({...response, dateTimeMessage: parseMessageTime(response.dateTimeMessage)}))
+            scrollToBottom();
+        }
         if(response.currentBank){
             setCurrentPrice(response.currentBank);
             activateTimer(response.secondsUntil, auction.id);
         }
-        else{
+        if(response.logMessage){
             setFinishTime(parseDateToDisplay(response.logTime));
             setLogs(logs.concat(response));
         }
@@ -149,10 +171,15 @@ const Auction = (props) => {
         }
     }
 
+    const handleSendMessage = (message) => {
+        client.current.sendMessage('/app/send/'+auction.id,
+            JSON.stringify({senderUsername: currentUser.username, auctionId: auction.id, dateTimeMessage: parseResponseDate(new Date()), message: message}));
+    }
+
     //------------------------WS logic------------------------//
 
     const animateConfetti = () => {
-        let ms = 6000;
+        let ms = 4000;
         confettiTimerId.current = setInterval(() => {
         if(ms < 0){
             clearInterval(confettiTimerId.current);
@@ -182,6 +209,7 @@ const Auction = (props) => {
                 console.log(response.data)
                 setCreator(response.data.creator);
                 setIsSubscribed(response.data.subscribers.some(user=>user.id === currentUser.id));
+                setMembers(response.data.subscribers);
                 switch (response.data.status) {
                     case 'DRAFT':
                         setStatus(response.data.status);
@@ -212,7 +240,16 @@ const Auction = (props) => {
                 getLots(response.data.id);
                 AuctionService.getAuctionLogs(response.data.id).then(
                     response => setLogs(response.data)
-                )
+                );
+                MessageService.getMessagesByAuctionId(response.data.id).then((response)=>{
+                    let dataPrev = []
+                    response.data.forEach(message=>
+                        dataPrev.push(
+                            {...message, dateTimeMessage: parseMessageTime(message.dateTimeMessage)}
+                        )
+                    )
+                    setChatMessages(dataPrev);
+                });
             }
         );
         return () => clearInterval(timerId.current);
@@ -296,13 +333,20 @@ const Auction = (props) => {
         {
             setIsModalSubscribe(false);
             setIsSubscribed(true);
+            setMembers(members.concat(currentUser));
+        });
+    }
+
+    const scrollToBottom = () => {
+        animateScroll.scrollToBottom({
+            containerId: "messageList"
         });
     }
 
     return (
         <Container>
             <SockJsClient url='http://localhost:8080/ws'
-                          topics={['/auction/logs/' + auction.id, '/auction/state/' + auction.id]}
+                          topics={['/auction/logs/' + auction.id, '/auction/state/' + auction.id, '/auction/chat/' + auction.id]}
                           onMessage={(msg) => onReceiveWebSocketMessage(msg)}
                           ref={client} />
             <div className="wrapper">
@@ -356,27 +400,29 @@ const Auction = (props) => {
                         </Row>
                         <Row className="mt-2">
                             <Col xs={12} md={4}>
-                                <div className="auctionBlock" style={{height: "300px"}}>
+                                <div className="auctionBlock">
                                     <h5>Description</h5>
-                                    {onEdit ?
-                                        <Form.Group>
-                                            <FormControl as="textarea" rows={9} defaultValue={auction.description}
-                                                         onChange={handleChangeAuction("description")}
-                                                         style={{resize: "none"}}/>
-                                        </Form.Group> :
-                                        <p>{auction.description}</p>}
+                                    <div style={{overflowY: 'auto', height: "250px"}}>
+                                        {onEdit ?
+                                            <Form.Group>
+                                                <FormControl as="textarea" rows={9} defaultValue={auction.description}
+                                                             onChange={handleChangeAuction("description")}
+                                                             style={{resize: "none"}}/>
+                                            </Form.Group> :
+                                            <p>{auction.description}</p>}
+                                    </div>
                                 </div>
 
-                                <div className="auctionBlock mt-3" style={{height: "300px"}}>
+                                <div className="auctionBlock mt-3">
                                     <h5>Logger</h5>
-                                    <div>
-                                        {logs.map(log =>
-                                            <div>
-                                                <p key={log.id} style={{fontSize: '12px', margin: 0}}><b>{log.logTime}</b></p>
+                                    <div style={{overflowY: 'auto', height: "250px"}}>
+                                        {(logs.length !== 0) ? logs.map(log =>
+                                            <div key={log.id}>
+                                                <p style={{fontSize: '12px', margin: 0}}><b>{log.logTime}</b></p>
                                                 <p style={{fontSize: '12px', margin: 0}}>{log.logMessage}</p>
                                                 <hr size={3} style={{color: '#9434B3'}}/>
                                             </div>
-                                        )}
+                                        ) : <p style={{fontStyle: 'italic'}}>There is no log messages yet</p>}
                                     </div>
                                 </div>
 
@@ -445,32 +491,21 @@ const Auction = (props) => {
                             </Col>
                             <Col xs={12} md={4}>
                                 <div>
-                                    <div className="auctionBlock" style={{height: "618px"}}>
-                                        <h5>Chat</h5>
-                                        {/*<Chat />
-                                        <h5>Owner</h5>
-                                        <div>
-                                            <div style={{display: 'inline-block', width: '10%'}}>
-                                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Breezeicons-actions-22-im-user.svg/1200px-Breezeicons-actions-22-im-user.svg.png"
-                                                     alt="No image" style={{height: '25px', objectFit: 'cover'}}/>
-                                            </div>
-                                            <div style={{float: 'right', width: '90%'}}>
-                                                <p><b>{creator.username}</b></p>
-                                            </div>
+                                    {(status === 'DRAFT' && auction.id) ?
+                                        <Categories auction={auction}/>
+                                        :
+                                        <div className="auctionBlock" style={{height: "618px", backgroundColor: '#E6EBEE'}}>
+                                            <Tabs defaultActiveKey="chat" id="chatTabs" className="mb-3">
+                                                <Tab eventKey="chat" title="Chat" onClick={()=>scrollToBottom()}>
+                                                    <Chat user={currentUser} messages={chatMessages} handleChatMessage={handleSendMessage}/>
+                                                </Tab>
+                                                <Tab eventKey="members" title="Members">
+                                                    <Members owner={auction.creator} members={members}/>
+                                                </Tab>
+                                            </Tabs>
                                         </div>
-                                        <h5>Players</h5>
-                                        {auction.subscribers && auction.subscribers.map(sub=>
-                                            <div>
-                                                <div style={{display: 'inline-block', width: '10%'}}>
-                                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Breezeicons-actions-22-im-user.svg/1200px-Breezeicons-actions-22-im-user.svg.png"
-                                                         alt="No image" style={{height: '25px', objectFit: 'cover'}}/>
-                                                </div>
-                                                <div style={{float: 'right', width: '90%'}}>
-                                                    <p><b>{sub.username}</b></p>
-                                                </div>
-                                            </div>
-                                        )}*/}
-                                    </div>
+                                    }
+
                                 </div>
                             </Col>
                         </Row>

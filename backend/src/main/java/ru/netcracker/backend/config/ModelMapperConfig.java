@@ -66,6 +66,8 @@ public class ModelMapperConfig {
                         });
 
         modelMapper.createTypeMap(MessageRequest.class, Message.class)
+                .addMappings(
+                        mapper -> mapper.skip(Message::setId))
                 .setPostConverter(context -> {
                     context.getDestination().setSender(
                             userRepository

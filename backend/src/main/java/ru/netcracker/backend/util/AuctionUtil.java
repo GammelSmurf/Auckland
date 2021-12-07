@@ -7,6 +7,7 @@ import java.util.Optional;
 
 public class AuctionUtil {
     public static final String AUCTION_NOT_FOUND_TEMPLATE = "Auction with id: %d was not found";
+    public static final String CATEGORY_NOT_FOUND_TEMPLATE = "Category with id: %d was not found";
 
     private AuctionUtil() {
     }

@@ -6,20 +6,22 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.netcracker.backend.exception.auction.AuctionAlreadyContainsCategoryException;
 import ru.netcracker.backend.exception.auction.NoLotsException;
 import ru.netcracker.backend.exception.auction.NotCorrectBeginDateException;
 import ru.netcracker.backend.exception.auction.NotCorrectStatusException;
 import ru.netcracker.backend.exception.user.UsernameNotFoundException;
-import ru.netcracker.backend.model.Auction;
-import ru.netcracker.backend.model.AuctionStatus;
-import ru.netcracker.backend.model.Lot;
-import ru.netcracker.backend.model.User;
+import ru.netcracker.backend.model.*;
 import ru.netcracker.backend.repository.AuctionRepository;
+import ru.netcracker.backend.repository.CategoryRepository;
+import ru.netcracker.backend.repository.TagRepository;
 import ru.netcracker.backend.repository.UserRepository;
 import ru.netcracker.backend.responses.AuctionResponse;
+import ru.netcracker.backend.responses.CategoryResponse;
 import ru.netcracker.backend.responses.UserResponse;
 import ru.netcracker.backend.service.AuctionService;
 import ru.netcracker.backend.service.LogService;
+import ru.netcracker.backend.service.TagService;
 import ru.netcracker.backend.util.AuctionUtil;
 import ru.netcracker.backend.util.LogLevel;
 import ru.netcracker.backend.util.UserUtil;
@@ -34,14 +36,20 @@ import java.util.stream.Collectors;
 public class AuctionServiceImpl implements AuctionService {
     private final AuctionRepository auctionRepository;
     private final UserRepository userRepository;
+    private final CategoryRepository categoryRepository;
+    private final TagRepository tagRepository;
     private final LogService logService;
+    private final TagService tagService;
     private final ModelMapper modelMapper;
 
     @Autowired
-    public AuctionServiceImpl(AuctionRepository auctionRepository, UserRepository userRepository, LogService logService, ModelMapper modelMapper) {
+    public AuctionServiceImpl(AuctionRepository auctionRepository, UserRepository userRepository, CategoryRepository categoryRepository, TagRepository tagRepository, LogService logService, TagService tagService, ModelMapper modelMapper) {
         this.auctionRepository = auctionRepository;
         this.userRepository = userRepository;
+        this.categoryRepository = categoryRepository;
+        this.tagRepository = tagRepository;
         this.logService = logService;
+        this.tagService = tagService;
         this.modelMapper = modelMapper;
     }
 
@@ -126,7 +134,7 @@ public class AuctionServiceImpl implements AuctionService {
         switch (auction.getStatus()) {
             case DRAFT:
                 Optional<Lot> lotOptional = AuctionUtil.getAnotherLot(auction);
-                if(currentDate.isAfter(auction.getBeginDate())){
+                if (currentDate.isAfter(auction.getBeginDate())) {
                     throw new NotCorrectBeginDateException();
                 }
                 if (lotOptional.isPresent()) {
@@ -158,5 +166,43 @@ public class AuctionServiceImpl implements AuctionService {
         auction.getSubscribers().add(user);
         user.getSubscribedAuctions().add(auction);
         return modelMapper.map(userRepository.save(user), UserResponse.class);
+    }
+
+    @Override
+    @Transactional
+    public CategoryResponse addCategoryToAuction(Long auctionId, Long categoryId) {
+        Auction auction = auctionRepository
+                .findById(auctionId)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(AuctionUtil.AUCTION_NOT_FOUND_TEMPLATE, auctionId)));
+        Category category = categoryRepository
+                .findById(categoryId)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(AuctionUtil.CATEGORY_NOT_FOUND_TEMPLATE, categoryId)));
+
+        if(auction.getCategories().contains(category)){
+            throw new AuctionAlreadyContainsCategoryException(category);
+        }
+        auction.getCategories().add(category);
+        category.getAuctions().add(auction);
+        auctionRepository.save(auction);
+        return modelMapper.map(category, CategoryResponse.class);
+    }
+
+    @Override
+    @Transactional
+    public AuctionResponse removeCategoryFromAuction(Long auctionId, Long categoryId) {
+        Auction auction = auctionRepository
+                .findById(auctionId)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(AuctionUtil.AUCTION_NOT_FOUND_TEMPLATE, auctionId)));
+        Category category = categoryRepository
+                .findById(categoryId)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(AuctionUtil.CATEGORY_NOT_FOUND_TEMPLATE, categoryId)));
+
+        List<Tag> tags = tagRepository.findAllByAuction_IdAndCategory_Id(auctionId, categoryId);
+        tags.forEach(auction.getTags()::remove);
+        tags.forEach(category.getTags()::remove);
+
+        auction.getCategories().remove(category);
+        category.getAuctions().remove(auction);
+        return modelMapper.map(auctionRepository.save(auction), AuctionResponse.class);
     }
 }

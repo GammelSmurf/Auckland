@@ -12,8 +12,10 @@ import ru.netcracker.backend.exception.auction.NoLotsException;
 import ru.netcracker.backend.exception.auction.NotCorrectStatusException;
 import ru.netcracker.backend.model.Auction;
 import ru.netcracker.backend.requests.AuctionRequest;
+import ru.netcracker.backend.requests.CategoryRequest;
 import ru.netcracker.backend.requests.SubscribeRequest;
 import ru.netcracker.backend.responses.AuctionResponse;
+import ru.netcracker.backend.responses.CategoryResponse;
 import ru.netcracker.backend.responses.UserResponse;
 import ru.netcracker.backend.service.AuctionService;
 
@@ -102,5 +104,21 @@ public class AuctionController {
                 subscribeRequest.getUsername(), subscribeRequest.getAuctionId());
         log.info("user: {} subscribed to auction with id: {}", userResponse.getUsername(), subscribeRequest.getAuctionId());
         return new ResponseEntity<>(userResponse, HttpStatus.OK);
+    }
+
+    @PostMapping("/category/add")
+    public ResponseEntity<CategoryResponse> addCategoryToAuction(@RequestBody CategoryRequest categoryRequest) {
+        CategoryResponse categoryResponse = auctionService.addCategoryToAuction(
+                categoryRequest.getAuctionId(), categoryRequest.getCategoryId());
+        log.info("category with id: {} was added to auction with id: {}", categoryRequest.getCategoryId(), categoryRequest.getAuctionId());
+        return new ResponseEntity<>(categoryResponse, HttpStatus.OK);
+    }
+
+    @PostMapping("/category/remove")
+    public ResponseEntity<AuctionResponse> removeCategoryFromAuction(@RequestBody CategoryRequest categoryRequest) {
+        AuctionResponse auctionResponse = auctionService.removeCategoryFromAuction(
+                categoryRequest.getAuctionId(), categoryRequest.getCategoryId());
+        log.info("category with id: {} was deleted from auction with id: {}", categoryRequest.getCategoryId(), categoryRequest.getAuctionId());
+        return new ResponseEntity<>(auctionResponse, HttpStatus.OK);
     }
 }

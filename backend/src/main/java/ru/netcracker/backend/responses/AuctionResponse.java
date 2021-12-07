@@ -4,9 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.netcracker.backend.model.AuctionStatus;
-import ru.netcracker.backend.model.Lot;
-import ru.netcracker.backend.model.User;
+import ru.netcracker.backend.model.*;
 import ru.netcracker.backend.util.JsonLocalDateTime;
 import ru.netcracker.backend.util.JsonLocalTime;
 
@@ -29,6 +27,8 @@ public class AuctionResponse {
     private int userLikes;
     private Set<Lot> lots;
     private Set<UserResponse> subscribers;
+    private Set<CategoryResponse> categories;
+    private Set<TagResponse> tags;
 
     @JsonLocalDateTime
     private LocalDateTime beginDate;

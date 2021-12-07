@@ -2,7 +2,9 @@ package ru.netcracker.backend.service;
 
 import org.springframework.data.domain.Pageable;
 import ru.netcracker.backend.model.Auction;
+import ru.netcracker.backend.requests.CategoryRequest;
 import ru.netcracker.backend.responses.AuctionResponse;
+import ru.netcracker.backend.responses.CategoryResponse;
 import ru.netcracker.backend.responses.UserResponse;
 
 import java.util.List;
@@ -27,4 +29,8 @@ public interface AuctionService {
     void makeAuctionWaiting(Long auctionId);
 
     UserResponse subscribe(String username, Long auctionId);
+
+    CategoryResponse addCategoryToAuction(Long auctionId, Long categoryId);
+
+    AuctionResponse removeCategoryFromAuction(Long auctionId, Long categoryId);
 }

@@ -130,4 +130,9 @@ public class MessageTests {
 
         Assertions.assertEquals("test",blockingStateQueue.poll(1,SECONDS).getUsername());
     }
+
+    @Test
+    public void testDeleteOldChats(){
+        messageService.deleteOldChats();
+    }
 }

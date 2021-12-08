@@ -78,6 +78,10 @@ public class User {
     @ManyToMany(mappedBy = "subscribers")
     private Set<Auction> subscribedAuctions = new HashSet<>();
 
+    @OneToMany(mappedBy = "user")
+    @JsonBackReference
+    private Set<Notification> notifications = new HashSet<>();
+
     public void subtractCurrency(BigDecimal currency) {
         this.currency = this.currency.subtract(currency);
     }

@@ -15,7 +15,7 @@ import org.springframework.web.socket.messaging.WebSocketStompClient;
 import org.springframework.web.socket.sockjs.client.SockJsClient;
 import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 import ru.netcracker.backend.controller.AuctionController;
-import ru.netcracker.backend.controller.UserController;
+import ru.netcracker.backend.controller.AdminController;
 import ru.netcracker.backend.requests.AuctionRequest;
 
 import java.time.LocalDateTime;
@@ -35,7 +35,7 @@ public class ValidationTests {
     @Autowired
     private AuctionController auctionController;
     @Autowired
-    private UserController userController;
+    private AdminController adminController;
 
     private final long TEST_AUCTION_ID = 1;
     private final long TEST_LOT_ID = 1;
@@ -74,6 +74,6 @@ public class ValidationTests {
         System.out.println(auctionRequest);
         auctionController.updateAuction(TEST_AUCTION_ID,auctionRequest);
         //System.out.println(auctionController.getAllOwnAuctions("  ", PageRequest.of(0,10)));
-        userController.banUser("  ");
+        adminController.banUser("  ");
     }
 }

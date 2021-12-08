@@ -21,9 +21,11 @@ import ru.netcracker.backend.responses.CategoryResponse;
 import ru.netcracker.backend.responses.UserResponse;
 import ru.netcracker.backend.service.AuctionService;
 import ru.netcracker.backend.service.LogService;
+import ru.netcracker.backend.service.NotificationService;
 import ru.netcracker.backend.service.TagService;
 import ru.netcracker.backend.util.AuctionUtil;
 import ru.netcracker.backend.util.LogLevel;
+import ru.netcracker.backend.util.NotificationLevel;
 import ru.netcracker.backend.util.UserUtil;
 
 import java.time.LocalDateTime;
@@ -39,18 +41,18 @@ public class AuctionServiceImpl implements AuctionService {
     private final CategoryRepository categoryRepository;
     private final TagRepository tagRepository;
     private final LogService logService;
-    private final TagService tagService;
     private final ModelMapper modelMapper;
+    private final NotificationService notificationService;
 
     @Autowired
-    public AuctionServiceImpl(AuctionRepository auctionRepository, UserRepository userRepository, CategoryRepository categoryRepository, TagRepository tagRepository, LogService logService, TagService tagService, ModelMapper modelMapper) {
+    public AuctionServiceImpl(AuctionRepository auctionRepository, UserRepository userRepository, CategoryRepository categoryRepository, TagRepository tagRepository, LogService logService, TagService tagService, ModelMapper modelMapper, NotificationService notificationService) {
         this.auctionRepository = auctionRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
         this.tagRepository = tagRepository;
         this.logService = logService;
-        this.tagService = tagService;
         this.modelMapper = modelMapper;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -163,6 +165,8 @@ public class AuctionServiceImpl implements AuctionService {
                 .findById(auctionId)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(AuctionUtil.AUCTION_NOT_FOUND_TEMPLATE, auctionId)));
 
+        notificationService.log(NotificationLevel.USER_SUBSCRIBED, user, auction);
+
         auction.getSubscribers().add(user);
         user.getSubscribedAuctions().add(auction);
         return modelMapper.map(userRepository.save(user), UserResponse.class);
@@ -178,7 +182,7 @@ public class AuctionServiceImpl implements AuctionService {
                 .findById(categoryId)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(AuctionUtil.CATEGORY_NOT_FOUND_TEMPLATE, categoryId)));
 
-        if(auction.getCategories().contains(category)){
+        if (auction.getCategories().contains(category)) {
             throw new AuctionAlreadyContainsCategoryException(category);
         }
         auction.getCategories().add(category);

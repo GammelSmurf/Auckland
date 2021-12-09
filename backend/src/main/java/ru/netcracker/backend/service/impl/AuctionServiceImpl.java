@@ -22,9 +22,11 @@ import ru.netcracker.backend.responses.CategoryResponse;
 import ru.netcracker.backend.responses.UserResponse;
 import ru.netcracker.backend.service.AuctionService;
 import ru.netcracker.backend.service.LogService;
+import ru.netcracker.backend.service.NotificationService;
 import ru.netcracker.backend.service.TagService;
 import ru.netcracker.backend.util.AuctionSpecification;
 import ru.netcracker.backend.util.LogLevel;
+import ru.netcracker.backend.util.NotificationLevel;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -40,6 +42,7 @@ public class AuctionServiceImpl implements AuctionService {
     private final LogService logService;
     private final ModelMapper modelMapper;
     private final AuctionSpecification auctionSpecification;
+    private final NotificationService notificationService;
 
     @Autowired
     public AuctionServiceImpl(AuctionRepository auctionRepository,
@@ -48,7 +51,7 @@ public class AuctionServiceImpl implements AuctionService {
                               TagRepository tagRepository,
                               LogService logService,
                               TagService tagService,
-                              ModelMapper modelMapper, AuctionSpecification auctionSpecification) {
+                              ModelMapper modelMapper, AuctionSpecification auctionSpecification, NotificationService notificationService) {
         this.auctionRepository = auctionRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
@@ -56,6 +59,7 @@ public class AuctionServiceImpl implements AuctionService {
         this.logService = logService;
         this.modelMapper = modelMapper;
         this.auctionSpecification = auctionSpecification;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -141,6 +145,8 @@ public class AuctionServiceImpl implements AuctionService {
         Auction auction = auctionRepository
                 .findById(auctionId)
                 .orElseThrow(() -> new AuctionNotFoundException(auctionId));
+
+        notificationService.log(NotificationLevel.USER_SUBSCRIBED, user, auction);
 
         auction.getSubscribers().add(user);
         user.getSubscribedAuctions().add(auction);

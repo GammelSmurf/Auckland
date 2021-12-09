@@ -41,6 +41,7 @@ public class ModelMapperConfig {
                         mapper -> {
                             mapper.skip(Auction::setId);
                             mapper.skip(Auction::setCreator);
+                            mapper.map(AuctionRequest::getUsersLimit, Auction::setUsersNumberLimit);
                         })
                 .setPostConverter(context -> {
                     context.getDestination().setCreator(
@@ -52,17 +53,28 @@ public class ModelMapperConfig {
 
         modelMapper.createTypeMap(LotRequest.class, Lot.class)
                 .addMappings(
-                        mapper -> mapper.skip(Lot::setId));
+                        mapper -> {
+                            mapper.skip(Lot::setId);
+                            mapper.map(LotRequest::getPicture, Lot::setPictureLink);
+                            mapper.map(LotRequest::getMinBank, Lot::setMinPrice);
+                            mapper.map(LotRequest::getStep, Lot::setPriceStep);
+                        });
 
         modelMapper.createTypeMap(Lot.class, LotResponse.class)
                 .addMappings(
-                        mapper -> mapper.map(src -> src.getAuction().getId(), LotResponse::setAuctionId));
+                        mapper ->  {
+                            mapper.map(src -> src.getAuction().getId(), LotResponse::setAuctionId);
+                            mapper.map(Lot::getPictureLink, LotResponse::setPicture);
+                            mapper.map(Lot::getMinPrice, LotResponse::setMinBank);
+                            mapper.map(Lot::getPriceStep, LotResponse::setStep);
+                        });
 
         modelMapper.createTypeMap(Auction.class, AuctionResponse.class)
                 .addMappings(
                         mapper -> {
                             mapper.map(Auction::getSubscribersCount, AuctionResponse::setUsersCount);
                             mapper.map(Auction::getLikesCount, AuctionResponse::setUserLikes);
+                            mapper.map(Auction::getUsersNumberLimit, AuctionResponse::setUsersLimit);
                         });
 
         modelMapper.createTypeMap(MessageRequest.class, Message.class)

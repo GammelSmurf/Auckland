@@ -17,8 +17,10 @@ import ru.netcracker.backend.responses.LotResponse;
 import ru.netcracker.backend.responses.SyncResponse;
 import ru.netcracker.backend.service.BidService;
 import ru.netcracker.backend.service.LogService;
+import ru.netcracker.backend.service.NotificationService;
 import ru.netcracker.backend.util.BidUtil;
 import ru.netcracker.backend.util.LogLevel;
+import ru.netcracker.backend.util.NotificationLevel;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -34,16 +36,18 @@ public class BidServiceImpl implements BidService {
     private final AuctionRepository auctionRepository;
     private final TransactionRepository transactionRepository;
     private final LogService logService;
+    private final NotificationService notificationService;
     private final ModelMapper modelMapper;
 
     @Autowired
     public BidServiceImpl(BidRepository bidRepository, UserRepository userRepository, AuctionRepository auctionRepository,
-                          TransactionRepository transactionRepository, LogService logService, ModelMapper modelMapper) {
+                          TransactionRepository transactionRepository, LogService logService, NotificationService notificationService, ModelMapper modelMapper) {
         this.bidRepository = bidRepository;
         this.userRepository = userRepository;
         this.auctionRepository = auctionRepository;
         this.transactionRepository = transactionRepository;
         this.logService = logService;
+        this.notificationService = notificationService;
         this.modelMapper = modelMapper;
     }
 
@@ -92,6 +96,7 @@ public class BidServiceImpl implements BidService {
                     auction.setStatus(AuctionStatus.RUNNING);
                     setNewEndTime(auction, currentDate);
                     logService.log(LogLevel.AUCTION_STATUS_CHANGE, auctionRepository.save(auction));
+                    notificationService.log(NotificationLevel.SUBSCRIBED_AUCTION_STATUS_CHANGED, null, auction);
                 }
                 return generateSyncResponse(auction, currentDate, false);
             case RUNNING:
@@ -134,6 +139,7 @@ public class BidServiceImpl implements BidService {
 
             logWinnerIfExists(auction);
             logService.log(LogLevel.AUCTION_STATUS_CHANGE, auction);
+            notificationService.log(NotificationLevel.SUBSCRIBED_AUCTION_STATUS_CHANGED, null, auction);
             return generateSyncResponse(auction, currentDate, false);
         } else {
             logWinnerIfExists(auction);

@@ -13,7 +13,7 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 public class LotRequest {
     @NotBlank(message="Lot's name should not be blank")
-    @Size(min=3,max=255)
+    @Size(min=3,max=1000)
     private String name;
     @NotBlank(message="Lot's description should not be blank")
     @Size(min=3,max=10000)
@@ -23,7 +23,7 @@ public class LotRequest {
     @Min(0)
     private Long step;
     @NotBlank(message="Lot picture address should not be blank")
-    @Size(min=3,max=255)
+    @Size(min=3,max=1000)
     private String picture;
     private Long auctionId;
 }

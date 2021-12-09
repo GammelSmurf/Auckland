@@ -13,12 +13,12 @@ import java.util.Set;
 @Table(name = "bet")
 @Getter
 @Setter
-public class Bet {
+public class Bid {
     @Id
-    @Column(name = "auction_id")
+    @Column(name = "bid_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private BigDecimal currentBank = new BigDecimal(0);
+    private BigDecimal amount = new BigDecimal(0);
 
     @OneToOne
     @JsonBackReference
@@ -33,13 +33,14 @@ public class Bet {
     private User user;
 
     @OneToMany
+    @JoinColumn(name="bid_id")
     @JsonBackReference
     private Set<Transaction> transactions = new HashSet<>();
 
-    public Bet() {
+    public Bid() {
     }
 
-    public Bet(Auction auction) {
+    public Bid(Auction auction) {
         this.auction = auction;
         this.lot = auction.getCurrentLot();
     }

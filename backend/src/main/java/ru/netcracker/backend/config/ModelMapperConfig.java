@@ -84,7 +84,7 @@ public class ModelMapperConfig {
                     return context.getDestination();
                 });
 
-        modelMapper.createTypeMap(Bet.class, BetResponse.class)
+        modelMapper.createTypeMap(Bid.class, BidResponse.class)
                 .setPostConverter(context -> {
                     context.getDestination().setSecondsUntil(Math.abs(Duration.between(context.getSource().getLot().getEndTime(), LocalDateTime.now()).toSeconds()));
                     return context.getDestination();

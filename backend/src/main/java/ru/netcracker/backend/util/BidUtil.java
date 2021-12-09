@@ -1,16 +1,17 @@
 package ru.netcracker.backend.util;
 
+import ru.netcracker.backend.exception.auction.NotCorrectStatusException;
 import ru.netcracker.backend.exception.bet.*;
 import ru.netcracker.backend.exception.user.NotSubscribedException;
 import ru.netcracker.backend.model.Auction;
-import ru.netcracker.backend.model.Bet;
+import ru.netcracker.backend.model.Bid;
 import ru.netcracker.backend.model.User;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public class BetUtil {
-    private BetUtil() {
+public class BidUtil {
+    private BidUtil() {
     }
 
     public static void validate(Auction auction, BigDecimal lotBank, User user)
@@ -18,6 +19,10 @@ public class BetUtil {
             LotTimeExpiredException, NoCurrencyException, NotSubscribedException {
         if (user.getSubscribedAuctions().isEmpty() || !user.getSubscribedAuctions().contains(auction)) {
             throw new NotSubscribedException("The user is not subscribed to the auction");
+        }
+
+        if (!auction.isRunning()) {
+            throw new NotCorrectStatusException(auction);
         }
 
         if (auction.getCurrentLot().getEndTime().isBefore(LocalDateTime.now())) {
@@ -28,18 +33,18 @@ public class BetUtil {
             throw new NoCurrencyException("User don't have enough money");
         }
 
-        if (isLess(lotBank, auction.getCurrentLot().getMinBank())) {
-            throw new BankLessThanMinException(String.format("Bank is less than minimum: %f", auction.getCurrentLot().getMinBank()));
+        if (isLess(lotBank, auction.getCurrentLot().getMinPrice())) {
+            throw new BankLessThanMinException(String.format("Bank is less than minimum: %f", auction.getCurrentLot().getMinPrice()));
         }
 
-        if (auction.getBet() != null) {
-            Bet bet = auction.getBet();
-            if (isLess(lotBank, bet.getCurrentBank())) {
-                throw new BankLessThanOldException(String.format("Bank is less than the old one: %f", bet.getCurrentBank()));
+        if (auction.getBid() != null) {
+            Bid bid = auction.getBid();
+            if (isLess(lotBank, bid.getAmount())) {
+                throw new BankLessThanOldException(String.format("Bank is less than the old one: %f", bid.getAmount()));
             }
 
-            if (isLess(lotBank.subtract(bet.getCurrentBank()), auction.getCurrentLot().getStep())) {
-                throw new BankLessThanStepException(String.format("Bet step is less than the minimal one: %f", auction.getCurrentLot().getStep()));
+            if (isLess(lotBank.subtract(bid.getAmount()), auction.getCurrentLot().getPriceStep())) {
+                throw new BankLessThanStepException(String.format("Bet step is less than the minimal one: %f", auction.getCurrentLot().getPriceStep()));
             }
         }
     }

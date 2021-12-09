@@ -16,19 +16,19 @@ public class Transaction {
     @Column(name = "transaction_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private BigDecimal currentBank;
-    private LocalDateTime datetime = LocalDateTime.now();
+    private BigDecimal price;
+    private LocalDateTime dateTime = LocalDateTime.now();
     @Enumerated(EnumType.STRING)
     private TransactionStatus transactionStatus = TransactionStatus.WAIT;
 
     @ManyToOne
-    private User user;
+    private User buyer;
 
     public Transaction() {
     }
 
-    public Transaction(Bet bet) {
-        this.user = bet.getUser();
-        this.currentBank = bet.getCurrentBank();
+    public Transaction(Bid bid) {
+        this.buyer = bid.getUser();
+        this.price = bid.getAmount();
     }
 }

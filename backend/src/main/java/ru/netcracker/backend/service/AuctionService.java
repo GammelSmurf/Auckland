@@ -2,7 +2,7 @@ package ru.netcracker.backend.service;
 
 import org.springframework.data.domain.Pageable;
 import ru.netcracker.backend.model.Auction;
-import ru.netcracker.backend.requests.CategoryRequest;
+import ru.netcracker.backend.requests.SearchRequest;
 import ru.netcracker.backend.responses.AuctionResponse;
 import ru.netcracker.backend.responses.CategoryResponse;
 import ru.netcracker.backend.responses.UserResponse;
@@ -12,21 +12,17 @@ import java.util.List;
 public interface AuctionService {
     List<AuctionResponse> getAllAuctions(Pageable pageable);
 
-    List<AuctionResponse> getAllSubscribedAuctions(String username, Pageable pageable);
-
-    List<AuctionResponse> getAllOwnAuctions(String username, Pageable pageable);
-
-    List<AuctionResponse> searchAuctions(String keyword, Pageable pageable);
+    List<AuctionResponse> searchAuctions(String username, SearchRequest searchRequest, Pageable pageable);
 
     AuctionResponse createAuction(Auction auction);
 
-    AuctionResponse updateAuction(Long id, Auction auction);
+    AuctionResponse updateAuction(Long auctionId, Auction auction);
 
-    void deleteAuction(Long id);
+    void deleteAuction(Long auctionId);
 
-    AuctionResponse getAuctionById(Long id);
+    AuctionResponse getAuctionById(Long auctionId);
 
-    void makeAuctionWaiting(Long auctionId);
+    void makeAuctionWaitingWithAnotherLot(Long auctionId);
 
     UserResponse subscribe(String username, Long auctionId);
 

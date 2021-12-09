@@ -3,14 +3,12 @@ package ru.netcracker.backend.model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
+import ru.netcracker.backend.exception.auction.NoLotsException;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "auctions")
@@ -35,15 +33,15 @@ public class Auction {
     private AuctionStatus status = AuctionStatus.DRAFT;
 
     private LocalTime boostTime;
-    private Integer usersLimit;
+    private Long usersNumberLimit;
 
     @OneToOne(mappedBy = "auction")
     @JsonBackReference
-    private Bet bet;
+    private Bid bid;
 
     @OneToMany(mappedBy = "auction")
     @JsonBackReference
-    private Set<Log> log = new HashSet<>();
+    private Set<Log> logs = new HashSet<>();
 
     @OneToOne
     @JsonBackReference
@@ -75,7 +73,7 @@ public class Auction {
             name = "ratings",
             joinColumns = @JoinColumn(name = "auction_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private Set<User> userLikes = new HashSet<>();
+    private Set<User> usersWhoLiked = new HashSet<>();
 
     @JsonBackReference
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -94,10 +92,37 @@ public class Auction {
     private Set<Category> categories = new HashSet<>();
 
     public int getLikesCount() {
-        return getUserLikes().size();
+        return this.getUsersWhoLiked().size();
     }
 
     public int getSubscribersCount() {
         return getSubscribers().size();
+    }
+
+    public boolean isDraft() {
+        return status == AuctionStatus.DRAFT;
+    }
+
+    public boolean isWaiting() {
+        return status == AuctionStatus.WAITING;
+    }
+
+    public boolean isFinished() {
+        return status == AuctionStatus.FINISHED;
+    }
+
+    public boolean isRunning() {
+        return status == AuctionStatus.RUNNING;
+    }
+
+    public Optional<Lot> getAnotherLot() {
+        return getLots().stream()
+                .filter(lot -> !lot.isFinished())
+                .findFirst();
+    }
+
+    public void setAnotherLot() {
+        this.currentLot = getAnotherLot()
+                .orElseThrow(NoLotsException::new);
     }
 }

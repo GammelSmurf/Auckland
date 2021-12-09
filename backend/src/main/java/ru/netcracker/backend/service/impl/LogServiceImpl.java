@@ -10,6 +10,7 @@ import ru.netcracker.backend.model.Log;
 import ru.netcracker.backend.repository.LogRepository;
 import ru.netcracker.backend.responses.LogResponse;
 import ru.netcracker.backend.service.LogService;
+import ru.netcracker.backend.util.ConsoleColors;
 import ru.netcracker.backend.util.LogLevel;
 
 import java.time.LocalDateTime;
@@ -52,7 +53,7 @@ public class LogServiceImpl implements LogService {
                 sendAuctionLogToWs(
                         auction.getId(),
                         addLog(level, auction,
-                                String.format(LOG_BET_MSG_TEMPLATE, auction.getBet().getUser().getUsername(), auction.getBet().getCurrentBank().toPlainString())));
+                                String.format(LOG_BET_MSG_TEMPLATE, auction.getBid().getUser().getUsername(), auction.getBid().getAmount().toPlainString())));
                 break;
             case AUCTION_STATUS_CHANGE:
                 sendAuctionLogToWs(
@@ -76,9 +77,8 @@ public class LogServiceImpl implements LogService {
     private Log addLog(LogLevel level, Auction auction, String msg) {
         Log log = new Log();
         log.setAuction(auction);
-        log.setLogMessage(generateMainString(level, msg));
-        log.setLogTime(LocalDateTime.now());
-
+        log.setMessage(generateMainString(level, msg));
+        log.setDateTime(LocalDateTime.now());
         return logRepository.save(log);
     }
 

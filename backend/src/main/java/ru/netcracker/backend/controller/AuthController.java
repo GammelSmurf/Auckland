@@ -49,7 +49,7 @@ public class AuthController {
                 signUpRequest.getUsername(),
                 signUpRequest.getPassword(),
                 signUpRequest.getEmail()), getSiteURL(request));
-        log.info("created user: {}", signUpRequest);
+        log.info("created user with email: {} and username: {}", signUpRequest.getEmail(), signUpRequest.getUsername());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

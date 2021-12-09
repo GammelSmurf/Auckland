@@ -6,15 +6,11 @@ spring:
   jpa:
     generate-ddl: true
     open-in-view: true
-#    show-sql: true
-#    properties:
-#      hibernate:
-#        format_sql: true
   mail:
     host: smtp.yandex.ru
     port: 465
     username: aucklandteam@yandex.ru
-    password:
+    password: Auckland1212
     properties:
       "mail.smtp.auth": true
       "mail.smtp.starttls.enable": true

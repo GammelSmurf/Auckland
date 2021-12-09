@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BetRequest {
+public class BidRequest {
     @NotBlank(message="Username should not be blank")
     @Size(min=3,max=255)
     private String username;

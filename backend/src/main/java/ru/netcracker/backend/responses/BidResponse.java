@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BetResponse {
+public class BidResponse {
     private BigDecimal currentBank;
     private Long secondsUntil;
 }

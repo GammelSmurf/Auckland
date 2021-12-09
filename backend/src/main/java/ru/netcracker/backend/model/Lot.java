@@ -18,21 +18,22 @@ public class Lot {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private String picture;
+    private String pictureLink;
     @Column(length = 10000)
     private String description;
 
-    private BigDecimal minBank;
-    private BigDecimal step;
+    private BigDecimal minPrice;
+    private BigDecimal priceStep;
     private LocalDateTime endTime;
 
     private boolean finished = false;
-    private BigDecimal winBank;
+    private BigDecimal winPrice;
 
     @OneToOne(mappedBy = "lot")
-    private Bet bet;
+    private Bid bid;
 
     @OneToOne(mappedBy = "currentLot")
+    @JsonBackReference
     private Auction auctionLot;
 
     @ManyToOne
@@ -41,5 +42,6 @@ public class Lot {
 
     @ManyToOne
     @JoinColumn(name = "auction_id", nullable = false)
+    @JsonBackReference
     private Auction auction;
 }

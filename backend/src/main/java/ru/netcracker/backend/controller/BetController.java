@@ -10,11 +10,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import ru.netcracker.backend.exception.ValidationException;
 import ru.netcracker.backend.model.Message;
-import ru.netcracker.backend.requests.BetRequest;
+import ru.netcracker.backend.requests.BidRequest;
 import ru.netcracker.backend.requests.MessageRequest;
-import ru.netcracker.backend.responses.BetResponse;
+import ru.netcracker.backend.responses.BidResponse;
 import ru.netcracker.backend.responses.MessageResponse;
-import ru.netcracker.backend.service.BetService;
+import ru.netcracker.backend.service.BidService;
 import ru.netcracker.backend.service.MessageService;
 
 import javax.validation.Valid;
@@ -23,25 +23,25 @@ import javax.validation.Valid;
 @Slf4j
 @Validated
 public class BetController {
-    private final BetService betService;
+    private final BidService bidService;
     private final MessageService messageService;
     private final ModelMapper modelMapper;
 
     @Autowired
-    public BetController(BetService betService, MessageService messageService, ModelMapper modelMapper) {
-        this.betService = betService;
+    public BetController(BidService bidService, MessageService messageService, ModelMapper modelMapper) {
+        this.bidService = bidService;
         this.messageService = messageService;
         this.modelMapper = modelMapper;
     }
 
     @MessageMapping("/play/{id}")
     @SendTo("/auction/state/{id}")
-    public BetResponse play(@DestinationVariable Long id, @Valid  BetRequest betRequest)
+    public BidResponse play(@DestinationVariable Long id, @Valid BidRequest bidRequest)
             throws ValidationException {
-        BetResponse betResponse = betService.makeBet(betRequest.getUsername(), id, betRequest.getCurrentBank());
+        BidResponse bidResponse = bidService.makeBid(bidRequest.getUsername(), id, bidRequest.getCurrentBank());
 
-        log.info("auction with id: {} has: {}", id, betResponse);
-        return betResponse;
+        log.info("auction with id: {} has: {}", id, bidResponse);
+        return bidResponse;
     }
 
     @MessageMapping("/send/{id}")

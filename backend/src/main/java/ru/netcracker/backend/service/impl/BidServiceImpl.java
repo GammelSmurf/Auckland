@@ -2,20 +2,23 @@ package ru.netcracker.backend.service.impl;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.netcracker.backend.exception.auction.AuctionNotFoundException;
 import ru.netcracker.backend.exception.auction.NotCorrectStatusException;
 import ru.netcracker.backend.model.*;
-import ru.netcracker.backend.repository.*;
-import ru.netcracker.backend.responses.BetResponse;
+import ru.netcracker.backend.repository.AuctionRepository;
+import ru.netcracker.backend.repository.BidRepository;
+import ru.netcracker.backend.repository.TransactionRepository;
+import ru.netcracker.backend.repository.UserRepository;
+import ru.netcracker.backend.responses.BidResponse;
 import ru.netcracker.backend.responses.LotResponse;
 import ru.netcracker.backend.responses.SyncResponse;
-import ru.netcracker.backend.service.BetService;
+import ru.netcracker.backend.service.BidService;
 import ru.netcracker.backend.service.LogService;
-import ru.netcracker.backend.service.NotificationService;
-import ru.netcracker.backend.util.*;
+import ru.netcracker.backend.util.BidUtil;
+import ru.netcracker.backend.util.LogLevel;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -25,60 +28,51 @@ import java.util.Comparator;
 
 @Service
 @Transactional(readOnly = true)
-public class BetServiceImpl implements BetService {
-    private final BetRepository betRepository;
+public class BidServiceImpl implements BidService {
+    private final BidRepository bidRepository;
     private final UserRepository userRepository;
     private final AuctionRepository auctionRepository;
     private final TransactionRepository transactionRepository;
     private final LogService logService;
-    private final NotificationService notificationService;
     private final ModelMapper modelMapper;
 
     @Autowired
-    public BetServiceImpl(BetRepository betRepository, UserRepository userRepository, AuctionRepository auctionRepository,
-                          TransactionRepository transactionRepository, LogService logService, NotificationService notificationService1, ModelMapper modelMapper) {
-        this.betRepository = betRepository;
+    public BidServiceImpl(BidRepository bidRepository, UserRepository userRepository, AuctionRepository auctionRepository,
+                          TransactionRepository transactionRepository, LogService logService, ModelMapper modelMapper) {
+        this.bidRepository = bidRepository;
         this.userRepository = userRepository;
         this.auctionRepository = auctionRepository;
         this.transactionRepository = transactionRepository;
         this.logService = logService;
-        this.notificationService = notificationService1;
         this.modelMapper = modelMapper;
     }
 
     @Override
     @Transactional
-    public BetResponse makeBet(String username, Long auctionId, BigDecimal betBank) {
+    public BidResponse makeBid(String username, Long auctionId, BigDecimal betBank) {
         User user = userRepository
                 .findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException(String.format(UserUtil.USER_NOT_FOUND_TEMPLATE, username)));
+                .orElseThrow(() -> new UsernameNotFoundException(username));
         Auction auction = auctionRepository
                 .findById(auctionId)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(AuctionUtil.AUCTION_NOT_FOUND_TEMPLATE, auctionId)));
-        switch (auction.getStatus()) {
-            case RUNNING:
-                BetUtil.validate(auction, betBank, user);
-                Bet bet = (auction.getBet() != null)
-                        ? auction.getBet()
-                        : new Bet(auction);
-                bet.setCurrentBank(betBank);
-                user.subtractCurrency(betBank);
-                bet.setUser(user);
-                bet.getLot().setEndTime(boostEndTime(bet));
-                bet.setAuction(auction);
-                bet.getTransactions().add(transactionRepository.save(new Transaction(bet)));
-                auction.setBet(bet);
-                logService.log(LogLevel.AUCTION_BET, bet.getAuction());
-                return modelMapper.map(betRepository.save(bet), BetResponse.class);
-            case DRAFT:
-            case WAITING:
-            case FINISHED:
-            default:
-                throw new NotCorrectStatusException(auction);
-        }
+                .orElseThrow(() -> new AuctionNotFoundException(auctionId));
+        BidUtil.validate(auction, betBank, user);
+        Bid bid = (auction.getBid() != null)
+                ? auction.getBid()
+                : new Bid(auction);
+        bid.setAmount(betBank);
+        user.subtractCurrency(betBank);
+        bid.setUser(user);
+        bid.getLot().setEndTime(boostEndTime(bid));
+        bid.setAuction(auction);
+        bid.getTransactions().add(transactionRepository.save(new Transaction(bid)));
+        auction.setBid(bid);
+        logService.log(LogLevel.AUCTION_BET, bid.getAuction());
+        return modelMapper.map(bidRepository.save(bid), BidResponse.class);
+
     }
 
-    private LocalDateTime boostEndTime(Bet oldBet) {
+    private LocalDateTime boostEndTime(Bid oldBet) {
         return oldBet.getLot()
                 .getEndTime()
                 .plus(oldBet.getAuction()
@@ -90,16 +84,14 @@ public class BetServiceImpl implements BetService {
     public SyncResponse sync(Long auctionId) {
         Auction auction = auctionRepository
                 .findById(auctionId)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(AuctionUtil.AUCTION_NOT_FOUND_TEMPLATE, auctionId)));
+                .orElseThrow(() -> new AuctionNotFoundException(auctionId));
         LocalDateTime currentDate = LocalDateTime.now();
         switch (auction.getStatus()) {
             case WAITING:
                 if (currentDate.isAfter(auction.getBeginDate()) || currentDate.isEqual(auction.getBeginDate())) {
                     auction.setStatus(AuctionStatus.RUNNING);
                     setNewEndTime(auction, currentDate);
-                    logService.log(LogLevel.AUCTION_STATUS_CHANGE, auction);
-                    notificationService.log(NotificationLevel.SUBSCRIBED_AUCTION_STATUS_CHANGED, null, auction);
-                    auctionRepository.save(auction);
+                    logService.log(LogLevel.AUCTION_STATUS_CHANGE, auctionRepository.save(auction));
                 }
                 return generateSyncResponse(auction, currentDate, false);
             case RUNNING:
@@ -118,31 +110,30 @@ public class BetServiceImpl implements BetService {
 
     public SyncResponse handleLotFinished(Auction auction, LocalDateTime currentDate) {
         auction.getCurrentLot().setFinished(true);
-        if (auction.getBet() != null) {
-            auction.getCurrentLot().setWinner(auction.getBet().getUser());
-            auction.getCurrentLot().setWinBank(auction.getBet().getCurrentBank());
+        if (auction.getBid() != null) {
+            auction.getCurrentLot().setWinner(auction.getBid().getUser());
+            auction.getCurrentLot().setWinPrice(auction.getBid().getAmount());
 
-            auction.getBet().getTransactions().stream()
-                    .max(Comparator.comparing(Transaction::getDatetime))
+            auction.getBid().getTransactions().stream()
+                    .max(Comparator.comparing(Transaction::getDateTime))
                     .ifPresent(tx -> tx.setTransactionStatus(TransactionStatus.DONE));
-            auction.getBet().getTransactions().stream()
+            auction.getBid().getTransactions().stream()
                     .filter(tx -> !tx.getTransactionStatus().equals(TransactionStatus.DONE))
                     .forEach(tx -> {
-                        tx.getUser().addCurrency(tx.getCurrentBank());
+                        tx.getBuyer().addCurrency(tx.getPrice());
                         transactionRepository.delete(tx);
                     });
 
-            betRepository.delete(auction.getBet());
+            bidRepository.delete(auction.getBid());
         }
 
-        if (AuctionUtil.getAnotherLot(auction).isEmpty()) {
+        if (auction.getAnotherLot().isEmpty()) {
             auction.setStatus(AuctionStatus.FINISHED);
             auction.setEndDate(currentDate);
             auctionRepository.save(auction);
 
             logWinnerIfExists(auction);
             logService.log(LogLevel.AUCTION_STATUS_CHANGE, auction);
-            notificationService.log(NotificationLevel.SUBSCRIBED_AUCTION_STATUS_CHANGED, null, auction);
             return generateSyncResponse(auction, currentDate, false);
         } else {
             logWinnerIfExists(auction);
@@ -159,8 +150,7 @@ public class BetServiceImpl implements BetService {
     }
 
     private Auction setAndSaveAnotherLot(Auction auction, LocalDateTime currentDate) {
-        auction.setCurrentLot(AuctionUtil.getAnotherLot(auction)
-                .orElseThrow());
+        auction.setAnotherLot();
         setNewEndTime(auction, currentDate);
         return auctionRepository.save(auction);
     }
@@ -176,7 +166,7 @@ public class BetServiceImpl implements BetService {
                 getDurationInSec(auction, currentDate),
                 modelMapper.map(auction.getCurrentLot(), LotResponse.class),
                 auction.getStatus(),
-                (auction.getBet() != null) ? auction.getBet().getCurrentBank() : null,
+                (auction.getBid() != null) ? auction.getBid().getAmount() : null,
                 changed);
     }
 

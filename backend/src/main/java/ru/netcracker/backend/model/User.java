@@ -51,7 +51,7 @@ public class User {
     }
 
     @OneToOne(mappedBy = "user")
-    private Bet bet;
+    private Bid bid;
 
     @OneToMany(
             mappedBy = "winner",

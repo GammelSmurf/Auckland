@@ -5,22 +5,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.netcracker.backend.exception.ValidationException;
 import ru.netcracker.backend.responses.SyncResponse;
-import ru.netcracker.backend.service.BetService;
+import ru.netcracker.backend.service.BidService;
 
 @RestController
 @RequestMapping("/api/sync")
 @CrossOrigin("*")
 @Slf4j
 public class SyncController {
-    private final BetService betService;
+    private final BidService bidService;
 
     @Autowired
-    public SyncController(BetService betService) {
-        this.betService = betService;
+    public SyncController(BidService bidService) {
+        this.bidService = bidService;
     }
 
     @GetMapping("/{id}")
     public SyncResponse sync(@PathVariable Long id) throws ValidationException {
-        return betService.sync(id);
+        return bidService.sync(id);
     }
 }

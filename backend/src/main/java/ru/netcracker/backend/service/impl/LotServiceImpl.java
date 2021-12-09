@@ -49,8 +49,8 @@ public class LotServiceImpl implements LotService {
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(LotUtil.LOT_NOT_FOUND_MSG_TEMPLATE, id)));
         oldLot.setName(newLot.getName());
         oldLot.setDescription(newLot.getDescription());
-        oldLot.setMinBank(newLot.getMinBank());
-        oldLot.setPicture(newLot.getPicture());
+        oldLot.setMinPrice(newLot.getMinPrice());
+        oldLot.setPictureLink(newLot.getPictureLink());
         return modelMapper.map(lotRepository.save(oldLot), LotResponse.class);
     }
 

@@ -7,16 +7,16 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "auction_logs")
+@Table(name = "logs")
 @Getter
 @Setter
 public class Log {
     @Id
-    @Column(name = "auction_id")
+    @Column(name = "log_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String logMessage;
-    private LocalDateTime logTime;
+    private String message;
+    private LocalDateTime dateTime;
 
     @ManyToOne
     private Auction auction;

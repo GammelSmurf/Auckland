@@ -39,7 +39,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse banUser(String username) {
         User user = userRepository
                 .findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException(String.format(UserUtil.USER_NOT_FOUND_TEMPLATE, username)));
+                .orElseThrow(() -> new UsernameNotFoundException(username));
         user.setBanned(true);
         return modelMapper.map(userRepository.save(user), UserResponse.class);
     }
@@ -49,7 +49,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse unbanUser(String username) {
         User user = userRepository
                 .findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException(String.format(UserUtil.USER_NOT_FOUND_TEMPLATE, username)));
+                .orElseThrow(() -> new UsernameNotFoundException(username));
         user.setBanned(false);
         return modelMapper.map(userRepository.save(user), UserResponse.class);
     }
@@ -59,7 +59,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse addCurrency(String username, BigDecimal currency) {
         User user = userRepository
                 .findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException(String.format(UserUtil.USER_NOT_FOUND_TEMPLATE, username)));
+                .orElseThrow(() -> new UsernameNotFoundException(username));
         user.addCurrency(currency);
         return modelMapper.map(userRepository.save(user), UserResponse.class);
     }

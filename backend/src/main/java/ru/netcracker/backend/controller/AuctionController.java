@@ -13,6 +13,7 @@ import ru.netcracker.backend.exception.auction.NotCorrectStatusException;
 import ru.netcracker.backend.model.Auction;
 import ru.netcracker.backend.requests.AuctionRequest;
 import ru.netcracker.backend.requests.CategoryRequest;
+import ru.netcracker.backend.requests.SearchRequest;
 import ru.netcracker.backend.requests.SubscribeRequest;
 import ru.netcracker.backend.responses.AuctionResponse;
 import ru.netcracker.backend.responses.CategoryResponse;
@@ -20,7 +21,7 @@ import ru.netcracker.backend.responses.UserResponse;
 import ru.netcracker.backend.service.AuctionService;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -43,19 +44,9 @@ public class AuctionController {
         return auctionService.getAllAuctions(pageable);
     }
 
-    @GetMapping("/sub")
-    public List<AuctionResponse> getAllSubscribedAuctions(@NotBlank @RequestParam("username") String username, Pageable pageable) {
-        return auctionService.getAllSubscribedAuctions(username, pageable);
-    }
-
-    @GetMapping("/own")
-    public List<AuctionResponse> getAllOwnAuctions(@NotBlank @RequestParam("username") String username, Pageable pageable) {
-        return auctionService.getAllOwnAuctions(username, pageable);
-    }
-
-    @GetMapping("/search")
-    public List<AuctionResponse> getAuctionByKeyword(@NotBlank @RequestParam("keyword") String keyword, Pageable pageable) {
-        return auctionService.searchAuctions(keyword, pageable);
+    @PostMapping("/search")
+    public List<AuctionResponse> getAuctionByKeyword(@RequestBody SearchRequest searchRequest, Pageable pageable, Principal principal) {
+        return auctionService.searchAuctions(principal.getName(), searchRequest, pageable);
     }
 
     @GetMapping("/{id}")
@@ -76,7 +67,7 @@ public class AuctionController {
 
     @PutMapping("/{id}/available")
     public ResponseEntity<Void> makeAuctionAvailable(@PathVariable long id) throws NoLotsException, NotCorrectStatusException {
-        auctionService.makeAuctionWaiting(id);
+        auctionService.makeAuctionWaitingWithAnotherLot(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -99,9 +90,8 @@ public class AuctionController {
     }
 
     @PostMapping("/subscribe")
-    public ResponseEntity<UserResponse> subscribe(@Valid @RequestBody SubscribeRequest subscribeRequest) {
-        UserResponse userResponse = auctionService.subscribe(
-                subscribeRequest.getUsername(), subscribeRequest.getAuctionId());
+    public ResponseEntity<UserResponse> subscribe(@Valid @RequestBody SubscribeRequest subscribeRequest, Principal principal) {
+        UserResponse userResponse = auctionService.subscribe(principal.getName(), subscribeRequest.getAuctionId());
         log.info("user: {} subscribed to auction with id: {}", userResponse.getUsername(), subscribeRequest.getAuctionId());
         return new ResponseEntity<>(userResponse, HttpStatus.OK);
     }

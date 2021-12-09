@@ -214,7 +214,7 @@
                         </goals>
                         <configuration>
                             <sources>
-                                <source>target/generated-sources/annotations</source>
+                                <source>target/generated-sources/apt</source>
                             </sources>
                         </configuration>
                     </execution>

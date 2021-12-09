@@ -17,5 +17,6 @@ public class SearchRequest {
     private boolean running;
     private boolean finished;
     private boolean sortedAvgPrice;
+    private boolean asc;
     private List<String> categories;
 }

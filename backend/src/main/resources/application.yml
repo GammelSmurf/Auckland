@@ -10,7 +10,7 @@ spring:
     host: smtp.yandex.ru
     port: 465
     username: aucklandteam@yandex.ru
-    password: Auckland1212
+    password:
     properties:
       "mail.smtp.auth": true
       "mail.smtp.starttls.enable": true

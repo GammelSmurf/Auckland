@@ -19,7 +19,7 @@ public class Transaction {
     private BigDecimal price;
     private LocalDateTime dateTime = LocalDateTime.now();
     @Enumerated(EnumType.STRING)
-    private TransactionStatus transactionStatus = TransactionStatus.WAIT;
+    private TransactionStatus transactionStatus = TransactionStatus.BEGIN;
 
     @ManyToOne
     private User buyer;

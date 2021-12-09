@@ -121,9 +121,9 @@ public class BidServiceImpl implements BidService {
 
             auction.getBid().getTransactions().stream()
                     .max(Comparator.comparing(Transaction::getDateTime))
-                    .ifPresent(tx -> tx.setTransactionStatus(TransactionStatus.DONE));
+                    .ifPresent(tx -> tx.setTransactionStatus(TransactionStatus.WAIT));
             auction.getBid().getTransactions().stream()
-                    .filter(tx -> !tx.getTransactionStatus().equals(TransactionStatus.DONE))
+                    .filter(tx -> !tx.getTransactionStatus().equals(TransactionStatus.WAIT))
                     .forEach(tx -> {
                         tx.getBuyer().addCurrency(tx.getPrice());
                         transactionRepository.delete(tx);

@@ -3,7 +3,7 @@ package ru.netcracker.backend.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.netcracker.backend.responses.LogResponse;
+import ru.netcracker.backend.model.responses.LogResponse;
 import ru.netcracker.backend.service.LogService;
 
 import java.util.List;

@@ -3,10 +3,10 @@ package ru.netcracker.backend.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -26,7 +26,6 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
-@EnableScheduling
 public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
     private final JwtFilter jwtFilter;
     private final UserDetailsServiceImpl userDetailsService;
@@ -57,7 +56,9 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
     }
 
     private SecurityContext securityContext() {
-        return SecurityContext.builder().securityReferences(defaultAuth()).build();
+        return SecurityContext.builder()
+                .securityReferences(defaultAuth())
+                .build();
     }
 
     private ApiKey apiKey() {
@@ -65,8 +66,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
     }
 
     private List<SecurityReference> defaultAuth() {
-        AuthorizationScope authorizationScope =
-                new AuthorizationScope("global", "accessEverything");
+        AuthorizationScope authorizationScope = new AuthorizationScope("global", "accessEverything");
         AuthorizationScope[] authorizationScopes = new AuthorizationScope[1];
         authorizationScopes[0] = authorizationScope;
         return List.of(new SecurityReference("JWT", authorizationScopes));
@@ -113,7 +113,6 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
                 .anyRequest()
                 .authenticated();
 
-        // Add our custom JWT security filter
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
     }
 }

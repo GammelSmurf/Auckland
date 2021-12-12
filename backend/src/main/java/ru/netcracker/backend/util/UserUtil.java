@@ -2,7 +2,7 @@ package ru.netcracker.backend.util;
 
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import ru.netcracker.backend.exception.user.EmailExistsException;
-import ru.netcracker.backend.model.User;
+import ru.netcracker.backend.model.entity.User;
 import ru.netcracker.backend.repository.UserRepository;
 
 public class UserUtil {

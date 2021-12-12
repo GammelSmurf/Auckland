@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.netcracker.backend.repository.CategoryRepository;
-import ru.netcracker.backend.responses.CategoryResponse;
+import ru.netcracker.backend.model.responses.CategoryResponse;
 import ru.netcracker.backend.service.CategoryService;
 
 import java.util.List;

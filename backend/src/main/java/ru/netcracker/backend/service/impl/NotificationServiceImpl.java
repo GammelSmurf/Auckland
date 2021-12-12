@@ -4,13 +4,13 @@ import org.modelmapper.ModelMapper;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.netcracker.backend.model.Auction;
-import ru.netcracker.backend.model.Notification;
-import ru.netcracker.backend.model.User;
+import ru.netcracker.backend.model.entity.Auction;
+import ru.netcracker.backend.model.entity.Notification;
+import ru.netcracker.backend.model.entity.User;
 import ru.netcracker.backend.repository.NotificationRepository;
-import ru.netcracker.backend.responses.NotificationResponse;
+import ru.netcracker.backend.model.responses.NotificationResponse;
 import ru.netcracker.backend.service.NotificationService;
-import ru.netcracker.backend.util.NotificationLevel;
+import ru.netcracker.backend.util.enumiration.NotificationLevel;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -57,7 +57,7 @@ public class NotificationServiceImpl implements NotificationService {
                         addNotification(auction.getCreator(), String.format(OWN_AUCTION_STATUS_CHANGED_MSG_TEMPLATE,
                                 auction.getName(), auction.getStatus())));
 
-                for (User member : auction.getSubscribers()) {
+                for (User member : auction.getSubscribedUsers()) {
                     sendNotificationToWs(
                             member.getId(),
                             addNotification(member, String.format(SUBSCRIBED_AUCTION_STATUS_CHANGED_MSG_TEMPLATE,
@@ -71,7 +71,7 @@ public class NotificationServiceImpl implements NotificationService {
         Notification notification = new Notification();
         notification.setUser(user);
         notification.setMessage(msg);
-        notification.setTime(LocalDateTime.now());
+        notification.setDateTime(LocalDateTime.now());
 
         return notificationRepository.save(notification);
     }

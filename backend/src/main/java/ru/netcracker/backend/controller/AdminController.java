@@ -8,8 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.netcracker.backend.exception.user.UserExistsException;
-import ru.netcracker.backend.requests.CurrencyRequest;
-import ru.netcracker.backend.responses.UserResponse;
+import ru.netcracker.backend.model.requests.CurrencyRequest;
+import ru.netcracker.backend.model.responses.UserResponse;
 import ru.netcracker.backend.service.NotificationService;
 import ru.netcracker.backend.service.UserService;
 

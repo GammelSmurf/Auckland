@@ -1,7 +1,7 @@
 package ru.netcracker.backend.service;
 
-import ru.netcracker.backend.model.Lot;
-import ru.netcracker.backend.responses.LotResponse;
+import ru.netcracker.backend.model.entity.Lot;
+import ru.netcracker.backend.model.responses.LotResponse;
 
 import java.util.List;
 

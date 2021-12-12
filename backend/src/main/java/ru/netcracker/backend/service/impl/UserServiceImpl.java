@@ -5,11 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.netcracker.backend.model.User;
+import ru.netcracker.backend.model.entity.User;
 import ru.netcracker.backend.repository.UserRepository;
-import ru.netcracker.backend.responses.UserResponse;
+import ru.netcracker.backend.model.responses.UserResponse;
 import ru.netcracker.backend.service.UserService;
-import ru.netcracker.backend.util.UserUtil;
 
 import java.math.BigDecimal;
 import java.util.List;

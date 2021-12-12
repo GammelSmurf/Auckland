@@ -5,14 +5,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import ru.netcracker.backend.model.*;
+import ru.netcracker.backend.model.entity.*;
 import ru.netcracker.backend.repository.UserRepository;
-import ru.netcracker.backend.requests.AuctionRequest;
-import ru.netcracker.backend.requests.LotRequest;
-import ru.netcracker.backend.requests.MessageRequest;
-import ru.netcracker.backend.requests.TagRequest;
-import ru.netcracker.backend.responses.*;
+import ru.netcracker.backend.model.requests.AuctionRequest;
+import ru.netcracker.backend.model.requests.LotRequest;
+import ru.netcracker.backend.model.requests.MessageRequest;
+import ru.netcracker.backend.model.requests.TagRequest;
+import ru.netcracker.backend.model.responses.*;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
@@ -42,6 +43,7 @@ public class ModelMapperConfig {
                             mapper.skip(Auction::setId);
                             mapper.skip(Auction::setCreator);
                             mapper.map(AuctionRequest::getUsersLimit, Auction::setUsersNumberLimit);
+                            mapper.map(AuctionRequest::getBoostTime, Auction::setExtraTime);
                         })
                 .setPostConverter(context -> {
                     context.getDestination().setCreator(
@@ -56,17 +58,18 @@ public class ModelMapperConfig {
                         mapper -> {
                             mapper.skip(Lot::setId);
                             mapper.map(LotRequest::getPicture, Lot::setPictureLink);
-                            mapper.map(LotRequest::getMinBank, Lot::setMinPrice);
-                            mapper.map(LotRequest::getStep, Lot::setPriceStep);
-                        });
+                        })
+                .setPostConverter(context -> {
+                    context.getDestination().setMinPrice(BigDecimal.valueOf(context.getSource().getMinBank()));
+                    context.getDestination().setPriceIncreaseStep(BigDecimal.valueOf(context.getSource().getStep()));
+                    return context.getDestination();
+                });
 
         modelMapper.createTypeMap(Lot.class, LotResponse.class)
                 .addMappings(
-                        mapper ->  {
+                        mapper -> {
                             mapper.map(src -> src.getAuction().getId(), LotResponse::setAuctionId);
                             mapper.map(Lot::getPictureLink, LotResponse::setPicture);
-                            mapper.map(Lot::getMinPrice, LotResponse::setMinBank);
-                            mapper.map(Lot::getPriceStep, LotResponse::setStep);
                         });
 
         modelMapper.createTypeMap(Auction.class, AuctionResponse.class)
@@ -75,6 +78,7 @@ public class ModelMapperConfig {
                             mapper.map(Auction::getSubscribersCount, AuctionResponse::setUsersCount);
                             mapper.map(Auction::getLikesCount, AuctionResponse::setUserLikes);
                             mapper.map(Auction::getUsersNumberLimit, AuctionResponse::setUsersLimit);
+                            mapper.map(Auction::getSubscribedUsers, AuctionResponse::setSubscribers);
                         });
 
         modelMapper.createTypeMap(MessageRequest.class, Message.class)
@@ -98,7 +102,7 @@ public class ModelMapperConfig {
 
         modelMapper.createTypeMap(Bid.class, BidResponse.class)
                 .setPostConverter(context -> {
-                    context.getDestination().setSecondsUntil(Math.abs(Duration.between(context.getSource().getLot().getEndTime(), LocalDateTime.now()).toSeconds()));
+                    context.getDestination().setSecondsUntil(Math.abs(Duration.between(context.getSource().getLot().getEndDateTime(), LocalDateTime.now()).toSeconds()));
                     return context.getDestination();
                 });
 

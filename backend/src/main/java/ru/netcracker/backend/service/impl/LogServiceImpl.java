@@ -5,13 +5,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.netcracker.backend.model.Auction;
-import ru.netcracker.backend.model.Log;
+import ru.netcracker.backend.model.entity.Auction;
+import ru.netcracker.backend.model.entity.Log;
 import ru.netcracker.backend.repository.LogRepository;
-import ru.netcracker.backend.responses.LogResponse;
+import ru.netcracker.backend.model.responses.LogResponse;
 import ru.netcracker.backend.service.LogService;
-import ru.netcracker.backend.util.ConsoleColors;
-import ru.netcracker.backend.util.LogLevel;
+import ru.netcracker.backend.util.enumiration.LogLevel;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -53,7 +52,7 @@ public class LogServiceImpl implements LogService {
                 sendAuctionLogToWs(
                         auction.getId(),
                         addLog(level, auction,
-                                String.format(LOG_BET_MSG_TEMPLATE, auction.getBid().getUser().getUsername(), auction.getBid().getAmount().toPlainString())));
+                                String.format(LOG_BET_MSG_TEMPLATE, auction.getCurrentBid().getUser().getUsername(), auction.getCurrentBid().getAmount().toPlainString())));
                 break;
             case AUCTION_STATUS_CHANGE:
                 sendAuctionLogToWs(

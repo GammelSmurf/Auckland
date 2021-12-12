@@ -7,9 +7,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.netcracker.backend.exception.user.EmailExistsException;
 import ru.netcracker.backend.exception.user.UserExistsException;
-import ru.netcracker.backend.model.User;
-import ru.netcracker.backend.requests.SignInRequest;
-import ru.netcracker.backend.requests.SignUpRequest;
+import ru.netcracker.backend.model.entity.User;
+import ru.netcracker.backend.model.requests.SignInRequest;
+import ru.netcracker.backend.model.requests.SignUpRequest;
 import ru.netcracker.backend.service.AuthService;
 
 import javax.mail.MessagingException;
@@ -57,7 +57,7 @@ public class AuthController {
     public ResponseEntity<Void> passwordChangeRequest(
             @NotBlank @RequestParam("username") String username, HttpServletRequest request)
             throws MessagingException, UnsupportedEncodingException {
-        authService.sendChangePasswordRequestToUserEmail(username, getSiteURL(request));
+        authService.generateNewPasswordAndSendEmail(username, getSiteURL(request));
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

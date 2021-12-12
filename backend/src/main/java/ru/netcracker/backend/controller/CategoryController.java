@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.netcracker.backend.responses.CategoryResponse;
+import ru.netcracker.backend.model.responses.CategoryResponse;
 import ru.netcracker.backend.service.CategoryService;
 
 import java.util.List;

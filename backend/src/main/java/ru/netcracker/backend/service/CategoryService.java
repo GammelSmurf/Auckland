@@ -1,6 +1,6 @@
 package ru.netcracker.backend.service;
 
-import ru.netcracker.backend.responses.CategoryResponse;
+import ru.netcracker.backend.model.responses.CategoryResponse;
 
 import java.util.List;
 

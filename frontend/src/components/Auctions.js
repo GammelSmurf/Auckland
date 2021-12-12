@@ -50,7 +50,7 @@ const Auctions = (props) => {
         AuctionService.getAllAuctions().then(
             (response) => {
                 let dataPrev = [];
-                response.data.forEach(item => {
+                response.data.content.forEach(item => {
                     dataPrev.push(
                         {
                             id: item.id, name: item.name, beginDate: parseDateInfo(item.beginDate), participants: item.usersLimit, likesCount: item.userLikes, usersCount: item.usersCount, status: item.status

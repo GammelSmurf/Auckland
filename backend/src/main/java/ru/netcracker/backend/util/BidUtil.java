@@ -3,9 +3,9 @@ package ru.netcracker.backend.util;
 import ru.netcracker.backend.exception.auction.NotCorrectStatusException;
 import ru.netcracker.backend.exception.bet.*;
 import ru.netcracker.backend.exception.user.NotSubscribedException;
-import ru.netcracker.backend.model.Auction;
-import ru.netcracker.backend.model.Bid;
-import ru.netcracker.backend.model.User;
+import ru.netcracker.backend.model.entity.Auction;
+import ru.netcracker.backend.model.entity.Bid;
+import ru.netcracker.backend.model.entity.User;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -25,7 +25,7 @@ public class BidUtil {
             throw new NotCorrectStatusException(auction);
         }
 
-        if (auction.getCurrentLot().getEndTime().isBefore(LocalDateTime.now())) {
+        if (auction.getCurrentLot().getEndDateTime().isBefore(LocalDateTime.now())) {
             throw new LotTimeExpiredException("Lot time is expired");
         }
 
@@ -37,14 +37,14 @@ public class BidUtil {
             throw new BankLessThanMinException(String.format("Bank is less than minimum: %f", auction.getCurrentLot().getMinPrice()));
         }
 
-        if (auction.getBid() != null) {
-            Bid bid = auction.getBid();
+        if (auction.getCurrentBid() != null) {
+            Bid bid = auction.getCurrentBid();
             if (isLess(lotBank, bid.getAmount())) {
                 throw new BankLessThanOldException(String.format("Bank is less than the old one: %f", bid.getAmount()));
             }
 
-            if (isLess(lotBank.subtract(bid.getAmount()), auction.getCurrentLot().getPriceStep())) {
-                throw new BankLessThanStepException(String.format("Bet step is less than the minimal one: %f", auction.getCurrentLot().getPriceStep()));
+            if (isLess(lotBank.subtract(bid.getAmount()), auction.getCurrentLot().getPriceIncreaseStep())) {
+                throw new BankLessThanStepException(String.format("Bet step is less than the minimal one: %f", auction.getCurrentLot().getPriceIncreaseStep()));
             }
         }
     }

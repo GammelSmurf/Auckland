@@ -5,10 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.netcracker.backend.model.Lot;
+import ru.netcracker.backend.model.entity.Lot;
 import ru.netcracker.backend.repository.AuctionRepository;
 import ru.netcracker.backend.repository.LotRepository;
-import ru.netcracker.backend.responses.LotResponse;
+import ru.netcracker.backend.model.responses.LotResponse;
 import ru.netcracker.backend.service.LotService;
 import ru.netcracker.backend.util.LotUtil;
 

@@ -7,9 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.netcracker.backend.model.Tag;
-import ru.netcracker.backend.requests.TagRequest;
-import ru.netcracker.backend.responses.TagResponse;
+import ru.netcracker.backend.model.entity.Tag;
+import ru.netcracker.backend.model.requests.TagRequest;
+import ru.netcracker.backend.model.responses.TagResponse;
 import ru.netcracker.backend.service.TagService;
 
 import javax.validation.Valid;

@@ -4,9 +4,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.netcracker.backend.model.Message;
+import ru.netcracker.backend.model.entity.Message;
 import ru.netcracker.backend.repository.MessageRepository;
-import ru.netcracker.backend.responses.MessageResponse;
+import ru.netcracker.backend.model.responses.MessageResponse;
 import ru.netcracker.backend.service.MessageService;
 
 import java.time.LocalDateTime;

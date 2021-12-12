@@ -1,18 +1,17 @@
 package ru.netcracker.backend.service;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import ru.netcracker.backend.model.Auction;
-import ru.netcracker.backend.requests.SearchRequest;
-import ru.netcracker.backend.responses.AuctionResponse;
-import ru.netcracker.backend.responses.CategoryResponse;
-import ru.netcracker.backend.responses.UserResponse;
-
-import java.util.List;
+import ru.netcracker.backend.model.entity.Auction;
+import ru.netcracker.backend.model.requests.SearchRequest;
+import ru.netcracker.backend.model.responses.AuctionResponse;
+import ru.netcracker.backend.model.responses.CategoryResponse;
+import ru.netcracker.backend.model.responses.UserResponse;
 
 public interface AuctionService {
-    List<AuctionResponse> getAllAuctions(Pageable pageable);
+    Page<AuctionResponse> getAllAuctions(Pageable pageable);
 
-    List<AuctionResponse> searchAuctions(String username, SearchRequest searchRequest, Pageable pageable);
+    Page<AuctionResponse> searchAuctions(String username, SearchRequest searchRequest, Pageable pageable);
 
     AuctionResponse createAuction(Auction auction);
 

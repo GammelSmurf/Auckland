@@ -6,8 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import ru.netcracker.backend.model.Lot;
-import ru.netcracker.backend.model.Message;
+import ru.netcracker.backend.model.entity.Message;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,6 +18,6 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     @Transactional
     @Modifying
     @Query("DELETE FROM Message m WHERE m IN " +
-            "(SELECT m FROM Message m INNER JOIN Auction a  ON m.auction=a WHERE a.status='FINISHED' and a.beginDate<:dateLineChat)" )
+            "(SELECT m FROM Message m INNER JOIN Auction a  ON m.auction=a WHERE a.status='FINISHED' and a.beginDateTime<:dateLineChat)")
     void deleteOldChats(@Param("dateLineChat") LocalDateTime dateLineChat);
 }

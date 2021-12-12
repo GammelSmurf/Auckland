@@ -34,14 +34,6 @@ public class RedirectController implements ErrorController {
         }
     }
 
-    @GetMapping("/recover")
-    public ResponseEntity<Void> recoverPassword(
-            @Param("username") String username, @Param("code") String code)
-            throws MessagingException, UnsupportedEncodingException {
-        authService.generateNewPassword(username, code);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
     @RequestMapping(value = PATH)
     @ResponseStatus(HttpStatus.OK)
     public String error() {

@@ -7,20 +7,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.netcracker.backend.exception.auction.AuctionNotFoundException;
 import ru.netcracker.backend.exception.auction.NotCorrectStatusException;
-import ru.netcracker.backend.model.*;
+import ru.netcracker.backend.model.entity.*;
+import ru.netcracker.backend.model.responses.BidResponse;
+import ru.netcracker.backend.model.responses.LotResponse;
+import ru.netcracker.backend.model.responses.SyncResponse;
 import ru.netcracker.backend.repository.AuctionRepository;
 import ru.netcracker.backend.repository.BidRepository;
 import ru.netcracker.backend.repository.TransactionRepository;
 import ru.netcracker.backend.repository.UserRepository;
-import ru.netcracker.backend.responses.BidResponse;
-import ru.netcracker.backend.responses.LotResponse;
-import ru.netcracker.backend.responses.SyncResponse;
 import ru.netcracker.backend.service.BidService;
 import ru.netcracker.backend.service.LogService;
 import ru.netcracker.backend.service.NotificationService;
 import ru.netcracker.backend.util.BidUtil;
-import ru.netcracker.backend.util.LogLevel;
-import ru.netcracker.backend.util.NotificationLevel;
+import ru.netcracker.backend.util.enumiration.LogLevel;
+import ru.netcracker.backend.util.enumiration.NotificationLevel;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -53,98 +53,138 @@ public class BidServiceImpl implements BidService {
 
     @Override
     @Transactional
-    public BidResponse makeBid(String username, Long auctionId, BigDecimal betBank) {
+    public BidResponse makeBid(String username, Long auctionId, BigDecimal amount) {
         User user = userRepository
                 .findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException(username));
         Auction auction = auctionRepository
                 .findById(auctionId)
                 .orElseThrow(() -> new AuctionNotFoundException(auctionId));
-        BidUtil.validate(auction, betBank, user);
-        Bid bid = (auction.getBid() != null)
-                ? auction.getBid()
-                : new Bid(auction);
-        bid.setAmount(betBank);
-        user.subtractCurrency(betBank);
-        bid.setUser(user);
-        bid.getLot().setEndTime(boostEndTime(bid));
-        bid.setAuction(auction);
-        bid.getTransactions().add(transactionRepository.save(new Transaction(bid)));
-        auction.setBid(bid);
+
+        BidUtil.validate(auction, amount, user);
+        Bid bid = makeBit(auction, user, amount);
+        createTransaction(bid);
         logService.log(LogLevel.AUCTION_BET, bid.getAuction());
         return modelMapper.map(bidRepository.save(bid), BidResponse.class);
 
     }
 
-    private LocalDateTime boostEndTime(Bid oldBet) {
-        return oldBet.getLot()
-                .getEndTime()
-                .plus(oldBet.getAuction()
-                        .getBoostTime().toNanoOfDay(), ChronoUnit.NANOS);
+    private Bid makeBit(Auction auction, User user, BigDecimal amount) {
+        Bid bid = (auction.getCurrentBid() != null)
+                ? auction.getCurrentBid()
+                : new Bid(auction);
+        bid.updateWith(amount, user, auction);
+        return bid;
+    }
+
+    private void createTransaction(Bid bid) {
+        bid.getTransactions().add(transactionRepository.save(new Transaction(bid)));
     }
 
     @Override
     @Transactional
-    public SyncResponse sync(Long auctionId) {
+    public SyncResponse handleAuctionProcess(Long auctionId) {
         Auction auction = auctionRepository
                 .findById(auctionId)
                 .orElseThrow(() -> new AuctionNotFoundException(auctionId));
-        LocalDateTime currentDate = LocalDateTime.now();
+
+        LocalDateTime currentDateTime = LocalDateTime.now();
         switch (auction.getStatus()) {
             case WAITING:
-                if (currentDate.isAfter(auction.getBeginDate()) || currentDate.isEqual(auction.getBeginDate())) {
-                    auction.setStatus(AuctionStatus.RUNNING);
-                    setNewEndTime(auction, currentDate);
-                    logService.log(LogLevel.AUCTION_STATUS_CHANGE, auctionRepository.save(auction));
-                    notificationService.log(NotificationLevel.SUBSCRIBED_AUCTION_STATUS_CHANGED, null, auction);
-                }
-                return generateSyncResponse(auction, currentDate, false);
+                return handleAuctionProcessInWaitingStatus(auction, currentDateTime);
             case RUNNING:
-                if (currentDate.isAfter(auction.getCurrentLot().getEndTime()) || currentDate.isEqual(auction.getCurrentLot().getEndTime())) {
-                    return handleLotFinished(auction, currentDate);
-                } else {
-                    return generateSyncResponse(auction, currentDate, false);
-                }
+                return handleAuctionProcessInRunningStatus(auction, currentDateTime);
             case FINISHED:
-                return generateSyncResponse(auction, currentDate, false);
+                return handleAuctionProcessInFinishedStatus(auction, currentDateTime);
             case DRAFT:
             default:
                 throw new NotCorrectStatusException(auction);
         }
     }
 
-    public SyncResponse handleLotFinished(Auction auction, LocalDateTime currentDate) {
-        auction.getCurrentLot().setFinished(true);
-        if (auction.getBid() != null) {
-            auction.getCurrentLot().setWinner(auction.getBid().getUser());
-            auction.getCurrentLot().setWinPrice(auction.getBid().getAmount());
+    private SyncResponse handleAuctionProcessInWaitingStatus(Auction auction, LocalDateTime currentDateTime) {
+        if (isAfterOrEqual(currentDateTime, auction.getBeginDateTime())) {
+            auction.setRunningStatus();
+            setNewEndTime(auction, currentDateTime);
 
-            auction.getBid().getTransactions().stream()
-                    .max(Comparator.comparing(Transaction::getDateTime))
-                    .ifPresent(tx -> tx.setTransactionStatus(TransactionStatus.WAIT));
-            auction.getBid().getTransactions().stream()
-                    .filter(tx -> !tx.getTransactionStatus().equals(TransactionStatus.WAIT))
-                    .forEach(tx -> {
-                        tx.getBuyer().addCurrency(tx.getPrice());
-                        transactionRepository.delete(tx);
-                    });
-
-            bidRepository.delete(auction.getBid());
+            sendLogAndNotificationAboutChangingAuctionStatus(auction);
         }
+        return generateSyncResponse(auction, currentDateTime, false);
+    }
 
+    private SyncResponse handleAuctionProcessInRunningStatus(Auction auction, LocalDateTime currentDateTime) {
+        if (isAfterOrEqual(currentDateTime, auction.getCurrentLot().getEndDateTime())) {
+            return handleLotFinished(auction, currentDateTime);
+        } else {
+            return generateSyncResponse(auction, currentDateTime, false);
+        }
+    }
+
+    private SyncResponse handleAuctionProcessInFinishedStatus(Auction auction, LocalDateTime currentDateTime) {
+        return generateSyncResponse(auction, currentDateTime, false);
+    }
+
+    private boolean isAfterOrEqual(LocalDateTime one, LocalDateTime other) {
+        return one.isAfter(other) || one.isEqual(other);
+    }
+
+    public SyncResponse handleLotFinished(Auction auction, LocalDateTime currentDateTime) {
+        auction.getCurrentLot().setFinished(true);
+        handleWinnerIfExists(auction);
+        return handleIfAuctionFinished(auction, currentDateTime);
+    }
+
+    private void handleWinnerIfExists(Auction auction) {
+        if (hasWinner(auction)) {
+            makeLotWon(auction);
+            freezeLastTransaction(auction);
+            refundMoneyAndDeleteAllTransactionsForBidExceptFrozen(auction);
+            bidRepository.delete(auction.getCurrentBid());
+        }
+    }
+
+    private SyncResponse handleIfAuctionFinished(Auction auction, LocalDateTime currentDateTime) {
         if (auction.getAnotherLot().isEmpty()) {
-            auction.setStatus(AuctionStatus.FINISHED);
-            auction.setEndDate(currentDate);
+            auction.setFinishedStatus();
+            auction.setEndDateTime(currentDateTime);
             auctionRepository.save(auction);
 
             logWinnerIfExists(auction);
-            logService.log(LogLevel.AUCTION_STATUS_CHANGE, auction);
-            notificationService.log(NotificationLevel.SUBSCRIBED_AUCTION_STATUS_CHANGED, null, auction);
-            return generateSyncResponse(auction, currentDate, false);
+            sendLogAndNotificationAboutChangingAuctionStatus(auction);
+            return generateSyncResponse(auction, currentDateTime, false);
         } else {
             logWinnerIfExists(auction);
-            return generateSyncResponse(setAndSaveAnotherLot(auction, currentDate), currentDate, true);
+            return generateSyncResponse(setAndSaveAnotherLot(auction, currentDateTime), currentDateTime, true);
         }
+    }
+
+    private void sendLogAndNotificationAboutChangingAuctionStatus(Auction auction) {
+        logService.log(LogLevel.AUCTION_STATUS_CHANGE, auction);
+        notificationService.log(NotificationLevel.SUBSCRIBED_AUCTION_STATUS_CHANGED, null, auction);
+    }
+
+    private boolean hasWinner(Auction auction) {
+        return auction.getCurrentBid() != null;
+    }
+
+    private void makeLotWon(Auction auction) {
+        auction.getCurrentLot().setWinner(auction.getCurrentBid().getUser());
+        auction.getCurrentLot().setWinPrice(auction.getCurrentBid().getAmount());
+    }
+
+    private void freezeLastTransaction(Auction auction) {
+        auction.getCurrentBid().getTransactions().stream()
+                .max(Comparator.comparing(Transaction::getDateTime))
+                .ifPresent(tx -> tx.setTransactionStatus(TransactionStatus.FROZEN));
+    }
+
+    private void refundMoneyAndDeleteAllTransactionsForBidExceptFrozen(Auction auction) {
+        auction.getCurrentBid().getTransactions().stream()
+                .filter(tx -> !tx.getTransactionStatus().equals(TransactionStatus.FROZEN))
+                .forEach(tx -> {
+                    tx.getBuyer().addCurrency(tx.getAmount());
+                    transactionRepository.delete(tx);
+                });
     }
 
     private void logWinnerIfExists(Auction auction) {
@@ -163,25 +203,26 @@ public class BidServiceImpl implements BidService {
 
     private void setNewEndTime(Auction auction, LocalDateTime currentDate) {
         auction.getCurrentLot()
-                .setEndTime(currentDate
-                        .plus(auction.getLotDuration().toNanoOfDay(), ChronoUnit.NANOS));
+                .setEndDateTime(currentDate
+                        .plus(auction.getLotDurationTime().toNanoOfDay(), ChronoUnit.NANOS));
     }
 
     private SyncResponse generateSyncResponse(Auction auction, LocalDateTime currentDate, boolean changed) {
-        return new SyncResponse(
-                getDurationInSec(auction, currentDate),
-                modelMapper.map(auction.getCurrentLot(), LotResponse.class),
-                auction.getStatus(),
-                (auction.getBid() != null) ? auction.getBid().getAmount() : null,
-                changed);
+        return SyncResponse.builder()
+                .secondsUntil(getDurationInSec(auction, currentDate))
+                .currentLot(modelMapper.map(auction.getCurrentLot(), LotResponse.class))
+                .auctionStatus(auction.getStatus())
+                .currentBank((auction.getCurrentBid() != null) ? auction.getCurrentBid().getAmount() : null)
+                .changed(changed)
+                .build();
     }
 
     private Long getDurationInSec(Auction auction, LocalDateTime currentDate) {
         switch (auction.getStatus()) {
             case WAITING:
-                return getDurationInSec(auction.getBeginDate(), currentDate);
+                return getDurationInSec(auction.getBeginDateTime(), currentDate);
             case RUNNING:
-                return getDurationInSec(auction.getCurrentLot().getEndTime(), currentDate);
+                return getDurationInSec(auction.getCurrentLot().getEndDateTime(), currentDate);
             case FINISHED:
                 return Duration.ZERO.toSeconds();
             case DRAFT:

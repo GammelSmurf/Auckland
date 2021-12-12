@@ -2,7 +2,7 @@ package ru.netcracker.backend.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.netcracker.backend.responses.NotificationResponse;
+import ru.netcracker.backend.model.responses.NotificationResponse;
 import ru.netcracker.backend.service.NotificationService;
 
 import java.util.List;

@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.netcracker.backend.exception.ValidationException;
-import ru.netcracker.backend.responses.SyncResponse;
+import ru.netcracker.backend.model.responses.SyncResponse;
 import ru.netcracker.backend.service.BidService;
 
 @RestController
@@ -21,6 +21,6 @@ public class SyncController {
 
     @GetMapping("/{id}")
     public SyncResponse sync(@PathVariable Long id) throws ValidationException {
-        return bidService.sync(id);
+        return bidService.handleAuctionProcess(id);
     }
 }

@@ -3,6 +3,7 @@ package ru.netcracker.backend.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,19 +11,18 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.netcracker.backend.exception.auction.NoLotsException;
 import ru.netcracker.backend.exception.auction.NotCorrectStatusException;
-import ru.netcracker.backend.model.Auction;
-import ru.netcracker.backend.requests.AuctionRequest;
-import ru.netcracker.backend.requests.CategoryRequest;
-import ru.netcracker.backend.requests.SearchRequest;
-import ru.netcracker.backend.requests.SubscribeRequest;
-import ru.netcracker.backend.responses.AuctionResponse;
-import ru.netcracker.backend.responses.CategoryResponse;
-import ru.netcracker.backend.responses.UserResponse;
+import ru.netcracker.backend.model.entity.Auction;
+import ru.netcracker.backend.model.requests.AuctionRequest;
+import ru.netcracker.backend.model.requests.CategoryRequest;
+import ru.netcracker.backend.model.requests.SearchRequest;
+import ru.netcracker.backend.model.requests.SubscribeRequest;
+import ru.netcracker.backend.model.responses.AuctionResponse;
+import ru.netcracker.backend.model.responses.CategoryResponse;
+import ru.netcracker.backend.model.responses.UserResponse;
 import ru.netcracker.backend.service.AuctionService;
 
 import javax.validation.Valid;
 import java.security.Principal;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/auctions")
@@ -40,12 +40,12 @@ public class AuctionController {
     }
 
     @GetMapping
-    public List<AuctionResponse> getAllAuctions(Pageable pageable) {
+    public Page<AuctionResponse> getAllAuctions(Pageable pageable) {
         return auctionService.getAllAuctions(pageable);
     }
 
     @PostMapping("/search")
-    public List<AuctionResponse> getAuctionByKeyword(@RequestBody SearchRequest searchRequest, Pageable pageable, Principal principal) {
+    public Page<AuctionResponse> getAuctionByKeyword(@RequestBody SearchRequest searchRequest, Pageable pageable, Principal principal) {
         return auctionService.searchAuctions(principal.getName(), searchRequest, pageable);
     }
 

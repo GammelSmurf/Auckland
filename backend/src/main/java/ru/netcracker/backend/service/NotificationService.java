@@ -1,10 +1,9 @@
 package ru.netcracker.backend.service;
 
-import ru.netcracker.backend.model.Auction;
-import ru.netcracker.backend.model.User;
-import ru.netcracker.backend.responses.LogResponse;
-import ru.netcracker.backend.responses.NotificationResponse;
-import ru.netcracker.backend.util.NotificationLevel;
+import ru.netcracker.backend.model.entity.Auction;
+import ru.netcracker.backend.model.entity.User;
+import ru.netcracker.backend.model.responses.NotificationResponse;
+import ru.netcracker.backend.util.enumiration.NotificationLevel;
 
 import java.util.List;
 

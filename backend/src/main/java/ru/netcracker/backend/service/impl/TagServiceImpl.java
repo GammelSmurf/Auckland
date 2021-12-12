@@ -4,9 +4,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.netcracker.backend.model.Tag;
+import ru.netcracker.backend.model.entity.Tag;
 import ru.netcracker.backend.repository.TagRepository;
-import ru.netcracker.backend.responses.TagResponse;
+import ru.netcracker.backend.model.responses.TagResponse;
 import ru.netcracker.backend.service.TagService;
 
 import java.util.List;

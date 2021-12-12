@@ -1,6 +1,6 @@
 package ru.netcracker.backend.service;
 
-import ru.netcracker.backend.responses.UserResponse;
+import ru.netcracker.backend.model.responses.UserResponse;
 
 import java.math.BigDecimal;
 import java.util.List;

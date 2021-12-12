@@ -6,9 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.netcracker.backend.model.Lot;
-import ru.netcracker.backend.requests.LotRequest;
-import ru.netcracker.backend.responses.LotResponse;
+import ru.netcracker.backend.model.entity.Lot;
+import ru.netcracker.backend.model.requests.LotRequest;
+import ru.netcracker.backend.model.responses.LotResponse;
 import ru.netcracker.backend.service.LotService;
 
 import javax.validation.Valid;

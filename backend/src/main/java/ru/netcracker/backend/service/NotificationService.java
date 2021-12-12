@@ -11,4 +11,6 @@ public interface NotificationService {
     List<NotificationResponse> getUserNotifications(Long userId);
 
     void log(NotificationLevel level, User user, Auction auction);
+
+    void deleteOldNotifications();
 }

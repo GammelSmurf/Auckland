@@ -28,3 +28,11 @@ Auckland:
     jwtExpirationMs: 86400000
   mail:
     senderName: Auckland team
+  schedule:
+    deleteMessages:
+      cron: 0 0 05 * * ?
+    deleteNotifications:
+      cron: 0 50 14 * * ?
+  removalPeriod:
+    messages: 7
+    notification: 7

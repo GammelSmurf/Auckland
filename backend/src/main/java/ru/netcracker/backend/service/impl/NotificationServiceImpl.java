@@ -1,6 +1,7 @@
 package ru.netcracker.backend.service.impl;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional(readOnly = true)
+//@Transactional(readOnly = true)
 public class NotificationServiceImpl implements NotificationService {
     private final SimpMessagingTemplate template;
     private final ModelMapper modelMapper;
@@ -27,6 +28,8 @@ public class NotificationServiceImpl implements NotificationService {
     private static final String USER_SUBSCRIBED_MSG_TEMPLATE = "User '%s' subscribed to auction '%s'";
     private static final String SUBSCRIBED_AUCTION_STATUS_CHANGED_MSG_TEMPLATE = "An auction you subscribed '%s' changed status to '%s'";
     private static final String OWN_AUCTION_STATUS_CHANGED_MSG_TEMPLATE = "Your auction '%s' changed status to '%s'";
+    @Value("${Auckland.removalPeriod.notification}")
+    private String daysForDelete;
 
     public NotificationServiceImpl(SimpMessagingTemplate template, ModelMapper modelMapper, NotificationRepository notificationRepository) {
         this.template = template;
@@ -65,6 +68,12 @@ public class NotificationServiceImpl implements NotificationService {
                 }
                 break;
         }
+    }
+
+    @Override
+    @Transactional
+    public void deleteOldNotifications() {
+        notificationRepository.deleteAllByTimeIsLessThan(LocalDateTime.now().minusDays(Long.parseLong(daysForDelete)));
     }
 
     private Notification addNotification(User user, String msg) {

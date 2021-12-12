@@ -32,7 +32,7 @@ Auckland:
     deleteMessages:
       cron: 0 0 05 * * ?
     deleteNotifications:
-      cron: 0 50 14 * * ?
+      cron: 0 0 05 * * ?
   removalPeriod:
     messages: 7
     notification: 7

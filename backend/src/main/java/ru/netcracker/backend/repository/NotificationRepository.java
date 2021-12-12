@@ -13,5 +13,5 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     List<Notification> findAllByUser_Id(Long auctionId);
 
     @Modifying
-    void deleteAllByTimeIsLessThan(LocalDateTime time);
+    void deleteAllByDateTimeIsLessThan(LocalDateTime time);
 }

@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-//@Transactional(readOnly = true)
+@Transactional(readOnly = true)
 public class NotificationServiceImpl implements NotificationService {
     private final SimpMessagingTemplate template;
     private final ModelMapper modelMapper;
@@ -73,7 +73,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     @Transactional
     public void deleteOldNotifications() {
-        notificationRepository.deleteAllByTimeIsLessThan(LocalDateTime.now().minusDays(Long.parseLong(daysForDelete)));
+        notificationRepository.deleteAllByDateTimeIsLessThan(LocalDateTime.now().minusDays(Long.parseLong(daysForDelete)));
     }
 
     private Notification addNotification(User user, String msg) {

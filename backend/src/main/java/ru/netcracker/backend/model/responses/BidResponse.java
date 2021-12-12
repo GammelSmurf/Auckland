@@ -10,6 +10,6 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BidResponse {
-    private BigDecimal currentBank;
+    private BigDecimal amount;
     private Long secondsUntil;
 }

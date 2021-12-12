@@ -14,13 +14,14 @@ public class LotResponse {
     private Long id;
     private String name;
     private String description;
-    private Long minBank;
-    private Long step;
-    private String picture;
+    private Long minPrice;
+    private Long priceIncreaseMinStep;
+    private Long winPrice;
+    private String pictureLink;
     private Long auctionId;
     private Boolean finished;
     private UserResponse winner;
 
     @JsonLocalDateTime
-    private LocalDateTime endTime;
+    private LocalDateTime endDateTime;
 }

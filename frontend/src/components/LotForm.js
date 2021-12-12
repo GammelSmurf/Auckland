@@ -25,27 +25,27 @@ const LotForm = (props) => {
                     </Form.Group>
                     <Form.Group>
                         <Form.Label>
-                            Picture
+                            Picture link
                         </Form.Label>
-                        <Form.Control required defaultValue={props.lot.picture} onChange={props.handleChange("picture")}/>
+                        <Form.Control required defaultValue={props.lot.pictureLink} onChange={props.handleChange("pictureLink")}/>
                         <Form.Control.Feedback type="invalid">
                             The value cannot be empty
                         </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group>
                         <Form.Label>
-                            Start bank
+                            Minimal price
                         </Form.Label>
-                        <Form.Control required type="number" min={1} defaultValue={props.lot.minBank} onChange={props.handleChange("minBank")}/>
+                        <Form.Control required type="number" min={1} defaultValue={props.lot.minPrice} onChange={props.handleChange("minPrice")}/>
                         <Form.Control.Feedback type="invalid">
                             The min value is 1
                         </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group>
                         <Form.Label>
-                            Minimal bet
+                            Price increase minimal step
                         </Form.Label>
-                        <Form.Control required type="number" min={1} defaultValue={props.lot.step} onChange={props.handleChange("step")}/>
+                        <Form.Control required type="number" min={1} defaultValue={props.lot.priceIncreaseMinStep} onChange={props.handleChange("priceIncreaseMinStep")}/>
                         <Form.Control.Feedback type="invalid">
                             The min value is 1
                         </Form.Control.Feedback>

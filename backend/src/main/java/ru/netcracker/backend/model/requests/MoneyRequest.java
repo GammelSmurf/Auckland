@@ -12,11 +12,11 @@ import java.math.BigDecimal;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CurrencyRequest {
+public class MoneyRequest {
     @NotBlank(message="Username should not be blank")
     @Size(min=3,max=255)
     private String username;
 
     @DecimalMin("0.01")
-    private BigDecimal currency;
+    private BigDecimal money;
 }

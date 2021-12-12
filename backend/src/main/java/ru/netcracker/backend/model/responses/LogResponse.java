@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class LogResponse {
     private Long id;
-    private String logMessage;
+    private String message;
 
     @JsonLocalDateTime
-    private LocalDateTime logTime;
+    private LocalDateTime dateTime;
 }

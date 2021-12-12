@@ -11,7 +11,7 @@ const LotCarousel = (props) => {
                         <div>
                             <img
                                 className="d-block w-100"
-                                src={lot.picture}
+                                src={lot.pictureLink}
                                 height="300"
                                 alt="No image"
                                 style={{filter: "brightness(60%)", objectFit: "cover"}}
@@ -21,7 +21,7 @@ const LotCarousel = (props) => {
                         <div style={{position: "absolute", top: 0, left: "15%", right: "15%"}}>
                             {props.status === 'FINISHED' ?
                             <h3 style={{color: "white"}}>{'Winner: ' + (lot.winner ? lot.winner.username : 'nobody')}</h3> :
-                                <h3 style={{color: "white"}}>{'Opening price: ' + lot.minBank} $</h3>}
+                                <h3 style={{color: "white"}}>{'Opening price: ' + lot.minPrice} $</h3>}
                         </div>
                         <Carousel.Caption>
                             <h3>{lot.name}</h3>

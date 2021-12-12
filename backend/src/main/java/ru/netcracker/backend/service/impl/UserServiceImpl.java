@@ -55,11 +55,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserResponse addCurrency(String username, BigDecimal currency) {
+    public UserResponse addMoney(String username, BigDecimal currency) {
         User user = userRepository
                 .findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException(username));
-        user.addCurrency(currency);
+        user.addMoney(currency);
         return modelMapper.map(userRepository.save(user), UserResponse.class);
     }
 }

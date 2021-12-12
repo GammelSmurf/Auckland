@@ -19,10 +19,10 @@ const createAuction = (values) =>{
             name: values.name,
             creatorUsername: values.username,
             description: values.description,
-            beginDate: values.beginDate,
-            lotDuration: values.lotDuration,
-            boostTime: values.boostTime,
-            usersLimit: values.usersLimit,
+            beginDateTime: values.beginDateTime,
+            lotDurationTime: values.lotDurationTime,
+            extraTime: values.extraTime,
+            usersCountLimit: values.usersCountLimit,
             status: values.status
         }, {headers: authHeader()})
         .then(response => {
@@ -46,10 +46,10 @@ const updateAuction = (values) =>{
             name: values.name,
             creatorUsername: values.username,
             description: values.description,
-            beginDate: values.beginDate,
-            lotDuration: values.lotDuration,
-            boostTime: values.boostTime,
-            usersLimit: values.usersLimit,
+            beginDateTime: values.beginDateTime,
+            lotDurationTime: values.lotDurationTime,
+            extraTime: values.extraTime,
+            usersCountLimit: values.usersCountLimit,
             status: values.status
         }, {headers: authHeader()})
         .then(response => {

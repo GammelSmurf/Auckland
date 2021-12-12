@@ -21,7 +21,7 @@ public class MessageRequest {
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     @JsonLocalDateTime
-    private LocalDateTime dateTimeMessage;
+    private LocalDateTime dateTime;
 
     @NotBlank(message="Message should not be blank")
     @Size(min=1,max=255)

@@ -23,24 +23,24 @@ public class AuctionResponse {
     private UserResponse creator;
     private LotResponse currentLot;
 
-    private int usersLimit;
-    private int usersCount;
-    private int userLikes;
+    private long usersCountLimit;
+    private long subscribedUsersCount;
+    private long userLikesCount;
     private Set<Lot> lots;
-    private Set<UserResponse> subscribers;
+    private Set<UserResponse> subscribedUsers;
     private Set<CategoryResponse> categories;
     private Set<TagResponse> tags;
 
     @JsonLocalDateTime
-    private LocalDateTime beginDate;
+    private LocalDateTime beginDateTime;
     @JsonLocalDateTime
-    private LocalDateTime endDate;
+    private LocalDateTime endDateTime;
 
     @JsonLocalTime
-    private LocalTime lotDuration;
+    private LocalTime lotDurationTime;
 
     @JsonLocalTime
-    private LocalTime boostTime;
+    private LocalTime extraTime;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private AuctionStatus status;

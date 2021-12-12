@@ -30,7 +30,7 @@ public class User {
     private String about;
 
 //    private BigDecimal currency = new BigDecimal(0);
-    private BigDecimal currency = new BigDecimal(50000); //TODO: delete. It's for debug
+    private BigDecimal money = new BigDecimal(50000); //TODO: delete. It's for debug
 
     private String verificationCode = RandomString.make(64);
     private String restoreCode;
@@ -83,12 +83,12 @@ public class User {
     @JsonBackReference
     private Set<Notification> notifications = new HashSet<>();
 
-    public void subtractCurrency(BigDecimal currency) {
-        this.currency = this.currency.subtract(currency);
+    public void subtractMoney(BigDecimal currency) {
+        this.money = this.money.subtract(currency);
     }
 
-    public void addCurrency(BigDecimal currency) {
-        this.currency = this.currency.add(currency);
+    public void addMoney(BigDecimal currency) {
+        this.money = this.money.add(currency);
     }
 
     public void subscribeToAuction(Auction auction) {

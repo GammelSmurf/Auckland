@@ -29,7 +29,7 @@ public class BidUtil {
             throw new LotTimeExpiredException("Lot time is expired");
         }
 
-        if (isLess(user.getCurrency(), lotBank)) {
+        if (isLess(user.getMoney(), lotBank)) {
             throw new NoCurrencyException("User don't have enough money");
         }
 
@@ -43,8 +43,8 @@ public class BidUtil {
                 throw new BankLessThanOldException(String.format("Bank is less than the old one: %f", bid.getAmount()));
             }
 
-            if (isLess(lotBank.subtract(bid.getAmount()), auction.getCurrentLot().getPriceIncreaseStep())) {
-                throw new BankLessThanStepException(String.format("Bet step is less than the minimal one: %f", auction.getCurrentLot().getPriceIncreaseStep()));
+            if (isLess(lotBank.subtract(bid.getAmount()), auction.getCurrentLot().getPriceIncreaseMinStep())) {
+                throw new BankLessThanStepException(String.format("Bet step is less than the minimal one: %f", auction.getCurrentLot().getPriceIncreaseMinStep()));
             }
         }
     }

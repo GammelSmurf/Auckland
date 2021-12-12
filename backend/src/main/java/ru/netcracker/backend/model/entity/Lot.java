@@ -23,7 +23,7 @@ public class Lot {
     private String description;
 
     private BigDecimal minPrice = new BigDecimal(0);
-    private BigDecimal priceIncreaseStep = new BigDecimal(0);
+    private BigDecimal priceIncreaseMinStep = new BigDecimal(0);
     private BigDecimal winPrice;
     private LocalDateTime endDateTime;
 

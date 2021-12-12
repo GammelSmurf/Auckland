@@ -42,7 +42,7 @@ const Users = () => {
         text: 'Email',
         sort: true
     }, {
-        dataField: 'currency',
+        dataField: 'money',
         text: 'Cash',
         sort: true
     }, {

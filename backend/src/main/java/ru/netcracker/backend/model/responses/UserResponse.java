@@ -18,5 +18,5 @@ public class UserResponse {
     private String about;
     private Boolean isBanned;
     private Boolean enabled;
-    private BigDecimal currency;
+    private BigDecimal money;
 }

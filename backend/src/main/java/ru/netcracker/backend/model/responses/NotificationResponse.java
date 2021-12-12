@@ -15,5 +15,5 @@ public class NotificationResponse {
     private String message;
 
     @JsonLocalDateTime
-    private LocalDateTime time;
+    private LocalDateTime dateTime;
 }

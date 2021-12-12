@@ -14,7 +14,7 @@ public class MessageResponse {
     private String username;
 
     @JsonLocalDateTime
-    private LocalDateTime dateTimeMessage;
+    private LocalDateTime dateTime;
 
     private String message;
 

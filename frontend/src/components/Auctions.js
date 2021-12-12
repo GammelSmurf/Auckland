@@ -17,19 +17,19 @@ const Auctions = (props) => {
         username: currentUser.username,
         name: "Auction name",
         description: "Lorem Ipsum - это текст-\"рыба\", часто используемый в печати и вэб-дизайне. Lorem Ipsum является стандартной \"рыбой\" для текстов на латинице с начала XVI века. В то время некий безымянный печатник создал большую коллекцию размеров и форм шрифтов, используя Lorem Ipsum для распечатки образцов. Lorem Ipsum не только успешно пережил без заметных изменений пять веков, но и перешагнул в электронный дизайн.",
-        usersLimit: 100,
-        beginDate: "",
-        lotDuration: "00:30:00",
-        boostTime: "00:00:10",
+        usersCountLimit: 100,
+        beginDateTime: "",
+        lotDurationTime: "00:30:00",
+        extraTime: "00:00:10",
         status: 'DRAFT'
     }
 
     const defLotValues = {
         name: 'Example lot',
         description: 'Lorem Ipsum - это текст-\"рыба\", часто используемый в печати и вэб-дизайне. Lorem Ipsum является стандартной \"рыбой\" для текстов на латинице с начала XVI века. В то время некий безымянный печатник создал большую коллекцию размеров и форм шрифтов, используя Lorem Ipsum для распечатки образцов. Lorem Ipsum не только успешно пережил без заметных изменений пять веков, но и перешагнул в электронный дизайн.',
-        minBank: '100',
-        step: '10',
-        picture: 'https://artworld.ru/images/cms/content/catalog3/ivan_shishkin_copy_kamskij_kartina_maslom_pejzazh_utro_v_sosnovom_lesu_1889_is200201_2.jpg'
+        minPrice: '100',
+        priceIncreaseMinStep: '10',
+        pictureLink: 'https://artworld.ru/images/cms/content/catalog3/ivan_shishkin_copy_kamskij_kartina_maslom_pejzazh_utro_v_sosnovom_lesu_1889_is200201_2.jpg'
     }
 
     const parseMinDate = () => {
@@ -53,7 +53,7 @@ const Auctions = (props) => {
                 response.data.content.forEach(item => {
                     dataPrev.push(
                         {
-                            id: item.id, name: item.name, beginDate: parseDateInfo(item.beginDate), participants: item.usersLimit, likesCount: item.userLikes, usersCount: item.usersCount, status: item.status
+                            id: item.id, name: item.name, beginDateTime: parseDateInfo(item.beginDateTime), participants: item.usersCountLimit, likesCount: item.userLikesCount, subscribedUsersCount: item.subscribedUsersCount, status: item.status
                         }
                     )
                 })
@@ -64,7 +64,7 @@ const Auctions = (props) => {
 
     const participantsFormatter = (cell, row) => {
         return (
-            <p>{row.usersCount + " / " + cell}</p>
+            <p>{row.subscribedUsersCount + " / " + cell}</p>
         );
     }
 
@@ -77,7 +77,7 @@ const Auctions = (props) => {
         text: 'Auctions name',
         sort: true
     }, {
-        dataField: 'beginDate',
+        dataField: 'beginDateTime',
         text: 'Start',
         sort: true
     }, {
@@ -86,7 +86,7 @@ const Auctions = (props) => {
         formatter: participantsFormatter,
         sort: true
     }, {
-        dataField: 'likesCount',
+        dataField: 'userLikesCount',
         text: 'Likes',
         sort: true
     }, {
@@ -102,7 +102,7 @@ const Auctions = (props) => {
     };
 
     const createAuction = () => {
-        defAucValues.beginDate = parseMinDate();
+        defAucValues.beginDateTime = parseMinDate();
         AuctionService.createAuction(defAucValues).then(
             (response) => {
                 LotService.createLot({...defLotValues, aucId: response.data.id}).then(

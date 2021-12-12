@@ -13,7 +13,6 @@ import ru.netcracker.backend.model.requests.MessageRequest;
 import ru.netcracker.backend.model.requests.TagRequest;
 import ru.netcracker.backend.model.responses.*;
 
-import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
@@ -41,9 +40,6 @@ public class ModelMapperConfig {
                 .addMappings(
                         mapper -> {
                             mapper.skip(Auction::setId);
-                            mapper.skip(Auction::setCreator);
-                            mapper.map(AuctionRequest::getUsersLimit, Auction::setUsersNumberLimit);
-                            mapper.map(AuctionRequest::getBoostTime, Auction::setExtraTime);
                         })
                 .setPostConverter(context -> {
                     context.getDestination().setCreator(
@@ -53,32 +49,23 @@ public class ModelMapperConfig {
                     return context.getDestination();
                 });
 
+        modelMapper.createTypeMap(Auction.class, AuctionResponse.class)
+                .addMappings(
+                        mapper -> {
+                            mapper.map(Auction::getUserLikesCount, AuctionResponse::setUserLikesCount);
+                            mapper.map(Auction::getSubscribedUsersCount, AuctionResponse::setSubscribedUsersCount);
+                        });
+
         modelMapper.createTypeMap(LotRequest.class, Lot.class)
                 .addMappings(
                         mapper -> {
                             mapper.skip(Lot::setId);
-                            mapper.map(LotRequest::getPicture, Lot::setPictureLink);
-                        })
-                .setPostConverter(context -> {
-                    context.getDestination().setMinPrice(BigDecimal.valueOf(context.getSource().getMinBank()));
-                    context.getDestination().setPriceIncreaseStep(BigDecimal.valueOf(context.getSource().getStep()));
-                    return context.getDestination();
-                });
+                        });
 
         modelMapper.createTypeMap(Lot.class, LotResponse.class)
                 .addMappings(
                         mapper -> {
                             mapper.map(src -> src.getAuction().getId(), LotResponse::setAuctionId);
-                            mapper.map(Lot::getPictureLink, LotResponse::setPicture);
-                        });
-
-        modelMapper.createTypeMap(Auction.class, AuctionResponse.class)
-                .addMappings(
-                        mapper -> {
-                            mapper.map(Auction::getSubscribersCount, AuctionResponse::setUsersCount);
-                            mapper.map(Auction::getLikesCount, AuctionResponse::setUserLikes);
-                            mapper.map(Auction::getUsersNumberLimit, AuctionResponse::setUsersLimit);
-                            mapper.map(Auction::getSubscribedUsers, AuctionResponse::setSubscribers);
                         });
 
         modelMapper.createTypeMap(MessageRequest.class, Message.class)

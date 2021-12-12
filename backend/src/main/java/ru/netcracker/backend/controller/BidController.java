@@ -38,7 +38,7 @@ public class BidController {
     @SendTo("/auction/state/{id}")
     public BidResponse play(@DestinationVariable Long id, @Valid BidRequest bidRequest)
             throws ValidationException {
-        BidResponse bidResponse = bidService.makeBid(bidRequest.getUsername(), id, bidRequest.getCurrentBank());
+        BidResponse bidResponse = bidService.makeBid(bidRequest.getUsername(), id, bidRequest.getAmount());
 
         log.info("auction with id: {} has: {}", id, bidResponse);
         return bidResponse;

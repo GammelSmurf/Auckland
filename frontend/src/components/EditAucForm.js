@@ -15,7 +15,7 @@ const EditAucForm = (props) => {
                 <h5>Settings</h5>
                 <Form.Group>
                     <InputGroup>
-                        <InputGroup.Text>Member limit</InputGroup.Text>
+                        <InputGroup.Text>Members count limit</InputGroup.Text>
                         <Form.Control required type="number" min="1" max="100" defaultValue={props.auction.usersLimit} onChange={props.handleChange("usersLimit")}/>
                     </InputGroup>
                     <Form.Control.Feedback type="invalid">
@@ -24,7 +24,7 @@ const EditAucForm = (props) => {
                 </Form.Group>
                 <Form.Group>
                     <InputGroup>
-                        <InputGroup.Text>Lot duration</InputGroup.Text>
+                        <InputGroup.Text>Lot duration time</InputGroup.Text>
                         <Form.Control required type="time" step="1" defaultValue={props.auction.lotDuration} onChange={props.handleChange("lotDuration")}/>
                     </InputGroup>
                     <Form.Control.Feedback type="invalid">
@@ -33,7 +33,7 @@ const EditAucForm = (props) => {
                 </Form.Group>
                 <Form.Group>
                     <InputGroup>
-                        <InputGroup.Text>Lot boost time</InputGroup.Text>
+                        <InputGroup.Text>Lot extra time</InputGroup.Text>
                         <Form.Control required type="time" step="1" defaultValue={props.auction.boostTime} onChange={props.handleChange("boostTime")}/>
                     </InputGroup>
                     <Form.Control.Feedback type="invalid">

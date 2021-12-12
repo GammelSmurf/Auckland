@@ -10,9 +10,9 @@ const getUsers = () => {
 
 const giveCash = (username, sum) => {
     return axios
-        .post(API_URL + 'currency/add', {
+        .post(API_URL + 'money/add', {
             username: username,
-            currency: sum
+            money: sum
         }, {headers: authHeader()})
         .then(response => {
 

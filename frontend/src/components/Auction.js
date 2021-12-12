@@ -12,7 +12,7 @@ import EditAucForm from "./EditAucForm";
 import AuthService from "../services/AuthService";
 import EditLotModal from "./EditLotModal";
 import ModalDialog from "./ModalDialog";
-import BetService from "../services/BetService";
+import BidService from "../services/BidService";
 import SockJsClient from 'react-stomp';
 import Categories from "./Categories";
 import Chat from "./Chat";
@@ -42,7 +42,7 @@ const Auction = (props) => {
     const [logs, setLogs] = useState([]);
     const [finishTime, setFinishTime] = useState('');
     const [currentPrice, setCurrentPrice] = useState('');
-    const [bet, setBet] = useState();
+    const [bidAmount, setBid] = useState();
     const [creator, setCreator] = useState({});
     const [errorMessage, setErrorMessage] = useState('');
     const [chatMessages, setChatMessages] = useState([]);
@@ -94,7 +94,7 @@ const Auction = (props) => {
                 console.log(response)
                 setLots(response.data);
                 // TEMPORARY
-                response.data.length > 0 && setFinishTime(parseDateToDisplay(response.data.at(-1).endTime));
+                response.data.length > 0 && setFinishTime(parseDateToDisplay(response.data.at(-1).endDateTime));
                 //
             }
         );
@@ -103,15 +103,15 @@ const Auction = (props) => {
     //------------------------WS logic------------------------//
 
     const syncState = (aucId) => {
-        BetService.getTime(aucId).then(
+        BidService.getTime(aucId).then(
             (syncResponse) => {
                 console.log('Sync')
                 console.log(syncResponse)
 
                 if(syncResponse.data.auctionStatus === 'RUNNING'){
                     setCarouselCurrentLot([syncResponse.data.currentLot]);
-                    syncResponse.data.currentBank ? setCurrentPrice(syncResponse.data.currentBank) :
-                        setCurrentPrice(syncResponse.data.currentLot.minBank);
+                    syncResponse.data.amount ? setCurrentPrice(syncResponse.data.amount) :
+                        setCurrentPrice(syncResponse.data.currentLot.minPrice);
                 }
                 if(syncResponse.data.auctionStatus === 'FINISHED'){
                     getLots(aucId);
@@ -143,37 +143,37 @@ const Auction = (props) => {
     const onReceiveWebSocketMessage = (response) => {
         if(response.username){
             console.log('Chat', response)
-            setChatMessages(chatMessages.concat({...response, dateTimeMessage: parseMessageTime(response.dateTimeMessage)}))
+            setChatMessages(chatMessages.concat({...response, dateTime: parseMessageTime(response.dateTime)}))
             scrollToBottom();
         }
-        if(response.currentBank){
-            setCurrentPrice(response.currentBank);
+        if(response.amount){
+            setCurrentPrice(response.amount);
             activateTimer(response.secondsUntil, auction.id);
         }
-        if(response.logMessage){
-            setFinishTime(parseDateToDisplay(response.logTime));
+        if(response.message){
+            setFinishTime(parseDateToDisplay(response.dateTime));
             setLogs(logs.concat(response));
         }
     }
 
-    const onBetChange = (e) => {
-        setBet(e.target.value);
+    const onBidChange = (e) => {
+        setBid(e.target.value);
     }
 
-    const handleSendBet = () => {
+    const handleSendBid = () => {
         setErrorMessage(null);
-        const sum = currentPrice + carouselCurrentLot[0].step;
-        if(!bet || bet < sum){
-            setErrorMessage('The bet must be greater then ' + sum + '$');
+        const sum = currentPrice + carouselCurrentLot[0].priceIncreaseMinStep;
+        if(!bidAmount || bidAmount < sum){
+            setErrorMessage('The bid must be greater then ' + sum + '$');
         }
         else{
-            client.current.sendMessage('/app/play/'+auction.id, JSON.stringify({username: currentUser.username, currentBank: bet}));
+            client.current.sendMessage('/app/play/'+auction.id, JSON.stringify({username: currentUser.username, amount: bidAmount}));
         }
     }
 
     const handleSendMessage = (message) => {
         client.current.sendMessage('/app/send/'+auction.id,
-            JSON.stringify({senderUsername: currentUser.username, auctionId: auction.id, dateTimeMessage: parseResponseDate(new Date()), message: message}));
+            JSON.stringify({senderUsername: currentUser.username, auctionId: auction.id, dateTime: parseResponseDate(new Date()), message: message}));
     }
 
     //------------------------WS logic------------------------//
@@ -208,12 +208,12 @@ const Auction = (props) => {
             (response) => {
                 console.log(response.data)
                 setCreator(response.data.creator);
-                setIsSubscribed(response.data.subscribers.some(user=>user.id === currentUser.id));
-                setMembers(response.data.subscribers);
+                setIsSubscribed(response.data.subscribedUsers.some(user=>user.id === currentUser.id));
+                setMembers(response.data.subscribedUsers);
                 switch (response.data.status) {
                     case 'DRAFT':
                         setStatus(response.data.status);
-                        setStrTimer(parseDateToDisplay(response.data.beginDate));
+                        setStrTimer(parseDateToDisplay(response.data.beginDateTime));
                         break;
                     case 'WAITING':
                         syncState(response.data.id);
@@ -225,16 +225,16 @@ const Auction = (props) => {
                         setStatus(response.data.status);
                         break;
                 }
-                setAuction({...response.data, beginDate: parseAuctionDate(response.data.beginDate)});
+                setAuction({...response.data, beginDateTime: parseAuctionDate(response.data.beginDateTime)});
                 setAucValues({
                     username: currentUser.username,
                     id: response.data.id,
                     name: response.data.name,
                     description: response.data.description,
-                    usersLimit: response.data.usersLimit,
-                    beginDate: parseResponseDate(response.data.beginDate),
-                    lotDuration: response.data.lotDuration,
-                    boostTime: response.data.boostTime,
+                    usersCountLimit: response.data.usersCountLimit,
+                    beginDateTime: parseResponseDate(response.data.beginDateTime),
+                    lotDurationTime: response.data.lotDurationTime,
+                    extraTime: response.data.extraTime,
                     status: response.data.status
                 });
                 getLots(response.data.id);
@@ -245,7 +245,7 @@ const Auction = (props) => {
                     let dataPrev = []
                     response.data.forEach(message=>
                         dataPrev.push(
-                            {...message, dateTimeMessage: parseMessageTime(message.dateTimeMessage)}
+                            {...message, dateTime: parseMessageTime(message.dateTime)}
                         )
                     )
                     setChatMessages(dataPrev);
@@ -267,9 +267,9 @@ const Auction = (props) => {
             id: currentLot.id,
             name: currentLot.name,
             description: currentLot.description,
-            minBank: currentLot.minBank,
-            step: currentLot.step,
-            picture: currentLot.picture,
+            minPrice: currentLot.minPrice,
+            priceIncreaseMinStep: currentLot.priceIncreaseMinStep,
+            pictureLink: currentLot.pictureLink,
             aucId: auction.id
         })
     }
@@ -306,7 +306,7 @@ const Auction = (props) => {
     const handleChangeAuction = (name) => (e) => {
         let value = e.target.value;
         setAuction({...auction, [name]: value})
-        if (name === "beginDate") {
+        if (name === "beginDateTime") {
             setStrTimer(parseDateToDisplay(value));
             value = parseResponseDate(value);
         }
@@ -418,8 +418,8 @@ const Auction = (props) => {
                                     <div style={{overflowY: 'auto', height: "250px"}}>
                                         {(logs.length !== 0) ? logs.map(log =>
                                             <div key={log.id}>
-                                                <p style={{fontSize: '12px', margin: 0}}><b>{log.logTime}</b></p>
-                                                <p style={{fontSize: '12px', margin: 0}}>{log.logMessage}</p>
+                                                <p style={{fontSize: '12px', margin: 0}}><b>{log.dateTime}</b></p>
+                                                <p style={{fontSize: '12px', margin: 0}}>{log.message}</p>
                                                 <hr size={3} style={{color: '#9434B3'}}/>
                                             </div>
                                         ) : <p style={{fontStyle: 'italic'}}>There is no log messages yet</p>}
@@ -467,22 +467,22 @@ const Auction = (props) => {
                                     {status === 'RUNNING' &&
                                     <div className='basicAnim' style={{marginTop: "10px"}}>
                                         <h5>Current price</h5>
-                                        <h1>{currentPrice}$ <span style={{fontSize: '20px', color: 'green'}}>(+{currentPrice-carouselCurrentLot[0].minBank}$)</span></h1>
+                                        <h1>{currentPrice}$ <span style={{fontSize: '20px', color: 'green'}}>(+{currentPrice-carouselCurrentLot[0].minPrice}$)</span></h1>
 
                                         {isSubscribed &&
                                         <div style={{padding: '5px'}}>
                                             <div style={{height: '62px'}}>
                                                 <InputGroup>
                                                     <FormControl aria-label="Amount (to the nearest dollar)"
-                                                                 placeholder="Enter the amount" onChange={onBetChange} type='number'/>
+                                                                 placeholder="Enter the amount" onChange={onBidChange} type='number'/>
                                                     <InputGroup.Text>$</InputGroup.Text>
                                                 </InputGroup>
                                                 {errorMessage &&
                                                 <p className='text-danger responseText'>{errorMessage}</p>}
                                             </div>
-                                            <Button onClick={handleSendBet} variant="warning"
+                                            <Button onClick={handleSendBid} variant="warning"
                                                     style={{marginTop: "10px", padding: "10px 30px"}}>
-                                                Make a bet
+                                                Make a bid
                                             </Button>
                                         </div>}
 
@@ -530,7 +530,7 @@ const Auction = (props) => {
                             {lots.map(lot =>
                                 <div key={lot.id} className="auctionBlock mt-4" style={{height: "300px"}}>
                                     <div style={{width: "30%", display: "inline-block"}}>
-                                        <img alt="No image" src={lot.picture}
+                                        <img alt="No image" src={lot.pictureLink}
                                              style={{width: "100%", maxHeight: "260px", objectFit: "cover"}}
                                         onError={(e)=>e.target.src='https://st3.depositphotos.com/23594922/31822/v/600/depositphotos_318221368-stock-illustration-missing-picture-page-for-website.jpg'}/>
                                     </div>

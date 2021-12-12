@@ -25,7 +25,7 @@ public class AuctionRequest {
   private String description;
 
   @Min(5)
-  private Integer usersLimit;
+  private Long usersCountLimit;
 
   @NotBlank(message="Creator name should not be blank")
   @Size(min=3,max=255)
@@ -33,13 +33,13 @@ public class AuctionRequest {
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   @JsonLocalDateTime
-  private LocalDateTime beginDate;
+  private LocalDateTime beginDateTime;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
   @JsonLocalTime
-  private LocalTime lotDuration;
+  private LocalTime lotDurationTime;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
   @JsonLocalTime
-  private LocalTime boostTime;
+  private LocalTime extraTime;
 }

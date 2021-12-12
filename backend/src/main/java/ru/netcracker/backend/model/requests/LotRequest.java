@@ -19,11 +19,11 @@ public class LotRequest {
     @Size(min=3,max=10000)
     private String description;
     @Min(0)
-    private Long minBank;
+    private Long minPrice;
     @Min(0)
-    private Long step;
+    private Long priceIncreaseMinStep;
     @NotBlank(message="Lot picture address should not be blank")
     @Size(min=3,max=1000)
-    private String picture;
+    private String pictureLink;
     private Long auctionId;
 }

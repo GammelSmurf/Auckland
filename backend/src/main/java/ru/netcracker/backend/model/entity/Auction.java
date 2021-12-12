@@ -31,7 +31,7 @@ public class Auction {
     private AuctionStatus status = AuctionStatus.DRAFT;
 
     private LocalTime extraTime;
-    private Long usersNumberLimit;
+    private Long usersCountLimit;
 
     @OneToOne(mappedBy = "auction")
     @JsonBackReference
@@ -92,17 +92,17 @@ public class Auction {
     public void copyMainParamsFrom(Auction auction) {
         setName(auction.getName());
         setDescription(auction.getDescription());
-        setUsersNumberLimit(auction.getUsersNumberLimit());
+        setUsersCountLimit(auction.getUsersCountLimit());
         setBeginDateTime(auction.getBeginDateTime());
         setLotDurationTime(auction.getLotDurationTime());
         setExtraTime(auction.getExtraTime());
     }
 
-    public int getLikesCount() {
-        return this.getUsersWhoLiked().size();
+    public int getUserLikesCount() {
+        return getUsersWhoLiked().size();
     }
 
-    public int getSubscribersCount() {
+    public int getSubscribedUsersCount() {
         return getSubscribedUsers().size();
     }
 
@@ -147,11 +147,11 @@ public class Auction {
 
     public void addCategory(Category category) {
         category.getAuctions().add(this);
-        this.getCategories().add(category);
+        getCategories().add(category);
     }
 
     public void removeCategory(Category category) {
         category.getAuctions().remove(this);
-        this.getCategories().remove(category);
+        getCategories().remove(category);
     }
 }

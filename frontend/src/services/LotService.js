@@ -16,9 +16,9 @@ const createLot = (values) =>{
         .post(API_URL, {
             name: values.name,
             description: values.description,
-            minBank: values.minBank,
-            step: values.step,
-            picture: values.picture,
+            minPrice: values.minPrice,
+            priceIncreaseMinStep: values.priceIncreaseMinStep,
+            pictureLink: values.pictureLink,
             auctionId: values.aucId
 
         }, {headers: authHeader()})
@@ -42,9 +42,9 @@ const updateLot = (values) =>{
         .put(API_URL + values.id, {
             name: values.name,
             description: values.description,
-            minBank: values.minBank,
-            step: values.step,
-            picture: values.picture,
+            minPrice: values.minPrice,
+            priceIncreaseMinStep: values.priceIncreaseMinStep,
+            pictureLink: values.pictureLink,
             auctionId: values.aucId
         }, {headers: authHeader()})
         .then(response => {

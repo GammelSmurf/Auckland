@@ -182,7 +182,7 @@ public class BidServiceImpl implements BidService {
         auction.getCurrentBid().getTransactions().stream()
                 .filter(tx -> !tx.getTransactionStatus().equals(TransactionStatus.FROZEN))
                 .forEach(tx -> {
-                    tx.getBuyer().addCurrency(tx.getAmount());
+                    tx.getBuyer().addMoney(tx.getAmount());
                     transactionRepository.delete(tx);
                 });
     }
@@ -212,7 +212,7 @@ public class BidServiceImpl implements BidService {
                 .secondsUntil(getDurationInSec(auction, currentDate))
                 .currentLot(modelMapper.map(auction.getCurrentLot(), LotResponse.class))
                 .auctionStatus(auction.getStatus())
-                .currentBank((auction.getCurrentBid() != null) ? auction.getCurrentBid().getAmount() : null)
+                .amount((auction.getCurrentBid() != null) ? auction.getCurrentBid().getAmount() : null)
                 .changed(changed)
                 .build();
     }

@@ -18,5 +18,5 @@ public class BidRequest {
     private String username;
 
     @DecimalMin(value = "0.01")
-    private BigDecimal currentBank;
+    private BigDecimal amount;
 }

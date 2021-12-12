@@ -16,6 +16,6 @@ public class SyncResponse {
     Long secondsUntil;
     LotResponse currentLot;
     AuctionStatus auctionStatus;
-    BigDecimal currentBank;
+    BigDecimal amount;
     Boolean changed;
 }

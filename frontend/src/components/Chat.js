@@ -40,7 +40,7 @@ const Chat = (props) => {
                             </span>
                             </div>
                             <p style={{margin: 0}}>{message.message}
-                                <span className='messageBoxTime'>{message.dateTimeMessage}</span>
+                                <span className='messageBoxTime'>{message.dateTime}</span>
                             </p>
                         </div>
 

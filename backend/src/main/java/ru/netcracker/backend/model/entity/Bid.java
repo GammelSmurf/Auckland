@@ -53,7 +53,7 @@ public class Bid {
         setUser(user);
         setAuction(auction);
         auction.setCurrentBid(this);
-        user.subtractCurrency(amount);
+        user.subtractMoney(amount);
     }
 
     public void addExtraTime() {

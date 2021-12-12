@@ -6,22 +6,30 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import ru.netcracker.backend.service.MessageService;
+import ru.netcracker.backend.service.NotificationService;
 
 @Configuration
 @EnableScheduling
 @Slf4j
 public class Schedule {
-    public static int i=0;
     private final MessageService messageService;
+    private final NotificationService notificationService;
 
     @Autowired
-    public Schedule(MessageService messageService){
+    public Schedule(MessageService messageService, NotificationService notificationService){
         this.messageService=messageService;
+        this.notificationService=notificationService;
     }
 
-    @Scheduled(cron = "0 0 05 * * ?")
+    @Scheduled(cron = "${Auckland.schedule.deleteMessages.cron}")
     public void checkChats(){
         messageService.deleteOldChats();
         log.info("Old chats are removed");
+    }
+
+    @Scheduled(cron = "${Auckland.schedule.deleteNotifications.cron}")
+    public void checkNotification(){
+        notificationService.deleteOldNotifications();
+        log.info("Old notifications are removed");
     }
 }

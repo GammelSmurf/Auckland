@@ -4,8 +4,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.netcracker.backend.repository.CategoryRepository;
+import ru.netcracker.backend.model.entity.Category;
 import ru.netcracker.backend.model.responses.CategoryResponse;
+import ru.netcracker.backend.repository.CategoryRepository;
 import ru.netcracker.backend.service.CategoryService;
 
 import java.util.List;
@@ -29,5 +30,13 @@ public class CategoryServiceImpl implements CategoryService {
                 .findAll().stream()
                 .map(category -> modelMapper.map(category, CategoryResponse.class))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public CategoryResponse addCategory(String categoryName) {
+        Category category=new Category();
+        category.setName(categoryName);
+        return modelMapper.map(categoryRepository.save(category),CategoryResponse.class);
     }
 }

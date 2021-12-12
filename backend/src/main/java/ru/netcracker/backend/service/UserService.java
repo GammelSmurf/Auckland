@@ -12,5 +12,5 @@ public interface UserService {
 
     UserResponse unbanUser(String username);
 
-    UserResponse addMoney(String username, BigDecimal currency);
+    UserResponse addCurrency(String username, BigDecimal currency);
 }

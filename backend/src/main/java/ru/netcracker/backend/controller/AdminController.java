@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.netcracker.backend.exception.user.UserExistsException;
-import ru.netcracker.backend.model.requests.MoneyRequest;
+import ru.netcracker.backend.model.requests.CurrencyRequest;
 import ru.netcracker.backend.model.responses.UserResponse;
 import ru.netcracker.backend.service.NotificationService;
 import ru.netcracker.backend.service.UserService;
@@ -54,10 +54,10 @@ public class AdminController {
         return new ResponseEntity<>(userResponse, HttpStatus.OK);
     }
 
-    @PostMapping("/money/add")
-    public ResponseEntity<?> addMoney(@Valid @RequestBody MoneyRequest moneyRequest) {
-        UserResponse userResponse = userService.addMoney(moneyRequest.getUsername(), moneyRequest.getMoney());
-        log.info("added {}$ to user {}", moneyRequest.getMoney(), moneyRequest.getUsername());
+    @PostMapping("/currency/add")
+    public ResponseEntity<?> addCurrency(@Valid @RequestBody CurrencyRequest currencyRequest) {
+        UserResponse userResponse = userService.addCurrency(currencyRequest.getUsername(), currencyRequest.getCurrency());
+        log.info("added {}$ to user {}", currencyRequest.getCurrency(), currencyRequest.getUsername());
         return new ResponseEntity<>(userResponse, HttpStatus.OK);
     }
 }

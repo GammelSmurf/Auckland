@@ -1,5 +1,6 @@
 package ru.netcracker.backend.service;
 
+import ru.netcracker.backend.model.requests.UserRequest;
 import ru.netcracker.backend.model.responses.UserResponse;
 
 import java.math.BigDecimal;
@@ -13,4 +14,6 @@ public interface UserService {
     UserResponse unbanUser(String username);
 
     UserResponse addCurrency(String username, BigDecimal currency);
+
+    UserResponse updateUser(UserRequest userRequest);
 }

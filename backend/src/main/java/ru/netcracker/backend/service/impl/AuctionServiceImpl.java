@@ -3,6 +3,7 @@ package ru.netcracker.backend.service.impl;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +22,7 @@ import ru.netcracker.backend.repository.UserRepository;
 import ru.netcracker.backend.service.AuctionService;
 import ru.netcracker.backend.service.LogService;
 import ru.netcracker.backend.service.NotificationService;
-import ru.netcracker.backend.util.specification.AuctionSpecification;
+import ru.netcracker.backend.util.component.specification.AuctionSpecification;
 import ru.netcracker.backend.util.AuctionUtil;
 import ru.netcracker.backend.util.enumiration.LogLevel;
 import ru.netcracker.backend.util.enumiration.NotificationLevel;
@@ -65,9 +66,9 @@ public class AuctionServiceImpl implements AuctionService {
     }
 
     @Override
-    public Page<AuctionResponse> searchAuctions(String username, SearchRequest searchRequest, Pageable pageable) {
+    public Page<AuctionResponse> searchAuctions(String username, SearchRequest searchRequest, int page, int size) {
         return auctionRepository
-                .findAll(auctionSpecification.getAuctions(username, searchRequest), pageable)
+                .findAll(auctionSpecification.getAuctionSpecification(searchRequest), PageRequest.of(page, size))
                 .map(auction -> modelMapper.map(auction, AuctionResponse.class));
     }
 

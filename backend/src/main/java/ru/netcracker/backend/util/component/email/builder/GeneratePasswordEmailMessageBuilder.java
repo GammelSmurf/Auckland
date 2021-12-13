@@ -1,4 +1,7 @@
-package ru.netcracker.backend.util.component.email;
+package ru.netcracker.backend.util.component.email.builder;
+
+import ru.netcracker.backend.util.component.email.Email;
+import ru.netcracker.backend.util.component.email.builder.EmailMessageBuilder;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -12,7 +15,7 @@ public class GeneratePasswordEmailMessageBuilder extends EmailMessageBuilder {
     }
 
     @Override
-    MimeMessage build() throws MessagingException, UnsupportedEncodingException {
+    public MimeMessage build() throws MessagingException, UnsupportedEncodingException {
         return buildMimeMessage()
                 .setSubject("Password recover")
                 .setMethodURL(String.format(

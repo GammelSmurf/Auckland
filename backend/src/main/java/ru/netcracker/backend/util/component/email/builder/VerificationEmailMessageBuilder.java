@@ -1,4 +1,7 @@
-package ru.netcracker.backend.util.component.email;
+package ru.netcracker.backend.util.component.email.builder;
+
+import ru.netcracker.backend.util.component.email.Email;
+import ru.netcracker.backend.util.component.email.builder.EmailMessageBuilder;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;

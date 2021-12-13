@@ -45,8 +45,8 @@ public class AuctionController {
     }
 
     @PostMapping("/search")
-    public Page<AuctionResponse> getAuctionByKeyword(@RequestBody SearchRequest searchRequest, Pageable pageable, Principal principal) {
-        return auctionService.searchAuctions(principal.getName(), searchRequest, pageable);
+    public Page<AuctionResponse> getAuctionByKeyword(@RequestBody SearchRequest searchRequest, int page, int size, Principal principal) {
+        return auctionService.searchAuctions(principal.getName(), searchRequest, page, size);
     }
 
     @GetMapping("/{id}")

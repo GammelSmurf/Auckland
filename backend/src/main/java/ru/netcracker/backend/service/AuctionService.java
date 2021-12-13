@@ -11,7 +11,7 @@ import ru.netcracker.backend.model.responses.UserResponse;
 public interface AuctionService {
     Page<AuctionResponse> getAllAuctions(Pageable pageable);
 
-    Page<AuctionResponse> searchAuctions(String username, SearchRequest searchRequest, Pageable pageable);
+    Page<AuctionResponse> searchAuctions(String username, SearchRequest searchRequest, int page, int size);
 
     AuctionResponse createAuction(Auction auction);
 

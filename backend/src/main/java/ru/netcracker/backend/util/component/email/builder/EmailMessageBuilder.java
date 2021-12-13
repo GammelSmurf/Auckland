@@ -1,8 +1,9 @@
-package ru.netcracker.backend.util.component.email;
+package ru.netcracker.backend.util.component.email.builder;
 
 import lombok.Data;
 import ru.netcracker.backend.util.EmailUtil;
 import ru.netcracker.backend.util.builder.MimeMessageBuilder;
+import ru.netcracker.backend.util.component.email.Email;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -16,7 +17,7 @@ public abstract class EmailMessageBuilder {
         this.email = email;
     }
 
-    abstract MimeMessage build() throws MessagingException, UnsupportedEncodingException;
+    public abstract MimeMessage build() throws MessagingException, UnsupportedEncodingException;
 
     public String generateContent(String content) {
         return EmailUtil.HELLO_MSG_TEMPLATE + content + String.format(EmailUtil.BYE_MSG_TEMPLATE, email.getSenderName());

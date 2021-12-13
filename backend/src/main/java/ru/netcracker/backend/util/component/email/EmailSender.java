@@ -5,6 +5,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 import ru.netcracker.backend.model.entity.User;
+import ru.netcracker.backend.util.component.email.builder.EmailMessageBuilder;
+import ru.netcracker.backend.util.component.email.builder.GeneratePasswordEmailMessageBuilder;
+import ru.netcracker.backend.util.component.email.builder.VerificationEmailMessageBuilder;
 import ru.netcracker.backend.util.enumiration.EmailLevel;
 
 import javax.mail.MessagingException;

@@ -1,7 +1,6 @@
 import React, {useEffect, useRef, useState} from "react";
 import {Button, Col, Container, Form, FormControl, InputGroup, Row, Spinner, Tabs} from "react-bootstrap";
 import confetti from 'canvas-confetti';
-import { addResponseMessage } from 'react-chat-widget';
 
 import AuctionService from "../services/AuctionService";
 import LotService from "../services/LotService";
@@ -131,7 +130,7 @@ const Auction = (props) => {
             const seconds = time % 60;
             if (time <= 0) {
                 syncState(aucId);
-                animateConfetti();
+                //animateConfetti();
                 clearInterval(timerId.current);
             } else {
                 setStrTimer(`${addZeroBefore(Math.trunc(hours))}:${addZeroBefore(Math.trunc(minutes))}:${addZeroBefore(seconds)}`);
@@ -142,7 +141,6 @@ const Auction = (props) => {
 
     const onReceiveWebSocketMessage = (response) => {
         if(response.username){
-            console.log('Chat', response)
             setChatMessages(chatMessages.concat({...response, dateTime: parseMessageTime(response.dateTime)}))
             scrollToBottom();
         }
@@ -150,7 +148,7 @@ const Auction = (props) => {
             setCurrentPrice(response.amount);
             activateTimer(response.secondsUntil, auction.id);
         }
-        if(response.message){
+        if(response.message && !response.username){
             setFinishTime(parseDateToDisplay(response.dateTime));
             setLogs(logs.concat(response));
         }
@@ -178,7 +176,7 @@ const Auction = (props) => {
 
     //------------------------WS logic------------------------//
 
-    const animateConfetti = () => {
+    /*const animateConfetti = () => {
         let ms = 4000;
         confettiTimerId.current = setInterval(() => {
         if(ms < 0){
@@ -201,7 +199,7 @@ const Auction = (props) => {
             ms -= 20;
         }, 20
         );
-    }
+    }*/
 
     useEffect(() => {
         AuctionService.getAuction(props.match.params.id).then(

@@ -1,10 +1,10 @@
 import BootStrapTable from "react-bootstrap-table-next";
 import React, {useEffect, useState} from "react";
-import UserService from "../services/UserService";
 import AuthService from "../services/AuthService";
-import {Button, Modal} from "react-bootstrap";
+import {Button} from "react-bootstrap";
 import ModalGiveCash from "./ModalGiveCash";
 import ModalDialog from "./ModalDialog";
+import AdminService from "../services/AdminService";
 
 
 const Users = () => {
@@ -16,7 +16,7 @@ const Users = () => {
     const currentUser = AuthService.getCurrentUser();
 
     useEffect(() => {
-        UserService.getUsers().then(
+        AdminService.getUsers().then(
             (response) => {
                 let dataPrev = [];
                 response.data.forEach(item => {
@@ -55,7 +55,7 @@ const Users = () => {
         sort: true
     }];
 
-    const rowStyle = (row, rowIndex) => {
+    const rowStyle = (row) => {
         const style = {};
         if (row.id === currentUser.id) {
             style.backgroundColor = 'rgba(255,193,7, 0.3)';
@@ -64,11 +64,11 @@ const Users = () => {
     };
 
     const handleBanUser = () => {
-        UserService.banUser(activeUsername).then(()=>window.location.reload());
+        AdminService.banUser(activeUsername).then(()=>window.location.reload());
     }
 
     const handleUnBanUser = () => {
-        UserService.unbanUser(activeUsername).then(()=>window.location.reload());
+        AdminService.unbanUser(activeUsername).then(()=>window.location.reload());
     }
 
     const expandRow = {

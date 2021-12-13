@@ -1,7 +1,6 @@
 import {Button, Form, FormControl, InputGroup, Modal} from "react-bootstrap";
 import React, {useState} from "react";
-import AuthService from "../services/AuthService";
-import UserService from "../services/UserService";
+import AdminService from "../services/AdminService";
 
 
 const ModalGiveCash = (props) => {
@@ -19,13 +18,13 @@ const ModalGiveCash = (props) => {
             setValidated(true);
         }
         else {
-            UserService.giveCash(props.username, sum)
+            AdminService.giveCash(props.username, sum)
                 .then(
                     () => {
                         setResponseMessage('Added successfully');
                     },
                     () => {
-                        setResponseMessage('Error');
+                        setResponseMessage('Internal error');
                     }
                 );
         }

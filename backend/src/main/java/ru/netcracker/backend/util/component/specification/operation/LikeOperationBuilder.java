@@ -1,6 +1,5 @@
 package ru.netcracker.backend.util.component.specification.operation;
 
-import ru.netcracker.backend.model.entity.Auction_;
 import ru.netcracker.backend.util.component.specification.Filter;
 import ru.netcracker.backend.util.component.specification.PredicateData;
 
@@ -18,7 +17,7 @@ public class LikeOperationBuilder extends OperationBuilder{
     }
 
     private Expression<String> getConcatExpression() {
-        return getBuilder().lower(getBuilder().concat(getRoot().get(Auction_.name), getRoot().get(Auction_.description)));
+        return getBuilder().lower(getRoot().get(getFilter().getProperty()));
     }
 
     private String generateValue() {

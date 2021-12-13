@@ -1,4 +1,4 @@
-package ru.netcracker.backend.util.enumiration;
+package ru.netcracker.backend.util.component.specification;
 
 public enum Direction {
     ASC,

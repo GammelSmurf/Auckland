@@ -38,6 +38,7 @@
 
 .authSubmitButton {
     margin-top: 15px;
+    margin-right: 10px;
 }
 
 .wrapper  {
@@ -60,6 +61,33 @@
     to {
         opacity: 1;
     }
+}
+
+.notificationBlock {
+    border-radius: 7px;
+    text-align: center !important;
+    max-height: 400px;
+    overflow-y: auto;
+    box-shadow: 0 0 10px rgba(0, 170, 141,0.2);
+}
+
+.notificationCounter {
+    background-color: #00AA8D;
+    border-radius: 50%;
+    color: white;
+    padding: 2px 6px;
+    font-size: 10px;
+}
+
+.notificationDropdown {
+    display: inline-block;
+    margin-right: 15px;
+    padding: 5px;
+}
+
+.notificationDropdown:hover {
+    background-color: rgba(233,236,236,1);
+    cursor: pointer;
 }
 
 .footer {

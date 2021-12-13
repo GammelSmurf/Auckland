@@ -24,9 +24,9 @@ const Login = (props) => {
                     () => {
                         props.history.push('/home');
                     },
-                    () => {
+                    (error) => {
                         setResponseTextVisibility(false);
-                        setMessage('Invalid username or password');
+                        setMessage(error.response.data.message);
                         setResponseTextVisibility(true);
                     }
                 );
@@ -78,6 +78,7 @@ const Login = (props) => {
                             }
                         </Form.Group>
                         <Button type="submit" variant="warning" className="authSubmitButton">Login</Button>
+                        <Button type="submit" variant="warning" className="authSubmitButton" onClick={()=>props.history.push('/auth/signup')}>Create account</Button>
                     </Form>
                 </div>
             </div>

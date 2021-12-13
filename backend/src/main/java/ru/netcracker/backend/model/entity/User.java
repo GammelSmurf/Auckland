@@ -29,8 +29,7 @@ public class User {
     private String secondName;
     private String about;
 
-//    private BigDecimal currency = new BigDecimal(0);
-    private BigDecimal money = new BigDecimal(50000); //TODO: delete. It's for debug
+    private BigDecimal money = new BigDecimal(0);
 
     private String verificationCode = RandomString.make(64);
     private String restoreCode;

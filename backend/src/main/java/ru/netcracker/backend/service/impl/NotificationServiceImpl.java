@@ -51,19 +51,19 @@ public class NotificationServiceImpl implements NotificationService {
             case USER_SUBSCRIBED:
                 sendNotificationToWs(
                         auction.getCreator().getId(),
-                        addNotification(auction.getCreator(), String.format(USER_SUBSCRIBED_MSG_TEMPLATE,
+                        addNotification(auction.getCreator(), auction, String.format(USER_SUBSCRIBED_MSG_TEMPLATE,
                                 user.getUsername(), auction.getName())));
                 break;
             case SUBSCRIBED_AUCTION_STATUS_CHANGED:
                 sendNotificationToWs(
                         auction.getCreator().getId(),
-                        addNotification(auction.getCreator(), String.format(OWN_AUCTION_STATUS_CHANGED_MSG_TEMPLATE,
+                        addNotification(auction.getCreator(), auction, String.format(OWN_AUCTION_STATUS_CHANGED_MSG_TEMPLATE,
                                 auction.getName(), auction.getStatus())));
 
                 for (User member : auction.getSubscribedUsers()) {
                     sendNotificationToWs(
                             member.getId(),
-                            addNotification(member, String.format(SUBSCRIBED_AUCTION_STATUS_CHANGED_MSG_TEMPLATE,
+                            addNotification(member, auction, String.format(SUBSCRIBED_AUCTION_STATUS_CHANGED_MSG_TEMPLATE,
                                     auction.getName(), auction.getStatus())));
                 }
                 break;
@@ -76,9 +76,10 @@ public class NotificationServiceImpl implements NotificationService {
         notificationRepository.deleteAllByDateTimeIsLessThan(LocalDateTime.now().minusDays(Long.parseLong(daysForDelete)));
     }
 
-    private Notification addNotification(User user, String msg) {
+    private Notification addNotification(User user, Auction auction, String msg) {
         Notification notification = new Notification();
         notification.setUser(user);
+        notification.setAuction(auction);
         notification.setMessage(msg);
         notification.setDateTime(LocalDateTime.now());
 

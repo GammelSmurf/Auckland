@@ -89,6 +89,10 @@ public class Auction {
             inverseJoinColumns = @JoinColumn(name = "user_id"))
     private Set<User> usersWhoLiked = new HashSet<>();
 
+    @OneToMany(mappedBy = "auction")
+    @JsonBackReference
+    private Set<Notification> notifications = new HashSet<>();
+
     public void copyMainParamsFrom(Auction auction) {
         setName(auction.getName());
         setDescription(auction.getDescription());

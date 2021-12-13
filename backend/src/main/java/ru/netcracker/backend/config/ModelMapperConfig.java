@@ -38,9 +38,7 @@ public class ModelMapperConfig {
     private void auctionMapperConfiguration() {
         modelMapper.createTypeMap(AuctionRequest.class, Auction.class)
                 .addMappings(
-                        mapper -> {
-                            mapper.skip(Auction::setId);
-                        })
+                        mapper -> mapper.skip(Auction::setId))
                 .setPostConverter(context -> {
                     context.getDestination().setCreator(
                             userRepository
@@ -58,15 +56,11 @@ public class ModelMapperConfig {
 
         modelMapper.createTypeMap(LotRequest.class, Lot.class)
                 .addMappings(
-                        mapper -> {
-                            mapper.skip(Lot::setId);
-                        });
+                        mapper -> mapper.skip(Lot::setId));
 
         modelMapper.createTypeMap(Lot.class, LotResponse.class)
                 .addMappings(
-                        mapper -> {
-                            mapper.map(src -> src.getAuction().getId(), LotResponse::setAuctionId);
-                        });
+                        mapper -> mapper.map(src -> src.getAuction().getId(), LotResponse::setAuctionId));
 
         modelMapper.createTypeMap(MessageRequest.class, Message.class)
                 .addMappings(
@@ -105,5 +99,9 @@ public class ModelMapperConfig {
                         });
 
         modelMapper.createTypeMap(Category.class, CategoryResponse.class);
+        modelMapper.createTypeMap(Notification.class, NotificationResponse.class)
+            .addMappings(
+                    mapper -> mapper.map(src -> src.getAuction().getId(), NotificationResponse::setAuctionId)
+            );
     }
 }

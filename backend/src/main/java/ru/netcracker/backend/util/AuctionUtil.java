@@ -19,7 +19,9 @@ public class AuctionUtil {
     }
 
     public static void validateBeforeDeleting(Auction auction) {
-        checkIfUserIsCreatorOfAuction(auction);
+        if (!isAuctionCreatorInSecurityContext(auction)) {
+            throw new AuctionIsNotOwnByUserException(auction);
+        }
     }
 
     public static void validateBeforeSubscribing(Auction auction) {

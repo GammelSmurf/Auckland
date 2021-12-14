@@ -12,6 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SearchRequest {
+    private boolean orPredicate = true;
     private List<Sort> sortList;
     private List<Filter> filterList;
 }

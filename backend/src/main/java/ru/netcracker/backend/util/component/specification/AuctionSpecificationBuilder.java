@@ -22,13 +22,19 @@ public class AuctionSpecificationBuilder {
         this.searchRequest = searchRequest;
     }
 
-    public javax.persistence.criteria.Predicate formatAuctionPredicates(Root<Auction> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+    public Predicate formatAuctionPredicates(Root<Auction> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
         copyPredicateData(root, query, criteriaBuilder);
 
         handleSortedPredicates();
         handleFilterPredicates();
 
-        return criteriaBuilder.or(filterPredicates.toArray(new javax.persistence.criteria.Predicate[0]));
+        return searchRequest.isOrPredicate()
+                ? criteriaBuilder.or(formatPredicatesArray())
+                : criteriaBuilder.and(formatPredicatesArray());
+    }
+
+    private Predicate[] formatPredicatesArray() {
+        return filterPredicates.toArray(new Predicate[0]);
     }
 
     private void copyPredicateData(Root<Auction> root, CriteriaQuery<?> query, CriteriaBuilder builder) {
@@ -54,16 +60,23 @@ public class AuctionSpecificationBuilder {
     }
 
     private Order formatAvgMinPriceOrder(Sort sort) {
-        Expression<Double> expression = data.getBuilder().avg(data.getRoot().join(Auction_.lots).get(Lot_.minPrice));
         return sort.getDirection().isAscending()
-                ? data.getBuilder().asc(expression)
-                : data.getBuilder().desc(expression);
+                ? data.getBuilder().asc(formatAvgExpression())
+                : data.getBuilder().desc(formatAvgExpression());
+    }
+
+    private Expression<Double> formatAvgExpression() {
+        return data.getBuilder().avg(data.getRoot().join(Auction_.lots).get(Lot_.minPrice));
     }
 
     private Order formatOrder(Sort sort) {
         return sort.getDirection().isAscending()
-                ? data.getBuilder().asc(data.getRoot().get(sort.getProperty()))
-                : data.getBuilder().desc(data.getRoot().get(sort.getProperty()));
+                ? data.getBuilder().asc(formatRootPathOfSortProperty(sort))
+                : data.getBuilder().desc(formatRootPathOfSortProperty(sort));
+    }
+
+    private Expression<String> formatRootPathOfSortProperty(Sort sort) {
+        return data.getRoot().get(sort.getProperty());
     }
 
     private void handleFilterPredicates() {

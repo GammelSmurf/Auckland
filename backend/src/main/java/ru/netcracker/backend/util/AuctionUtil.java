@@ -23,13 +23,11 @@ public class AuctionUtil {
     }
 
     public static void validateBeforeSubscribing(Auction auction) {
-        if (auction.getCreator().getUsername().equals(SecurityUtil.getUsernameFromSecurityCtx())) {
-            throw new AuctionIsOwnByUserException(auction);
-        }
+        checkIfUserIsCreatorOfAuction(auction);
     }
 
     public static void validateBeforeGetting(Auction auction) {
-        if (auction.isDraft()) {
+        if (auction.isDraft() && !isAuctionCreatorInSecurityContext(auction)) {
             throw new NotCorrectStatusException(auction);
         }
     }
@@ -46,8 +44,8 @@ public class AuctionUtil {
     }
 
     private static void checkIfUserIsCreatorOfAuction(Auction auction) {
-        if (auction.getCreator().getUsername().equals(SecurityUtil.getUsernameFromSecurityCtx())) {
-            throw new AuctionIsNotOwnByUserException(auction);
+        if (isAuctionCreatorInSecurityContext(auction)) {
+            throw new AuctionIsOwnByUserException(auction);
         }
     }
 
@@ -55,5 +53,9 @@ public class AuctionUtil {
         if (auction.getCategories().contains(category)) {
             throw new AuctionAlreadyContainsCategoryException(category);
         }
+    }
+
+    private static boolean isAuctionCreatorInSecurityContext(Auction auction) {
+        return auction.getCreator().getUsername().equals(SecurityUtil.getUsernameFromSecurityCtx());
     }
 }

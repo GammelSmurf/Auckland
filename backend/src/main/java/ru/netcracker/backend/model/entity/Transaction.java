@@ -23,6 +23,10 @@ public class Transaction {
 
     @ManyToOne
     private User buyer;
+    @ManyToOne
+    private User auctionCreator;
+    @ManyToOne
+    private Lot lot;
 
     public Transaction() {
     }
@@ -30,5 +34,7 @@ public class Transaction {
     public Transaction(Bid bid) {
         this.buyer = bid.getUser();
         this.amount = bid.getAmount();
+        this.auctionCreator = bid.getAuction().getCreator();
+        this.lot = bid.getLot();
     }
 }

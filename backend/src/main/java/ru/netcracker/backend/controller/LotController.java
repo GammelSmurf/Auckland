@@ -38,6 +38,16 @@ public class LotController {
         return lotService.getLotsByAuctionId(id);
     }
 
+    @GetMapping("/won/received")
+    public List<LotResponse> getLotsWonAndTransferred() {
+        return lotService.getLotsWonAndTransferred();
+    }
+
+    @GetMapping("/won/pending")
+    public List<LotResponse> getLotsWonAndNotTransferred() {
+        return lotService.getLotsWonAndNotTransferred();
+    }
+
     @PostMapping
     public ResponseEntity<LotResponse> createLot(@Valid @RequestBody LotRequest lotRequest) {
         LotResponse lotResponse = lotService.createLot(

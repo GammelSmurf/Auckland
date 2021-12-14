@@ -15,4 +15,8 @@ public interface LotService {
     void deleteLot(Long lotId);
 
     List<LotResponse> getLotsByAuctionId(Long auctionId);
+
+    List<LotResponse> getLotsWonAndTransferred();
+
+    List<LotResponse> getLotsWonAndNotTransferred();
 }

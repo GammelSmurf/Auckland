@@ -28,6 +28,7 @@ public class Lot {
     private LocalDateTime endDateTime;
 
     private boolean finished = false;
+    private boolean transferred = false;
 
     @OneToOne(mappedBy = "lot")
     private Bid bid;

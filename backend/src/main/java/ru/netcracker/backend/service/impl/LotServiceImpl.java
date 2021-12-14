@@ -11,6 +11,7 @@ import ru.netcracker.backend.repository.LotRepository;
 import ru.netcracker.backend.model.responses.LotResponse;
 import ru.netcracker.backend.service.LotService;
 import ru.netcracker.backend.util.LotUtil;
+import ru.netcracker.backend.util.SecurityUtil;
 
 import java.util.List;
 import java.util.Optional;
@@ -68,6 +69,22 @@ public class LotServiceImpl implements LotService {
     @Override
     public List<LotResponse> getLotsByAuctionId(Long auctionId) {
         return lotRepository.findAllByAuction_Id(auctionId).stream()
+                .map(lot -> modelMapper.map(lot, LotResponse.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<LotResponse> getLotsWonAndTransferred() {
+        return getResponseLotsByTransferred(true);
+    }
+
+    @Override
+    public List<LotResponse> getLotsWonAndNotTransferred() {
+        return getResponseLotsByTransferred(false);
+    }
+
+    private List<LotResponse> getResponseLotsByTransferred(boolean transferred) {
+        return lotRepository.findAllByWinner_UsernameAndTransferred(SecurityUtil.getUsernameFromSecurityCtx(), transferred).stream()
                 .map(lot -> modelMapper.map(lot, LotResponse.class))
                 .collect(Collectors.toList());
     }

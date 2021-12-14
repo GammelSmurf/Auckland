@@ -106,6 +106,7 @@ public class AuctionServiceImpl implements AuctionService {
         Auction auction = auctionRepository
                 .findById(auctionId)
                 .orElseThrow(() -> new AuctionNotFoundException(auctionId));
+        AuctionUtil.validateBeforeDeleting(auction);
         auctionRepository.delete(auction);
     }
 
@@ -141,6 +142,7 @@ public class AuctionServiceImpl implements AuctionService {
                 .findById(auctionId)
                 .orElseThrow(() -> new AuctionNotFoundException(auctionId));
 
+        AuctionUtil.validateBeforeSubscribing(auction);
         user.subscribeToAuction(auction);
         notificationService.log(NotificationLevel.USER_SUBSCRIBED, userRepository.save(user), auction);
         return modelMapper.map(user, UserResponse.class);

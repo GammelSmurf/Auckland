@@ -11,7 +11,7 @@ import ru.netcracker.backend.model.responses.UserResponse;
 public interface AuctionService {
     Page<AuctionResponse> getAllAuctions(Pageable pageable);
 
-    Page<AuctionResponse> searchAuctions(String username, SearchRequest searchRequest, int page, int size);
+    Page<AuctionResponse> searchAuctions(SearchRequest searchRequest, int page, int size);
 
     AuctionResponse createAuction(Auction auction);
 
@@ -23,7 +23,7 @@ public interface AuctionService {
 
     void makeAuctionWaitingWithAnotherLot(Long auctionId);
 
-    UserResponse subscribe(String username, Long auctionId);
+    UserResponse subscribe(Long auctionId);
 
     CategoryResponse addCategoryToAuction(Long auctionId, Long categoryId);
 

@@ -22,6 +22,7 @@ import ru.netcracker.backend.repository.UserRepository;
 import ru.netcracker.backend.service.AuctionService;
 import ru.netcracker.backend.service.LogService;
 import ru.netcracker.backend.service.NotificationService;
+import ru.netcracker.backend.util.SecurityUtil;
 import ru.netcracker.backend.util.component.specification.AuctionSpecification;
 import ru.netcracker.backend.util.AuctionUtil;
 import ru.netcracker.backend.util.enumiration.LogLevel;
@@ -66,7 +67,7 @@ public class AuctionServiceImpl implements AuctionService {
     }
 
     @Override
-    public Page<AuctionResponse> searchAuctions(String username, SearchRequest searchRequest, int page, int size) {
+    public Page<AuctionResponse> searchAuctions(SearchRequest searchRequest, int page, int size) {
         return auctionRepository
                 .findAll(auctionSpecification.getAuctionSpecification(searchRequest), PageRequest.of(page, size))
                 .map(auction -> modelMapper.map(auction, AuctionResponse.class));
@@ -122,10 +123,10 @@ public class AuctionServiceImpl implements AuctionService {
 
     @Override
     @Transactional
-    public UserResponse subscribe(String username, Long auctionId) {
+    public UserResponse subscribe(Long auctionId) {
         User user = userRepository
-                .findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException(username));
+                .findByUsername(SecurityUtil.getUsernameFromSecurityCtx())
+                .orElseThrow(() -> new UsernameNotFoundException(SecurityUtil.getUsernameFromSecurityCtx()));
         Auction auction = auctionRepository
                 .findById(auctionId)
                 .orElseThrow(() -> new AuctionNotFoundException(auctionId));

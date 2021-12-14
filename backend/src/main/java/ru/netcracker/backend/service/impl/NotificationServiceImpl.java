@@ -8,9 +8,10 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.netcracker.backend.model.entity.Auction;
 import ru.netcracker.backend.model.entity.Notification;
 import ru.netcracker.backend.model.entity.User;
-import ru.netcracker.backend.repository.NotificationRepository;
 import ru.netcracker.backend.model.responses.NotificationResponse;
+import ru.netcracker.backend.repository.NotificationRepository;
 import ru.netcracker.backend.service.NotificationService;
+import ru.netcracker.backend.util.SecurityUtil;
 import ru.netcracker.backend.util.enumiration.NotificationLevel;
 
 import java.time.LocalDateTime;
@@ -38,8 +39,8 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public List<NotificationResponse> getUserNotifications(Long userId) {
-        return notificationRepository.findAllByUser_Id(userId).stream()
+    public List<NotificationResponse> getUserNotifications() {
+        return notificationRepository.findAllByUser_Username(SecurityUtil.getUsernameFromSecurityCtx()).stream()
                 .map(notification -> modelMapper.map(notification, NotificationResponse.class))
                 .collect(Collectors.toList());
     }

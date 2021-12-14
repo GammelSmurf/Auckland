@@ -3,7 +3,7 @@ import authHeader from "./AuthHeader";
 
 const API_URL = 'http://localhost:8080/api/user/';
 
-const getUserNotifications = (userId) => {
-    return axios.get(API_URL + 'notifications/' + userId, { headers: authHeader() });
+const getUserNotifications = () => {
+    return axios.get(API_URL + 'notifications', { headers: authHeader() });
 }
 export default {getUserNotifications}

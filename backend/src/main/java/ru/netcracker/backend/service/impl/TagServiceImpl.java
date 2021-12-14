@@ -40,8 +40,8 @@ public class TagServiceImpl implements TagService {
 
     @Override
     @Transactional
-    public void deleteTag(Long id) {
-        Optional<Tag> tagOptional = tagRepository.findById(id);
+    public void deleteTag(Long tagId) {
+        Optional<Tag> tagOptional = tagRepository.findById(tagId);
         if (tagOptional.isPresent()) {
             Tag tag = tagOptional.get();
             tag.getAuction().getTags().remove(tag);

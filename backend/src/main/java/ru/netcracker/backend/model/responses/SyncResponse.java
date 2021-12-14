@@ -13,9 +13,9 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Builder
 public class SyncResponse {
-    Long secondsUntil;
-    LotResponse currentLot;
-    AuctionStatus auctionStatus;
-    BigDecimal amount;
-    Boolean changed;
+    private Long secondsUntil;
+    private LotResponse currentLot;
+    private AuctionStatus auctionStatus;
+    private BigDecimal amount;
+    private Boolean changed;
 }

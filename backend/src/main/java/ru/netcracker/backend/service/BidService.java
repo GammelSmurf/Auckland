@@ -7,7 +7,7 @@ import ru.netcracker.backend.model.responses.SyncResponse;
 import java.math.BigDecimal;
 
 public interface BidService {
-    BidResponse makeBid(String username, Long auctionId, BigDecimal amount) throws ValidationException;
+    BidResponse makeBid(Long auctionId, BigDecimal amount) throws ValidationException;
 
     SyncResponse handleAuctionProcess(Long auctionId);
 }

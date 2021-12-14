@@ -30,9 +30,9 @@ public class UserController {
         this.userService = userService;
         this.modelMapper = modelMapper;
     }
-    @GetMapping("/notifications/{id}")
-    public List<NotificationResponse> getUserNotifications(@PathVariable(name = "id") Long userId) {
-        return notificationService.getUserNotifications(userId);
+    @GetMapping("/notifications")
+    public List<NotificationResponse> getUserNotifications() {
+        return notificationService.getUserNotifications();
     }
 
     @PutMapping("/update")

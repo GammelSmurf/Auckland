@@ -19,6 +19,7 @@ import ru.netcracker.backend.service.BidService;
 import ru.netcracker.backend.service.LogService;
 import ru.netcracker.backend.service.NotificationService;
 import ru.netcracker.backend.util.BidUtil;
+import ru.netcracker.backend.util.SecurityUtil;
 import ru.netcracker.backend.util.enumiration.LogLevel;
 import ru.netcracker.backend.util.enumiration.NotificationLevel;
 
@@ -53,23 +54,23 @@ public class BidServiceImpl implements BidService {
 
     @Override
     @Transactional
-    public BidResponse makeBid(String username, Long auctionId, BigDecimal amount) {
+    public BidResponse makeBid(Long auctionId, BigDecimal amount) {
         User user = userRepository
-                .findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException(username));
+                .findByUsername(SecurityUtil.getUsernameFromSecurityCtx())
+                .orElseThrow(() -> new UsernameNotFoundException(SecurityUtil.getUsernameFromSecurityCtx()));
         Auction auction = auctionRepository
                 .findById(auctionId)
                 .orElseThrow(() -> new AuctionNotFoundException(auctionId));
 
         BidUtil.validate(auction, amount, user);
-        Bid bid = makeBit(auction, user, amount);
+        Bid bid = formatBit(auction, user, amount);
         createTransaction(bid);
         logService.log(LogLevel.AUCTION_BET, bid.getAuction());
         return modelMapper.map(bidRepository.save(bid), BidResponse.class);
 
     }
 
-    private Bid makeBit(Auction auction, User user, BigDecimal amount) {
+    private Bid formatBit(Auction auction, User user, BigDecimal amount) {
         Bid bid = (auction.getCurrentBid() != null)
                 ? auction.getCurrentBid()
                 : new Bid(auction);

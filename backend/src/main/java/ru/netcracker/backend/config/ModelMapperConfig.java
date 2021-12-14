@@ -84,6 +84,7 @@ public class ModelMapperConfig {
         modelMapper.createTypeMap(Bid.class, BidResponse.class)
                 .setPostConverter(context -> {
                     context.getDestination().setSecondsUntil(Math.abs(Duration.between(context.getSource().getLot().getEndDateTime(), LocalDateTime.now()).toSeconds()));
+                    context.getDestination().setRemainingUserMoney(context.getSource().getUser().getMoney());
                     return context.getDestination();
                 });
 

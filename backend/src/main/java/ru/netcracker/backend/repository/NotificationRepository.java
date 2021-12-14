@@ -10,7 +10,7 @@ import java.util.List;
 
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
-    List<Notification> findAllByUser_Id(Long auctionId);
+    List<Notification> findAllByUser_Username(String username);
 
     @Modifying
     void deleteAllByDateTimeIsLessThan(LocalDateTime time);

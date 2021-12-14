@@ -34,22 +34,22 @@ public class BidController {
         this.modelMapper = modelMapper;
     }
 
-    @MessageMapping("/play/{id}")
-    @SendTo("/auction/state/{id}")
-    public BidResponse play(@DestinationVariable Long id, @Valid BidRequest bidRequest)
+    @MessageMapping("/play/{auctionId}")
+    @SendTo("/auction/state/{auctionId}")
+    public BidResponse play(@DestinationVariable Long auctionId, @Valid BidRequest bidRequest)
             throws ValidationException {
-        BidResponse bidResponse = bidService.makeBid(bidRequest.getUsername(), id, bidRequest.getAmount());
+        BidResponse bidResponse = bidService.makeBid(auctionId, bidRequest.getAmount());
 
-        log.info("auction with id: {} has: {}", id, bidResponse);
+        log.info("auction with id: {} has: {}", auctionId, bidResponse);
         return bidResponse;
     }
 
-    @MessageMapping("/send/{id}")
-    @SendTo("/auction/chat/{id}")
-    public MessageResponse play(@DestinationVariable Long id, @Valid MessageRequest messageRequest)
+    @MessageMapping("/send/{auctionId}")
+    @SendTo("/auction/chat/{auctionId}")
+    public MessageResponse play(@DestinationVariable Long auctionId, @Valid MessageRequest messageRequest)
             throws ValidationException {
         MessageResponse messageResponse=messageService.addMessage(modelMapper.map(messageRequest, Message.class));
-        log.info("auction with id: {} received a message: {}", id, messageResponse);
+        log.info("auction with id: {} received a message: {}", auctionId, messageResponse);
         return messageResponse;
     }
 }

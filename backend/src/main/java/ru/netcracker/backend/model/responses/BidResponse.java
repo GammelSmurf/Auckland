@@ -12,4 +12,5 @@ import java.math.BigDecimal;
 public class BidResponse {
     private BigDecimal amount;
     private Long secondsUntil;
+    private BigDecimal remainingUserMoney;
 }

@@ -46,8 +46,8 @@ public class AuctionController {
     }
 
     @PostMapping("/search")
-    public Page<AuctionResponse> getAuctionByKeyword(@RequestBody SearchRequest searchRequest, int page, int size, Principal principal) {
-        return auctionService.searchAuctions(principal.getName(), searchRequest, page, size);
+    public Page<AuctionResponse> getAuctionByKeyword(@RequestBody SearchRequest searchRequest, int page, int size) {
+        return auctionService.searchAuctions(searchRequest, page, size);
     }
 
     @GetMapping("/{id}")
@@ -91,8 +91,8 @@ public class AuctionController {
     }
 
     @PostMapping("/subscribe")
-    public ResponseEntity<UserResponse> subscribe(@Valid @RequestBody SubscribeRequest subscribeRequest, Principal principal) {
-        UserResponse userResponse = auctionService.subscribe(principal.getName(), subscribeRequest.getAuctionId());
+    public ResponseEntity<UserResponse> subscribe(@Valid @RequestBody SubscribeRequest subscribeRequest) {
+        UserResponse userResponse = auctionService.subscribe(subscribeRequest.getAuctionId());
         log.info("user: {} subscribed to auction with id: {}", userResponse.getUsername(), subscribeRequest.getAuctionId());
         return new ResponseEntity<>(userResponse, HttpStatus.OK);
     }

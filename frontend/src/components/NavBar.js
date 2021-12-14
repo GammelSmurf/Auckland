@@ -12,7 +12,7 @@ const MyNavBar = (props) => {
     const currentUser = AuthService.getCurrentUser();
 
     useEffect(() => {
-        UserService.getUserNotifications(currentUser.id).then((response)=>{
+        UserService.getUserNotifications().then((response)=>{
             setNotifications(response.data);
         });
     }, [])

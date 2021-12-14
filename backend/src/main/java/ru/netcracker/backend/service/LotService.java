@@ -10,9 +10,9 @@ public interface LotService {
 
     LotResponse createLot(Lot lot);
 
-    LotResponse updateLot(Long id, Lot lot);
+    LotResponse updateLot(Long lotId, Lot lot);
 
-    void deleteLot(Long id);
+    void deleteLot(Long lotId);
 
     List<LotResponse> getLotsByAuctionId(Long auctionId);
 }

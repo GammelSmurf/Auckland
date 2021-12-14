@@ -78,7 +78,6 @@ const getAuctionLogs = (auctionId) => {
 const subscribe = (values) =>{
     return axios
         .post(API_URL + 'subscribe', {
-            username: values.username,
             auctionId: values.auctionId
         }, {headers: authHeader()})
         .then(response => {

@@ -8,7 +8,7 @@ import ru.netcracker.backend.util.enumiration.NotificationLevel;
 import java.util.List;
 
 public interface NotificationService {
-    List<NotificationResponse> getUserNotifications(Long userId);
+    List<NotificationResponse> getUserNotifications();
 
     void log(NotificationLevel level, User user, Auction auction);
 

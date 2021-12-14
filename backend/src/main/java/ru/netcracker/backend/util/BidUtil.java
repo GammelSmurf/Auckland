@@ -14,7 +14,7 @@ public class BidUtil {
     private BidUtil() {
     }
 
-    public static void validate(Auction auction, BigDecimal lotBank, User user)
+    public static void validate(Auction auction, BigDecimal amount, User user)
             throws BankLessThanMinException, BankLessThanOldException, BankLessThanStepException,
             LotTimeExpiredException, NoCurrencyException, NotSubscribedException {
         if (user.getSubscribedAuctions().isEmpty() || !user.getSubscribedAuctions().contains(auction)) {
@@ -29,21 +29,21 @@ public class BidUtil {
             throw new LotTimeExpiredException("Lot time is expired");
         }
 
-        if (isLess(user.getMoney(), lotBank)) {
+        if (isLess(user.getMoney(), amount)) {
             throw new NoCurrencyException("User don't have enough money");
         }
 
-        if (isLess(lotBank, auction.getCurrentLot().getMinPrice())) {
+        if (isLess(amount, auction.getCurrentLot().getMinPrice())) {
             throw new BankLessThanMinException(String.format("Bank is less than minimum: %f", auction.getCurrentLot().getMinPrice()));
         }
 
         if (auction.getCurrentBid() != null) {
             Bid bid = auction.getCurrentBid();
-            if (isLess(lotBank, bid.getAmount())) {
+            if (isLess(amount, bid.getAmount())) {
                 throw new BankLessThanOldException(String.format("Bank is less than the old one: %f", bid.getAmount()));
             }
 
-            if (isLess(lotBank.subtract(bid.getAmount()), auction.getCurrentLot().getPriceIncreaseMinStep())) {
+            if (isLess(amount.subtract(bid.getAmount()), auction.getCurrentLot().getPriceIncreaseMinStep())) {
                 throw new BankLessThanStepException(String.format("Bet step is less than the minimal one: %f", auction.getCurrentLot().getPriceIncreaseMinStep()));
             }
         }

@@ -135,7 +135,7 @@ public class Auction {
     }
 
     public void setFinishedStatus() {
-        setStatus(AuctionStatus.RUNNING);
+        setStatus(AuctionStatus.FINISHED);
     }
 
     public Optional<Lot> getAnotherLot() {

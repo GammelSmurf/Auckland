@@ -43,10 +43,10 @@ public class LotServiceImpl implements LotService {
 
     @Override
     @Transactional
-    public LotResponse updateLot(Long id, Lot newLot) {
+    public LotResponse updateLot(Long lotId, Lot newLot) {
         Lot oldLot = lotRepository
-                .findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(LotUtil.LOT_NOT_FOUND_MSG_TEMPLATE, id)));
+                .findById(lotId)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(LotUtil.LOT_NOT_FOUND_MSG_TEMPLATE, lotId)));
         oldLot.setName(newLot.getName());
         oldLot.setDescription(newLot.getDescription());
         oldLot.setMinPrice(newLot.getMinPrice());
@@ -56,8 +56,8 @@ public class LotServiceImpl implements LotService {
 
     @Override
     @Transactional
-    public void deleteLot(Long id) {
-        Optional<Lot> lotOptional = lotRepository.findById(id);
+    public void deleteLot(Long lotId) {
+        Optional<Lot> lotOptional = lotRepository.findById(lotId);
         if (lotOptional.isPresent()) {
             Lot lot = lotOptional.get();
             lot.getAuction().getLots().remove(lot);

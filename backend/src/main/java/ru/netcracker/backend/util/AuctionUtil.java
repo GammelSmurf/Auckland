@@ -4,7 +4,6 @@ import ru.netcracker.backend.exception.auction.*;
 import ru.netcracker.backend.model.entity.Auction;
 import ru.netcracker.backend.model.entity.Category;
 import ru.netcracker.backend.repository.AuctionRepository;
-import ru.netcracker.backend.repository.UserRepository;
 
 import java.time.LocalDateTime;
 
@@ -26,6 +25,12 @@ public class AuctionUtil {
     public static void validateBeforeSubscribing(Auction auction) {
         if (auction.getCreator().getUsername().equals(SecurityUtil.getUsernameFromSecurityCtx())) {
             throw new AuctionIsOwnByUserException(auction);
+        }
+    }
+
+    public static void validateBeforeGetting(Auction auction) {
+        if (auction.isDraft()) {
+            throw new NotCorrectStatusException(auction);
         }
     }
 

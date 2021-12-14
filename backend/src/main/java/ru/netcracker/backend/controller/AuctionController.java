@@ -47,7 +47,7 @@ public class AuctionController {
     public Page<AuctionResponse> getAuctionBySearchRequest(@RequestBody SearchRequest searchRequest, int page, int size) {
         return auctionService.searchAuctions(searchRequest, page, size);
     }
-    //TODO: security: Can we get finished auctions?
+
     @GetMapping("/{auctionId}")
     public ResponseEntity<AuctionResponse> getAuction(@PathVariable(name = "auctionId") Long auctionId) {
         AuctionResponse auctionResponse = auctionService.getAuctionById(auctionId);

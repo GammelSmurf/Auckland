@@ -112,11 +112,11 @@ public class AuctionServiceImpl implements AuctionService {
 
     @Override
     public AuctionResponse getAuctionById(Long auctionId) {
-        return modelMapper.map(
-                auctionRepository
-                        .findById(auctionId)
-                        .orElseThrow(() -> new AuctionNotFoundException(auctionId)),
-                AuctionResponse.class);
+        Auction auction = auctionRepository
+                .findById(auctionId)
+                .orElseThrow(() -> new AuctionNotFoundException(auctionId));
+        AuctionUtil.validateBeforeGetting(auction);
+        return modelMapper.map(auction ,AuctionResponse.class);
     }
 
     @Override

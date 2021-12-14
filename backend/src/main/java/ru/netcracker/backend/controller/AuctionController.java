@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +22,6 @@ import ru.netcracker.backend.model.responses.UserResponse;
 import ru.netcracker.backend.service.AuctionService;
 
 import javax.validation.Valid;
-import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/auctions")
@@ -46,13 +44,13 @@ public class AuctionController {
     }
 
     @PostMapping("/search")
-    public Page<AuctionResponse> getAuctionByKeyword(@RequestBody SearchRequest searchRequest, int page, int size) {
+    public Page<AuctionResponse> getAuctionBySearchRequest(@RequestBody SearchRequest searchRequest, int page, int size) {
         return auctionService.searchAuctions(searchRequest, page, size);
     }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<AuctionResponse> getAuction(@PathVariable(name = "id") Long id) {
-        AuctionResponse auctionResponse = auctionService.getAuctionById(id);
+    //TODO: security: Can we get finished auctions?
+    @GetMapping("/{auctionId}")
+    public ResponseEntity<AuctionResponse> getAuction(@PathVariable(name = "auctionId") Long auctionId) {
+        AuctionResponse auctionResponse = auctionService.getAuctionById(auctionId);
         log.info("sent auction: {}", auctionResponse);
         return new ResponseEntity<>(auctionResponse, HttpStatus.OK);
     }

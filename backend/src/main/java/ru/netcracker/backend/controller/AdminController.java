@@ -1,7 +1,6 @@
 package ru.netcracker.backend.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.netcracker.backend.exception.user.UserExistsException;
 import ru.netcracker.backend.model.requests.MoneyRequest;
 import ru.netcracker.backend.model.responses.UserResponse;
-import ru.netcracker.backend.service.NotificationService;
 import ru.netcracker.backend.service.UserService;
 
 import javax.validation.Valid;
@@ -23,15 +21,11 @@ import java.util.List;
 @Slf4j
 @Validated
 public class AdminController {
-    private final ModelMapper modelMapper;
     private final UserService userService;
-    private final NotificationService notificationService;
 
     @Autowired
-    public AdminController(ModelMapper modelMapper, UserService userService, NotificationService notificationService) {
-        this.modelMapper = modelMapper;
+    public AdminController(UserService userService) {
         this.userService = userService;
-        this.notificationService = notificationService;
     }
 
     @GetMapping

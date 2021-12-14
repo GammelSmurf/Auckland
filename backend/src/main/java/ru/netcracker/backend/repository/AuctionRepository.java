@@ -10,4 +10,5 @@ import java.util.Optional;
 @Repository
 public interface AuctionRepository extends JpaRepository<Auction, Long>, JpaSpecificationExecutor<Auction> {
     Optional<Auction> findById(Long id);
+    boolean existsByName(String name);
 }

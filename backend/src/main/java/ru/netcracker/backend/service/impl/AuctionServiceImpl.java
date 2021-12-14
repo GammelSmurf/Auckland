@@ -23,6 +23,7 @@ import ru.netcracker.backend.service.AuctionService;
 import ru.netcracker.backend.service.LogService;
 import ru.netcracker.backend.service.NotificationService;
 import ru.netcracker.backend.util.SecurityUtil;
+import ru.netcracker.backend.util.component.RandomNameGenerator;
 import ru.netcracker.backend.util.component.specification.AuctionSpecification;
 import ru.netcracker.backend.util.AuctionUtil;
 import ru.netcracker.backend.util.enumiration.LogLevel;
@@ -41,6 +42,7 @@ public class AuctionServiceImpl implements AuctionService {
     private final ModelMapper modelMapper;
     private final AuctionSpecification auctionSpecification;
     private final NotificationService notificationService;
+    private final RandomNameGenerator nameGenerator;
 
     @Autowired
     public AuctionServiceImpl(AuctionRepository auctionRepository,
@@ -48,7 +50,7 @@ public class AuctionServiceImpl implements AuctionService {
                               CategoryRepository categoryRepository,
                               TagRepository tagRepository,
                               LogService logService,
-                              ModelMapper modelMapper, AuctionSpecification auctionSpecification, NotificationService notificationService) {
+                              ModelMapper modelMapper, AuctionSpecification auctionSpecification, NotificationService notificationService, RandomNameGenerator nameGenerator) {
         this.auctionRepository = auctionRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
@@ -57,6 +59,7 @@ public class AuctionServiceImpl implements AuctionService {
         this.modelMapper = modelMapper;
         this.auctionSpecification = auctionSpecification;
         this.notificationService = notificationService;
+        this.nameGenerator = nameGenerator;
     }
 
     @Override
@@ -76,7 +79,13 @@ public class AuctionServiceImpl implements AuctionService {
     @Override
     @Transactional
     public AuctionResponse createAuction(Auction auction) {
+        AuctionUtil.validateBeforeCreatingOrUpdating(auction, auctionRepository);
+        setRandomName(auction);
         return modelMapper.map(auctionRepository.save(auction), AuctionResponse.class);
+    }
+
+    private void setRandomName(Auction auction) {
+        auction.setName(nameGenerator.getName(7));
     }
 
     @Override
@@ -87,6 +96,7 @@ public class AuctionServiceImpl implements AuctionService {
                 .orElseThrow(() -> new AuctionNotFoundException(auctionId));
 
         oldAuction.copyMainParamsFrom(newAuction);
+        AuctionUtil.validateBeforeCreatingOrUpdating(oldAuction, auctionRepository);
         return modelMapper.map(auctionRepository.save(oldAuction), AuctionResponse.class);
     }
 

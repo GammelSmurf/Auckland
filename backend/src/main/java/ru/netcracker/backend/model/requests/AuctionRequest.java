@@ -27,10 +27,6 @@ public class AuctionRequest {
   @Min(5)
   private Long usersCountLimit;
 
-  @NotBlank(message="Creator name should not be blank")
-  @Size(min=3,max=255)
-  private String creatorUsername;
-
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   @JsonLocalDateTime
   private LocalDateTime beginDateTime;

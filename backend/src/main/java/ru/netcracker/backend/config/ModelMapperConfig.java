@@ -12,6 +12,7 @@ import ru.netcracker.backend.model.requests.LotRequest;
 import ru.netcracker.backend.model.requests.MessageRequest;
 import ru.netcracker.backend.model.requests.TagRequest;
 import ru.netcracker.backend.model.responses.*;
+import ru.netcracker.backend.util.SecurityUtil;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -42,8 +43,8 @@ public class ModelMapperConfig {
                 .setPostConverter(context -> {
                     context.getDestination().setCreator(
                             userRepository
-                                    .findByUsername(context.getSource().getCreatorUsername())
-                                    .orElseThrow(() -> new UsernameNotFoundException(context.getSource().getCreatorUsername())));
+                                    .findByUsername(SecurityUtil.getUsernameFromSecurityCtx())
+                                    .orElseThrow(() -> new UsernameNotFoundException(SecurityUtil.getUsernameFromSecurityCtx())));
                     return context.getDestination();
                 });
 

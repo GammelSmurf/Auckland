@@ -35,10 +35,10 @@ public class EqualOperationBuilder extends OperationBuilder {
                     getPredicateList().add(equals(getRoot().get(getFilter().getProperty()), AuctionStatus.valueOf(value)));
                     break;
                 case "tags":
-                    getPredicateList().add(equals(getBuilder().lower(getRoot().join(Auction_.tags).get(Tag_.name)), value));
+                    getPredicateList().add(equals(getRoot().join(Auction_.tags).get(Tag_.name), value));
                     break;
                 case "categories":
-                    getPredicateList().add(equals(getBuilder().lower(getRoot().join(Auction_.categories).get(Category_.name)), value));
+                    getPredicateList().add(equals(getRoot().join(Auction_.categories).get(Category_.name), value));
                     break;
                 default:
                     getPredicateList().add(equals(getRoot().get(getFilter().getProperty()), value));

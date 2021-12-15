@@ -43,4 +43,8 @@ public abstract class OperationBuilder {
     protected List<Predicate> getPredicateList() {
         return predicateList;
     }
+
+    protected Predicate[] formatPredicateArray() {
+        return getPredicateList().toArray(new Predicate[0]);
+    }
 }

@@ -9,4 +9,5 @@ public class Filter {
     private final String property;
     private final Operation operation;
     private final List<String> values;
+    private final boolean orPredicate = true;
 }

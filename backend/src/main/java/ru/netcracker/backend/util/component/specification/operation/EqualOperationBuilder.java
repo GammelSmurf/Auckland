@@ -32,7 +32,9 @@ public class EqualOperationBuilder extends OperationBuilder {
         for (String value : getFilter().getValues()) {
             getPredicateList().add(equals(getRoot().get(getFilter().getProperty()), value));
         }
-        return getBuilder().or(getPredicateList().toArray(new Predicate[0]));
+        return getFilter().isOrPredicate()
+                ? getBuilder().or(formatPredicateArray())
+                : getBuilder().and(formatPredicateArray());
     }
 
     private Predicate equals(Path<?> var1, Object var2) {

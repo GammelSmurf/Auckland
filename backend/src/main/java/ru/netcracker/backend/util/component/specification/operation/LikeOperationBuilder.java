@@ -16,7 +16,9 @@ public class LikeOperationBuilder extends OperationBuilder{
         for (String value : getFilter().getValues()) {
             getPredicateList().add(like(getConcatExpression(), generateValue(value)));
         }
-        return getBuilder().or(getPredicateList().toArray(new Predicate[0]));
+        return getFilter().isOrPredicate()
+                ? getBuilder().or(formatPredicateArray())
+                : getBuilder().and(formatPredicateArray());
     }
 
     private Expression<String> getConcatExpression() {

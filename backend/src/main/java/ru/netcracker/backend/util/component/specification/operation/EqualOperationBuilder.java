@@ -1,5 +1,6 @@
 package ru.netcracker.backend.util.component.specification.operation;
 
+import ru.netcracker.backend.model.entity.AuctionStatus;
 import ru.netcracker.backend.model.entity.Auction_;
 import ru.netcracker.backend.model.entity.User_;
 import ru.netcracker.backend.util.SecurityUtil;
@@ -30,7 +31,11 @@ public class EqualOperationBuilder extends OperationBuilder {
 
     private Predicate equalsWithOrPredicateOnValues() {
         for (String value : getFilter().getValues()) {
-            getPredicateList().add(equals(getRoot().get(getFilter().getProperty()), value));
+            if (getFilter().getProperty().equals("status")) {
+                getPredicateList().add(equals(getRoot().get(getFilter().getProperty()), AuctionStatus.valueOf(value)));
+            } else {
+                getPredicateList().add(equals(getRoot().get(getFilter().getProperty()), value));
+            }
         }
         return getFilter().isOrPredicate()
                 ? getBuilder().or(formatPredicateArray())

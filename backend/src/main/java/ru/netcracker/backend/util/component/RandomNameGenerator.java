@@ -19,8 +19,7 @@ public class RandomNameGenerator {
     public String getName(int lengthOfName) {
         handleSettingLengthOfName(lengthOfName);
         for (;;) {
-            Random randomNumberGenerator = new Random(Calendar.getInstance()
-                    .getTimeInMillis());
+            Random randomNumberGenerator = new Random(Calendar.getInstance().getTimeInMillis());
 
             char[] nameInCharArray = new char[length];
 

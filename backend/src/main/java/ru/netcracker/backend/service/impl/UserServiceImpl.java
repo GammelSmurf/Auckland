@@ -2,6 +2,7 @@ package ru.netcracker.backend.service.impl;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,14 +23,18 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final BCryptPasswordEncoder encoder;
+    private final SimpMessagingTemplate template;
+
+    private static final String WEB_SOCKET_PATH_TEMPLATE_BALANCE = "/user/balance/%d";
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository,
                            ModelMapper modelMapper,
-                           BCryptPasswordEncoder encoder) {
+                           BCryptPasswordEncoder encoder, SimpMessagingTemplate template) {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
         this.encoder = encoder;
+        this.template = template;
     }
 
     @Override
@@ -82,5 +87,18 @@ public class UserServiceImpl implements UserService {
         oldUser.setPassword(encoder.encode(userRequest.getPassword()));
 
         return modelMapper.map(userRepository.save(oldUser),UserResponse.class);
+    }
+
+    @Override
+    public void sendBalanceToUserAfterUpdate(Long userId) {
+        User user=userRepository.getById(userId);
+        sendBalanceToWs(userId,user.getMoney());
+    }
+    private void sendBalanceToWs(Long userId, BigDecimal balance) {
+        sendObjectToWs(userId, balance);
+    }
+
+    private void sendObjectToWs(Long userId, Object obj) {
+        template.convertAndSend(String.format(WEB_SOCKET_PATH_TEMPLATE_BALANCE, userId), obj);
     }
 }

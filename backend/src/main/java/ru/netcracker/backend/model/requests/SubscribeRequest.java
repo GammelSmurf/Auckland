@@ -11,10 +11,5 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SubscribeRequest {
-    @NotBlank(message="Subscribes name should not be blank")
-    @Size(min=3,max=255)
-    private String username;
-
-
     private Long auctionId;
 }

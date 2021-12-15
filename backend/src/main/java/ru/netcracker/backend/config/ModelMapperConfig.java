@@ -41,8 +41,8 @@ public class ModelMapperConfig {
                 .addMappings(
                         mapper -> {
                             mapper.skip(Auction::setId);
-                            mapper.skip(Auction::setUsersCount);
-                            mapper.skip(Auction::setLikes);
+                            mapper.skip(Auction::setSubscribedUsersCount);
+                            mapper.skip(Auction::setUserLikesCount);
                         })
                 .setPostConverter(context -> {
                     context.getDestination().setCreator(
@@ -51,13 +51,6 @@ public class ModelMapperConfig {
                                     .orElseThrow(() -> new UsernameNotFoundException(SecurityUtil.getUsernameFromSecurityCtx())));
                     return context.getDestination();
                 });
-
-        modelMapper.createTypeMap(Auction.class, AuctionResponse.class)
-                .addMappings(
-                        mapper -> {
-                            mapper.map(Auction::getUserLikesCount, AuctionResponse::setUserLikesCount);
-                            mapper.map(Auction::getSubscribedUsersCount, AuctionResponse::setSubscribedUsersCount);
-                        });
 
         modelMapper.createTypeMap(LotRequest.class, Lot.class)
                 .addMappings(

@@ -33,8 +33,8 @@ public class Auction {
     private LocalTime extraTime;
     private Long usersCountLimit;
 
-    private Long usersCount = 0L;
-    private Long likes = 0L;
+    private Long subscribedUsersCount = 0L;
+    private Long userLikesCount = 0L;
 
     @OneToOne(mappedBy = "auction")
     @JsonBackReference
@@ -105,14 +105,6 @@ public class Auction {
         setExtraTime(auction.getExtraTime());
     }
 
-    public int getUserLikesCount() {
-        return getUsersWhoLiked().size();
-    }
-
-    public int getSubscribedUsersCount() {
-        return getSubscribedUsers().size();
-    }
-
     public boolean isDraft() {
         return status == AuctionStatus.DRAFT;
     }
@@ -142,7 +134,7 @@ public class Auction {
     }
 
     public void incUsersCount() {
-        this.usersCount++;
+        this.subscribedUsersCount++;
     }
 
     public void addUserWhoLiked(User user) {
@@ -156,11 +148,11 @@ public class Auction {
     }
 
     public void incLikes() {
-        this.likes++;
+        this.userLikesCount++;
     }
 
     public void decLikes() {
-        this.likes--;
+        this.userLikesCount--;
     }
 
     public Optional<Lot> getAnotherLot() {

@@ -52,9 +52,17 @@
 
 .responseText {
     animation-duration: 1.5s;
-    animation-name: responseTextAnimation;
+    animation-name: opacityAnimation;
 }
-@keyframes responseTextAnimation {
+
+.timeRaiseAnim {
+    animation-duration: 1s;
+    animation-name: opacityAnimation;
+    animation-direction: reverse;
+    animation-fill-mode: forwards;
+}
+
+@keyframes opacityAnimation {
     from {
         opacity: 0;
     }

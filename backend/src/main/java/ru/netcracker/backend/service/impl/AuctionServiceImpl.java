@@ -95,8 +95,8 @@ public class AuctionServiceImpl implements AuctionService {
                 .findById(auctionId)
                 .orElseThrow(() -> new AuctionNotFoundException(auctionId));
 
-        oldAuction.copyMainParamsFrom(newAuction);
         AuctionUtil.validateBeforeUpdating(oldAuction, newAuction, auctionRepository);
+        oldAuction.copyMainParamsFrom(newAuction);
         return modelMapper.map(auctionRepository.save(oldAuction), AuctionResponse.class);
     }
 
@@ -116,7 +116,7 @@ public class AuctionServiceImpl implements AuctionService {
                 .findById(auctionId)
                 .orElseThrow(() -> new AuctionNotFoundException(auctionId));
         AuctionUtil.validateBeforeGetting(auction);
-        return modelMapper.map(auction, AuctionResponse.class);
+        return modelMapper.map(auction ,AuctionResponse.class);
     }
 
     @Override
@@ -160,7 +160,8 @@ public class AuctionServiceImpl implements AuctionService {
 
         AuctionUtil.validateBeforeAddingCategoryToAuction(auction, category);
         auction.addCategory(category);
-        return modelMapper.map(auctionRepository.save(auction), CategoryResponse.class);
+        auctionRepository.save(auction);
+        return modelMapper.map(category, CategoryResponse.class);
     }
 
     @Override

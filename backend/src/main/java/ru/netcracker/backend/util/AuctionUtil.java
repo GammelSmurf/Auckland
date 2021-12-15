@@ -27,9 +27,7 @@ public class AuctionUtil {
     }
 
     public static void validateBeforeDeleting(Auction auction) {
-        if (!isAuctionCreatorInSecurityContext(auction)) {
-            throw new AuctionIsNotOwnByUserException(auction);
-        }
+        checkIfUserIsNotCreatorOfAuction(auction);
     }
 
     public static void validateBeforeSubscribing(Auction auction) {
@@ -43,10 +41,7 @@ public class AuctionUtil {
     }
 
     public static void validateBeforeMakingWaiting(Auction auction) {
-        if (!isAuctionCreatorInSecurityContext(auction)) {
-            throw new AuctionIsNotOwnByUserException(auction);
-        }
-
+        checkIfUserIsNotCreatorOfAuction(auction);
         if (!auction.isDraft() || auction.isWaiting() || auction.isFinished()) {
             throw new NotCorrectStatusException(auction);
         }
@@ -59,6 +54,12 @@ public class AuctionUtil {
     private static void checkIfUserIsCreatorOfAuction(Auction auction) {
         if (isAuctionCreatorInSecurityContext(auction)) {
             throw new AuctionIsOwnByUserException(auction);
+        }
+    }
+
+    private static void checkIfUserIsNotCreatorOfAuction(Auction auction) {
+        if (!isAuctionCreatorInSecurityContext(auction)) {
+            throw new AuctionIsNotOwnByUserException(auction);
         }
     }
 

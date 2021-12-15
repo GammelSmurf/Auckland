@@ -3,6 +3,7 @@ import authHeader from "./AuthHeader";
 
 const API_URL = 'http://localhost:8080/api/auctions/';
 const API_URL_LOGS = 'http://localhost:8080/api/auction/logs/'
+
 const getAllAuctions = () => {
     return axios.get(API_URL, { headers: authHeader() });
 }
@@ -78,7 +79,8 @@ const getAuctionLogs = (auctionId) => {
 const subscribe = (values) =>{
     return axios
         .post(API_URL + 'subscribe', {
-            auctionId: values.auctionId
+            auctionId: values.auctionId,
+            username: values.username
         }, {headers: authHeader()})
         .then(response => {
             return response
@@ -107,4 +109,15 @@ const removeCategory = (values) => {
         });
 }
 
-export default {getAllAuctions, getAuction, deleteAuction, createAuction, updateAuction, setStatusWaiting, getAuctionLogs, subscribe, addCategory, removeCategory};
+const searchAuctions = (filterList, sortList) => {
+    return axios
+        .post(API_URL + 'search', {
+            filterList: filterList,
+            sortList: sortList
+        }, {params:{page: 0, size: 10},headers: authHeader()})
+        .then(response => {
+            return response
+        });
+}
+
+export default {getAllAuctions, getAuction, deleteAuction, createAuction, updateAuction, setStatusWaiting, getAuctionLogs, subscribe, addCategory, removeCategory, searchAuctions};

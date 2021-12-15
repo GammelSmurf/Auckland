@@ -22,10 +22,13 @@ public class Transaction {
     private TransactionStatus transactionStatus = TransactionStatus.STARTED;
 
     @ManyToOne
+    @JoinColumn(name = "buyer_user_id")
     private User buyer;
     @ManyToOne
+    @JoinColumn(name = "creator_user_id")
     private User auctionCreator;
     @ManyToOne
+    @JoinColumn(name = "lot_id")
     private Lot lot;
 
     public Transaction() {

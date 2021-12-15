@@ -41,12 +41,13 @@ public class Auction {
     private Bid currentBid;
 
     @OneToOne
+    @JoinColumn(name = "current_lot_id")
     @JsonBackReference
     private Lot currentLot;
 
     @ManyToOne
+    @JoinColumn(name = "creator_user_id")
     @JsonBackReference
-    @JoinColumn(name = "user_id", nullable = false)
     private User creator;
 
     @OneToMany(

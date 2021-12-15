@@ -33,7 +33,7 @@ public class User {
 
     private String verificationCode = RandomString.make(64);
     private String restoreCode;
-    private boolean isBanned = false;
+    private boolean banned = false;
     private boolean enabled = false;
 
     public User() {
@@ -70,7 +70,7 @@ public class User {
     private Set<Auction> ownAuctions = new HashSet<>(0);
 
     @ElementCollection(targetClass = UserRole.class, fetch = FetchType.EAGER)
-    @JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     private Set<UserRole> userRoles = new HashSet<>();

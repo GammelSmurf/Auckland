@@ -49,7 +49,7 @@ public class BidController {
     @SendTo("/auction/chat/{auctionId}")
     public MessageResponse send(@DestinationVariable Long auctionId, @Valid MessageRequest messageRequest)
             throws ValidationException {
-        MessageResponse messageResponse=messageService.addMessage(modelMapper.map(messageRequest, Message.class));
+        MessageResponse messageResponse = messageService.addMessage(modelMapper.map(messageRequest, Message.class));
         log.info("auction with id: {} received a message: {}", auctionId, messageResponse);
         return messageResponse;
     }

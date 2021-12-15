@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "bet")
+@Table(name = "bids")
 @Getter
 @Setter
 public class Bid {
@@ -23,14 +23,17 @@ public class Bid {
     private BigDecimal amount = new BigDecimal(0);
 
     @OneToOne
+    @JoinColumn(name="auction_id")
     @JsonBackReference
     private Auction auction;
 
     @OneToOne
+    @JoinColumn(name="lot_id")
     @JsonBackReference
     private Lot lot;
 
     @OneToOne
+    @JoinColumn(name="user_id")
     @JsonBackReference
     private User user;
 

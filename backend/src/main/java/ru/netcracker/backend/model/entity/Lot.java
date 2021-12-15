@@ -42,7 +42,7 @@ public class Lot {
     private Auction auctionBeingPlayed;
 
     @ManyToOne
-    @JoinColumn(name = "winner_id")
+    @JoinColumn(name = "winner_user_id")
     private User winner;
 
     @ManyToOne

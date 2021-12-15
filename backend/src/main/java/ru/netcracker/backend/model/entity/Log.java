@@ -19,5 +19,6 @@ public class Log {
     private LocalDateTime dateTime;
 
     @ManyToOne
+    @JoinColumn(name="auction_id")
     private Auction auction;
 }

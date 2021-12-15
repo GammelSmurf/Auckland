@@ -13,15 +13,18 @@ public class LikeOperationBuilder extends OperationBuilder{
 
     @Override
     public Predicate build() {
-        return like(getConcatExpression(), generateValue());
+        for (String value : getFilter().getValues()) {
+            getPredicateList().add(like(getConcatExpression(), generateValue(value)));
+        }
+        return getBuilder().or(getPredicateList().toArray(new Predicate[0]));
     }
 
     private Expression<String> getConcatExpression() {
         return getBuilder().lower(getRoot().get(getFilter().getProperty()));
     }
 
-    private String generateValue() {
-        return "%" + getFilter().getValue().toLowerCase() + "%";
+    private String generateValue(String value) {
+        return "%" + value + "%";
     }
 
     private Predicate like(Expression<String> var1, String var2) {

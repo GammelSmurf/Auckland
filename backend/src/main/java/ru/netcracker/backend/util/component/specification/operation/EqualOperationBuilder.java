@@ -24,8 +24,15 @@ public class EqualOperationBuilder extends OperationBuilder {
             case "creator":
                 return equals(getRoot().join(Auction_.creator).get(User_.username), SecurityUtil.getUsernameFromSecurityCtx());
             default:
-                return equals(getRoot().get(getFilter().getProperty()), getFilter().getValue());
+                return equalsWithOrPredicateOnValues();
         }
+    }
+
+    private Predicate equalsWithOrPredicateOnValues() {
+        for (String value : getFilter().getValues()) {
+            getPredicateList().add(equals(getRoot().get(getFilter().getProperty()), value));
+        }
+        return getBuilder().or(getPredicateList().toArray(new Predicate[0]));
     }
 
     private Predicate equals(Path<?> var1, Object var2) {

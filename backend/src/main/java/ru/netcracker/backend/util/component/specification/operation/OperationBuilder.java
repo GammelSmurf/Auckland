@@ -5,10 +5,13 @@ import ru.netcracker.backend.util.component.specification.Filter;
 import ru.netcracker.backend.util.component.specification.PredicateData;
 
 import javax.persistence.criteria.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class OperationBuilder {
     private final Filter filter;
     private final PredicateData data;
+    private List<Predicate> predicateList = new ArrayList<>();
 
     public OperationBuilder(Filter filter, PredicateData data) {
         this.filter = filter;
@@ -35,5 +38,9 @@ public abstract class OperationBuilder {
 
     protected Filter getFilter() {
         return this.filter;
+    }
+
+    protected List<Predicate> getPredicateList() {
+        return predicateList;
     }
 }

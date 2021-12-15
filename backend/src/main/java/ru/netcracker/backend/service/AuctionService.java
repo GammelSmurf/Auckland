@@ -28,4 +28,8 @@ public interface AuctionService {
     CategoryResponse addCategoryToAuction(Long auctionId, Long categoryId);
 
     AuctionResponse removeCategoryFromAuction(Long auctionId, Long categoryId);
+
+    AuctionResponse like(Long auctionId);
+
+    AuctionResponse dislike(Long auctionId);
 }

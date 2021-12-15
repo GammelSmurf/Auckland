@@ -116,7 +116,7 @@ public class AuctionServiceImpl implements AuctionService {
                 .findById(auctionId)
                 .orElseThrow(() -> new AuctionNotFoundException(auctionId));
         AuctionUtil.validateBeforeGetting(auction);
-        return modelMapper.map(auction ,AuctionResponse.class);
+        return modelMapper.map(auction, AuctionResponse.class);
     }
 
     @Override
@@ -175,6 +175,34 @@ public class AuctionServiceImpl implements AuctionService {
 
         removeTagConnectionsFromCategoryAndAuction(auction, category);
         auction.removeCategory(category);
+        return modelMapper.map(auctionRepository.save(auction), AuctionResponse.class);
+    }
+
+    @Override
+    @Transactional
+    public AuctionResponse like(Long auctionId) {
+        Auction auction = auctionRepository
+                .findById(auctionId)
+                .orElseThrow(() -> new AuctionNotFoundException(auctionId));
+        User user = userRepository
+                .findByUsername(SecurityUtil.getUsernameFromSecurityCtx())
+                .orElseThrow(() -> new UsernameNotFoundException(SecurityUtil.getUsernameFromSecurityCtx()));
+        AuctionUtil.validateBeforeLike(auction, user);
+        auction.addUserWhoLiked(user);
+        return modelMapper.map(auctionRepository.save(auction), AuctionResponse.class);
+    }
+
+    @Override
+    @Transactional
+    public AuctionResponse dislike(Long auctionId) {
+        Auction auction = auctionRepository
+                .findById(auctionId)
+                .orElseThrow(() -> new AuctionNotFoundException(auctionId));
+        User user = userRepository
+                .findByUsername(SecurityUtil.getUsernameFromSecurityCtx())
+                .orElseThrow(() -> new UsernameNotFoundException(SecurityUtil.getUsernameFromSecurityCtx()));
+        AuctionUtil.validateBeforeDislike(auction, user);
+        auction.removeUserWhoLiked(user);
         return modelMapper.map(auctionRepository.save(auction), AuctionResponse.class);
     }
 

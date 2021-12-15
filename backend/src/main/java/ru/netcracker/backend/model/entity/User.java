@@ -92,6 +92,7 @@ public class User {
 
     public void subscribeToAuction(Auction auction) {
         auction.getSubscribedUsers().add(this);
+        auction.incUsersCount();
         this.getSubscribedAuctions().add(auction);
     }
 }

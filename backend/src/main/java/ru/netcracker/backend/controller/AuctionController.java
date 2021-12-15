@@ -88,6 +88,16 @@ public class AuctionController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @PostMapping("/like/{auctionId}")
+    public ResponseEntity<AuctionResponse> like(@PathVariable(name = "auctionId") Long auctionId) {
+        return new ResponseEntity<>(auctionService.like(auctionId), HttpStatus.OK);
+    }
+
+    @PostMapping("/dislike/{auctionId}")
+    public ResponseEntity<AuctionResponse> dislike(@PathVariable(name = "auctionId") Long auctionId) {
+        return new ResponseEntity<>(auctionService.dislike(auctionId), HttpStatus.OK);
+    }
+
     @PostMapping("/subscribe")
     public ResponseEntity<UserResponse> subscribe(@Valid @RequestBody SubscribeRequest subscribeRequest) {
         UserResponse userResponse = auctionService.subscribe(subscribeRequest.getAuctionId());

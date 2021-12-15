@@ -33,6 +33,9 @@ public class Auction {
     private LocalTime extraTime;
     private Long usersCountLimit;
 
+    private Long usersCount;
+    private Long likes = 0L;
+
     @OneToOne(mappedBy = "auction")
     @JsonBackReference
     private Bid currentBid;
@@ -136,6 +139,28 @@ public class Auction {
 
     public void setFinishedStatus() {
         setStatus(AuctionStatus.FINISHED);
+    }
+
+    public void incUsersCount() {
+        this.usersCount++;
+    }
+
+    public void addUserWhoLiked(User user) {
+        getUsersWhoLiked().add(user);
+        incLikes();
+    }
+
+    public void removeUserWhoLiked(User user) {
+        getUsersWhoLiked().remove(user);
+        decLikes();
+    }
+
+    public void incLikes() {
+        this.likes++;
+    }
+
+    public void decLikes() {
+        this.likes--;
     }
 
     public Optional<Lot> getAnotherLot() {

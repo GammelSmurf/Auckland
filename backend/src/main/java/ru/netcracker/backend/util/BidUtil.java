@@ -18,7 +18,7 @@ public class BidUtil {
             throws BankLessThanMinException, BankLessThanOldException, BankLessThanStepException,
             LotTimeExpiredException, NoCurrencyException, NotSubscribedException {
         if (user.getSubscribedAuctions().isEmpty() || !user.getSubscribedAuctions().contains(auction)) {
-            throw new NotSubscribedException("The user is not subscribed to the auction");
+            throw new NotSubscribedException();
         }
 
         if (!auction.isRunning()) {

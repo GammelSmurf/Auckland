@@ -33,7 +33,7 @@ public class Auction {
     private LocalTime extraTime;
     private Long usersCountLimit;
 
-    private Long usersCount;
+    private Long usersCount = 0L;
     private Long likes = 0L;
 
     @OneToOne(mappedBy = "auction")

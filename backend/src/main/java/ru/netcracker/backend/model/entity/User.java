@@ -29,7 +29,7 @@ public class User {
     private String secondName;
     private String about;
 
-    private BigDecimal money = new BigDecimal(0);
+    private BigDecimal money = new BigDecimal(10000);
 
     private String verificationCode = RandomString.make(64);
     private String restoreCode;

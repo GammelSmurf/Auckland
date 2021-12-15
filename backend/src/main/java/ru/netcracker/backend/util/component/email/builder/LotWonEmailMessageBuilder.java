@@ -20,7 +20,7 @@ public class LotWonEmailMessageBuilder extends EmailMessageBuilder {
         return buildMimeMessage()
                 .setSubject("Lot Won.")
                 .setContent(generateContent("Congratulations, you have won the lot: " + lot.getName() + "." +
-                        "Please contact the auctioneer via the contact details to discuss the transfer of the lot" + lot.getAuction().getCreator().getEmail() + "." +
+                        "Please contact the auctioneer via the contact details to discuss the transfer of the lot: " + lot.getAuction().getCreator().getEmail() + " ." +
                         "To make a transaction, after the transfer of the lot, confirm this in your profile."
                 ))
                 .build();

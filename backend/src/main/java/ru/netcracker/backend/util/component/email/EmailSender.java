@@ -41,23 +41,23 @@ public class EmailSender {
     }
 
     public void createAndSendLotWonEmail(User to, Lot lot) throws MessagingException, UnsupportedEncodingException {
-        createAndSendEmail(EmailLevel.LOT_WON, to, null, lot);
+        //createAndSendEmail(EmailLevel.LOT_WON, to, null, lot);
     }
 
     public void createAndSendLotSoldEmail(User to, Lot lot) throws MessagingException, UnsupportedEncodingException {
-        createAndSendEmail(EmailLevel.LOT_SOLD, to, null, lot);
+        //createAndSendEmail(EmailLevel.LOT_SOLD, to, null, lot);
     }
 
     public void createAndSendBuyerTransactionDoneEmail(User to) throws MessagingException, UnsupportedEncodingException {
-        createAndSendEmail(EmailLevel.BUYER_TRANSACTION_DONE, to, null, null);
+        //createAndSendEmail(EmailLevel.BUYER_TRANSACTION_DONE, to, null, null);
     }
 
     public void createAndSendSellerTransactionDoneEmail(User to, Transaction transaction) throws MessagingException, UnsupportedEncodingException {
-        createAndSendEmail(EmailLevel.SELLER_TRANSACTION_DONE, to, null, transaction);
+        //createAndSendEmail(EmailLevel.SELLER_TRANSACTION_DONE, to, null, transaction);
     }
 
     public void createAndSendTransferExpiredEmail(User to) throws MessagingException, UnsupportedEncodingException {
-        createAndSendEmail(EmailLevel.TRANSACTION_EXPIRED, to, null, null);
+        //createAndSendEmail(EmailLevel.TRANSACTION_EXPIRED, to, null, null);
     }
 
     private MimeMessage createMimeMessage(EmailLevel level, User to, String siteUrl, Object transferObject) throws MessagingException, UnsupportedEncodingException {

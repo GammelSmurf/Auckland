@@ -18,6 +18,7 @@ import ru.netcracker.backend.service.BidService;
 import ru.netcracker.backend.service.MessageService;
 
 import javax.validation.Valid;
+import java.security.Principal;
 
 @Controller
 @Slf4j
@@ -38,7 +39,7 @@ public class BidController {
     @SendTo("/auction/state/{auctionId}")
     public BidResponse play(@DestinationVariable Long auctionId, @Valid BidRequest bidRequest)
             throws ValidationException {
-        BidResponse bidResponse = bidService.makeBid(auctionId, bidRequest.getAmount());
+        BidResponse bidResponse = bidService.makeBid(auctionId, bidRequest.getAmount(), bidRequest.getUsername());
 
         log.info("auction with id: {} has: {}", auctionId, bidResponse);
         return bidResponse;
@@ -46,7 +47,7 @@ public class BidController {
 
     @MessageMapping("/send/{auctionId}")
     @SendTo("/auction/chat/{auctionId}")
-    public MessageResponse play(@DestinationVariable Long auctionId, @Valid MessageRequest messageRequest)
+    public MessageResponse send(@DestinationVariable Long auctionId, @Valid MessageRequest messageRequest)
             throws ValidationException {
         MessageResponse messageResponse=messageService.addMessage(modelMapper.map(messageRequest, Message.class));
         log.info("auction with id: {} received a message: {}", auctionId, messageResponse);

@@ -2,11 +2,11 @@ package ru.netcracker.backend.service.impl;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.netcracker.backend.exception.auction.AuctionNotFoundException;
 import ru.netcracker.backend.exception.auction.NotCorrectStatusException;
+import ru.netcracker.backend.exception.user.UsernameNotFoundException;
 import ru.netcracker.backend.model.entity.*;
 import ru.netcracker.backend.model.responses.BidResponse;
 import ru.netcracker.backend.model.responses.LotResponse;
@@ -19,7 +19,6 @@ import ru.netcracker.backend.service.BidService;
 import ru.netcracker.backend.service.LogService;
 import ru.netcracker.backend.service.NotificationService;
 import ru.netcracker.backend.util.BidUtil;
-import ru.netcracker.backend.util.SecurityUtil;
 import ru.netcracker.backend.util.component.email.EmailSender;
 import ru.netcracker.backend.util.enumiration.LogLevel;
 import ru.netcracker.backend.util.enumiration.NotificationLevel;
@@ -59,10 +58,10 @@ public class BidServiceImpl implements BidService {
 
     @Override
     @Transactional
-    public BidResponse makeBid(Long auctionId, BigDecimal amount) {
+    public BidResponse makeBid(Long auctionId, BigDecimal amount, String username) {
         User user = userRepository
-                .findByUsername(SecurityUtil.getUsernameFromSecurityCtx())
-                .orElseThrow(() -> new UsernameNotFoundException(SecurityUtil.getUsernameFromSecurityCtx()));
+                .findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException(username));
         Auction auction = auctionRepository
                 .findById(auctionId)
                 .orElseThrow(() -> new AuctionNotFoundException(auctionId));
@@ -144,7 +143,9 @@ public class BidServiceImpl implements BidService {
         if (hasWinner(auction)) {
             makeLotWon(auction);
             freezeLastTransaction(auction);
+            deleteAllUnnecessaryWinnerTransactions(auction);
             refundMoneyAndDeleteAllTransactionsForBidExceptFrozen(auction);
+            sendLotWonEmails(auction);
             bidRepository.delete(auction.getCurrentBid());
         }
     }
@@ -181,15 +182,14 @@ public class BidServiceImpl implements BidService {
     private void freezeLastTransaction(Auction auction) {
         auction.getCurrentBid().getTransactions().stream()
                 .max(Comparator.comparing(Transaction::getDateTime))
-                .ifPresent(tx -> {
-                    tx.setTransactionStatus(TransactionStatus.FROZEN);
-                    try {
-                        emailSender.createAndSendLotWonEmail(tx.getBuyer(), tx.getLot());
-                        emailSender.createAndSendLotSoldEmail(tx.getAuctionCreator(), tx.getLot());
-                    } catch (MessagingException | UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
-                });
+                .ifPresent(tx -> tx.setTransactionStatus(TransactionStatus.FROZEN));
+    }
+
+    private void deleteAllUnnecessaryWinnerTransactions(Auction auction) {
+        auction.getCurrentBid().getTransactions().stream()
+                .filter(tx -> (tx.getBuyer().equals(auction.getCurrentLot().getWinner())
+                        && !tx.getTransactionStatus().equals(TransactionStatus.FROZEN)))
+                .forEach(transactionRepository::delete);
     }
 
     private void refundMoneyAndDeleteAllTransactionsForBidExceptFrozen(Auction auction) {
@@ -199,6 +199,16 @@ public class BidServiceImpl implements BidService {
                     tx.getBuyer().addMoney(tx.getAmount());
                     transactionRepository.delete(tx);
                 });
+    }
+
+    private void sendLotWonEmails(Auction auction) {
+        try {
+            System.out.println("sendEmail");
+            emailSender.createAndSendLotWonEmail(auction.getCurrentBid().getUser(), auction.getCurrentLot());
+            emailSender.createAndSendLotSoldEmail(auction.getCreator(), auction.getCurrentLot());
+        } catch (MessagingException | UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
     }
 
     private void logWinnerIfExists(Auction auction) {

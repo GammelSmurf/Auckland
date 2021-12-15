@@ -16,4 +16,6 @@ public interface UserService {
     UserResponse addMoney(String username, BigDecimal money);
 
     UserResponse updateUser(UserRequest userRequest);
+
+    void sendBalanceToUserAfterUpdate(Long userId);
 }

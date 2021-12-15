@@ -14,9 +14,15 @@ public class AuctionUtil {
     private AuctionUtil() {
     }
 
-    public static void validateBeforeCreatingOrUpdating(Auction auction, AuctionRepository auctionRepository) {
+    public static void validateBeforeCreating(Auction auction, AuctionRepository auctionRepository) {
         if (auctionRepository.existsByName(auction.getName())) {
             throw new AuctionNameAlreadyExistsException(auction);
+        }
+    }
+
+    public static void validateBeforeUpdating(Auction oldAuction, Auction newAuction, AuctionRepository auctionRepository) {
+        if (!oldAuction.getName().equals(newAuction.getName()) && auctionRepository.existsByName(newAuction.getName())) {
+            throw new AuctionNameAlreadyExistsException(newAuction);
         }
     }
 
@@ -37,7 +43,10 @@ public class AuctionUtil {
     }
 
     public static void validateBeforeMakingWaiting(Auction auction) {
-        checkIfUserIsCreatorOfAuction(auction);
+        if (!isAuctionCreatorInSecurityContext(auction)) {
+            throw new AuctionIsNotOwnByUserException(auction);
+        }
+
         if (!auction.isDraft() || auction.isWaiting() || auction.isFinished()) {
             throw new NotCorrectStatusException(auction);
         }

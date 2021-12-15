@@ -23,6 +23,8 @@ public class EqualOperationBuilder extends OperationBuilder {
                 return equals(getRoot().join(Auction_.subscribedUsers).get(User_.username), SecurityUtil.getUsernameFromSecurityCtx());
             case "creator":
                 return equals(getRoot().join(Auction_.creator).get(User_.username), SecurityUtil.getUsernameFromSecurityCtx());
+            case "other":
+                return getBuilder().not(equals(getRoot().get(Auction_.status), AuctionStatus.DRAFT));
             default:
                 return equalsWithOrPredicateOnValues();
         }

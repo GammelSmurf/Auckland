@@ -27,7 +27,7 @@ const LotForm = (props) => {
                         <Form.Label>
                             Picture link
                         </Form.Label>
-                        <Form.Control required defaultValue={props.lot.pictureLink} onChange={props.handleChange("pictureLink")}/>
+                        <Form.Control defaultValue={props.lot.pictureLink} onChange={props.handleChange("pictureLink")}/>
                         <Form.Control.Feedback type="invalid">
                             The value cannot be empty
                         </Form.Control.Feedback>

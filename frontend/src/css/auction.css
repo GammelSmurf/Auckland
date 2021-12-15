@@ -55,6 +55,11 @@ span.tag {
     cursor: pointer;
 }
 
+.tagWrapper {
+    display: inline-block;
+    margin-right: 12px;
+}
+
 .messageBox {
     display: inline-block;
     background-color: white;

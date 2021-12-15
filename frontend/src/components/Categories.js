@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Button, FormControl, InputGroup} from "react-bootstrap";
 import CategoryService from "../services/CategoryService";
 import {Dropdown} from "react-bootstrap";
@@ -12,15 +12,6 @@ const Categories = (props) => {
     const [isAddingTag, setIsAddingTag] = useState(false);
     const [newTagName, setNewTagName] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
-
-
-    const colors = [
-        '#FF9E00', '#FF4545', '#40E687','#00C1FF','#AD61FF'
-    ]
-
-    const getColor = (catId) => {
-        return colors[catId%colors.length];
-    }
 
     useEffect(() => {
         setAucCategories(props.auction.categories);
@@ -70,13 +61,13 @@ const Categories = (props) => {
 
                     <Dropdown.Menu style={{textAlign: 'center'}}>
                         {allCategories.map(cat =>
-                            <Dropdown.Item key={cat.id} href="#/action-1" onClick={()=>handleAddCategory(cat.id)}>
+                            <Dropdown.Item key={cat.id} onClick={()=>handleAddCategory(cat.id)}>
                                 <span className='tag'>{cat.name}</span>
                             </Dropdown.Item>
                         )}
                     </Dropdown.Menu>
                 </Dropdown>
-                <Button variant='warning' onClick={()=>setIsAddingTag(!isAddingTag)}>Add tags</Button>
+                <Button variant='warning' onClick={()=>setIsAddingTag(!isAddingTag)} disabled={aucCategories.length === 0}>Add tags</Button>
                 {errorMessage &&
                 <p className='text-danger responseText'>{errorMessage}</p>}
             </div>
@@ -84,13 +75,13 @@ const Categories = (props) => {
             {aucCategories && aucCategories.map(cat=>
                 <div key={cat.id} className='auctionBlock' style={{marginTop: '15px', backgroundColor: '#E6EBEE'}}>
                     <div>
-                        <span className='tag' style={{color: getColor(cat.id)}}
+                        <span className='tag' style={{color: props.getColor(cat.id)}}
                               onClick={()=>handleDeleteCategory(cat.id)}><b>{cat.name}</b></span>
                     </div>
                     <div>
                         {aucTags && aucTags.filter(tag=>tag.categoryId === cat.id).map(tag=>
-                            <div key={tag.id} style={{display: 'inline-block', marginRight: '12px'}}>
-                                <p><span style={{borderBottom: '2px solid '+getColor(cat.id), cursor: 'not-allowed'}}
+                            <div key={tag.id} className='tagWrapper'>
+                                <p><span style={{borderBottom: '2px solid '+ props.getColor(cat.id), cursor: 'not-allowed'}}
                                          onClick={()=>handleDeleteTag(tag.id)}>{tag.name}</span></p>
                             </div>
                         )}

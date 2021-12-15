@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from "react";
 import {Button, Col, Container, Form, FormControl, InputGroup, Row, Spinner, Tabs} from "react-bootstrap";
-import confetti from 'canvas-confetti';
+//import confetti from 'canvas-confetti';
 
 import AuctionService from "../services/AuctionService";
 import LotService from "../services/LotService";
@@ -43,14 +43,27 @@ const Auction = (props) => {
     const [currentPrice, setCurrentPrice] = useState('');
     const [bidAmount, setBid] = useState();
     const [creator, setCreator] = useState({});
+    const [isErrorMessage, setIsErrorMessage] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [chatMessages, setChatMessages] = useState([]);
     const [members, setMembers] = useState([]);
+    const [isTimeRaise, setIsTimeRaise] = useState(false);
 
     const client = useRef(null);
     const timerId = useRef(null);
-    const confettiTimerId = useRef(null);
+    //const confettiTimerId = useRef(null);
     const lotSection = useRef(null);
+    const bidInput = useRef(null);
+
+    const errorPictureURL = 'https://st3.depositphotos.com/23594922/31822/v/600/depositphotos_318221368-stock-illustration-missing-picture-page-for-website.jpg';
+
+    const colors = [
+        '#FF9E00', '#FF4545', '#40E687','#00C1FF','#AD61FF'
+    ]
+
+    const getColor = (catId) => {
+        return colors[catId%colors.length];
+    }
 
     const addZeroBefore = (n) => {
         return (n < 10 ? '0' : '') + n;
@@ -87,33 +100,25 @@ const Auction = (props) => {
         return dateTimeFormat(date);
     }
 
-    const getLots = (aucId) => {
-        LotService.getLotsByAuctionId(aucId).then(
-            (response) => {
-                console.log(response)
-                setLots(response.data);
-                // TEMPORARY
-                response.data.length > 0 && setFinishTime(parseDateToDisplay(response.data.at(-1).endDateTime));
-                //
-            }
-        );
-    }
-
     //------------------------WS logic------------------------//
 
     const syncState = (aucId) => {
         BidService.getTime(aucId).then(
             (syncResponse) => {
-                console.log('Sync')
-                console.log(syncResponse)
-
                 if(syncResponse.data.auctionStatus === 'RUNNING'){
                     setCarouselCurrentLot([syncResponse.data.currentLot]);
-                    syncResponse.data.amount ? setCurrentPrice(syncResponse.data.amount) :
+                    console.log(syncResponse);
+                    (syncResponse.data.amount && !syncResponse.data.changed) ?
+                        setCurrentPrice(syncResponse.data.amount) :
                         setCurrentPrice(syncResponse.data.currentLot.minPrice);
                 }
                 if(syncResponse.data.auctionStatus === 'FINISHED'){
-                    getLots(aucId);
+                    AuctionService.getAuction(auction.id).then((response)=> {
+                            setAuction(response.data);
+                            setFinishTime(response.data.endDateTime);
+                            setLots(response.data.lots);
+                        }
+                    );
                 } else {
                     activateTimer(syncResponse.data.secondsUntil, aucId);
                 }
@@ -123,15 +128,16 @@ const Auction = (props) => {
     }
 
     const activateTimer = (inputSeconds, aucId) => {
+        clearInterval(timerId.current);
         let time = inputSeconds;
         timerId.current = setInterval(() => {
             const hours = time / 3600 % 60;
             const minutes = time / 60 % 60;
             const seconds = time % 60;
             if (time <= 0) {
+                clearInterval(timerId.current);
                 syncState(aucId);
                 //animateConfetti();
-                clearInterval(timerId.current);
             } else {
                 setStrTimer(`${addZeroBefore(Math.trunc(hours))}:${addZeroBefore(Math.trunc(minutes))}:${addZeroBefore(seconds)}`);
             }
@@ -149,7 +155,6 @@ const Auction = (props) => {
             activateTimer(response.secondsUntil, auction.id);
         }
         if(response.message && !response.username){
-            setFinishTime(parseDateToDisplay(response.dateTime));
             setLogs(logs.concat(response));
         }
     }
@@ -159,14 +164,17 @@ const Auction = (props) => {
     }
 
     const handleSendBid = () => {
-        setErrorMessage(null);
         const sum = currentPrice + carouselCurrentLot[0].priceIncreaseMinStep;
         if(!bidAmount || bidAmount < sum){
-            setErrorMessage('The bid must be greater then ' + sum + '$');
+            showErrorMessage('The bid must be greater then ' + sum + '$');
         }
         else{
+            setIsErrorMessage(false);
+            setIsTimeRaise(true);
+            setTimeout(()=>setIsTimeRaise(false), 1000);
             client.current.sendMessage('/app/play/'+auction.id, JSON.stringify({username: currentUser.username, amount: bidAmount}));
         }
+        bidInput.current.value = '';
     }
 
     const handleSendMessage = (message) => {
@@ -204,7 +212,7 @@ const Auction = (props) => {
     useEffect(() => {
         AuctionService.getAuction(props.match.params.id).then(
             (response) => {
-                console.log(response.data)
+                console.log('Auction',response.data)
                 setCreator(response.data.creator);
                 setIsSubscribed(response.data.subscribedUsers.some(user=>user.id === currentUser.id));
                 setMembers(response.data.subscribedUsers);
@@ -221,6 +229,7 @@ const Auction = (props) => {
                         break;
                     case 'FINISHED':
                         setStatus(response.data.status);
+                        setFinishTime(response.data.endDateTime);
                         break;
                 }
                 setAuction({...response.data, beginDateTime: parseAuctionDate(response.data.beginDateTime)});
@@ -235,7 +244,7 @@ const Auction = (props) => {
                     extraTime: response.data.extraTime,
                     status: response.data.status
                 });
-                getLots(response.data.id);
+                setLots(response.data.lots);
                 AuctionService.getAuctionLogs(response.data.id).then(
                     response => setLogs(response.data)
                 );
@@ -257,7 +266,7 @@ const Auction = (props) => {
         AuctionService.setStatusWaiting(auction.id).then(()=>{
             setIsModalStartCountDown(false);
             syncState(auction.id);
-        }).catch((error)=>{setErrorMessage(null);setErrorMessage(error.response.data.message)});
+        }).catch((error)=>{showErrorMessage(error.response.data.message)});
     }
 
     const setDefaultLotValues = (currentLot) => {
@@ -320,7 +329,7 @@ const Auction = (props) => {
         if (form.checkValidity() === false) {
             setValidated(true);
         } else {
-            AuctionService.updateAuction(aucValues).then(() => setOnEdit(false));
+            AuctionService.updateAuction(aucValues).then(() => setOnEdit(false), (error) => showErrorMessage(error.response.data.message));
         }
         event.preventDefault();
         event.stopPropagation();
@@ -339,6 +348,28 @@ const Auction = (props) => {
         animateScroll.scrollToBottom({
             containerId: "messageList"
         });
+    }
+
+    const parseTimeRaise = (inputTime) => {
+        console.log(inputTime)
+        let result = '';
+        const parts = inputTime.split(':');
+        if(parts[0] !== '00'){
+            result += parts[0] + 'h ';
+        }
+        if(parts[1] !== '00'){
+            result += parts[1] + 'm ';
+        }
+        if(parts[2] !== '00'){
+            result += parts[2] + 's ';
+        }
+        return result;
+    }
+
+    const showErrorMessage = (message) => {
+        setErrorMessage(message);
+        setIsErrorMessage(false);
+        setTimeout(()=>setIsErrorMessage(true), 10);
     }
 
     return (
@@ -363,6 +394,8 @@ const Auction = (props) => {
                                             <Form.Control.Feedback type="invalid">
                                                 The value cannot be empty
                                             </Form.Control.Feedback>
+                                            {isErrorMessage  && <p className='text-danger responseText'
+                                                style={{margin: '0', fontSize: '14px'}}>{errorMessage}</p>}
                                         </Form.Group>
                                         :
                                         <h3><FontAwesomeIcon icon={faArrowLeft} color="#FFCA2C" size="sm"
@@ -441,8 +474,18 @@ const Auction = (props) => {
                                     {status === 'RUNNING' &&
                                         <>
                                             <h5 className='basicAnim'>Lot is over in</h5>
-                                            {strTimer ? <h1>{strTimer}</h1> :
-                                                <Spinner animation="border" role="status"/>}
+                                            <div>
+                                                <div style={{width: '30%', display: 'inline-block'}}/>
+                                                <div style={{width: '40%', display: 'inline-block'}}>
+                                                    {strTimer ? <h1>{strTimer} </h1> :
+                                                        <Spinner animation="border" role="status"/>}
+                                                </div>
+                                                <div style={{width: '30%', display: 'inline-block', textAlign: 'left'}}>
+                                                    {isTimeRaise && <span
+                                                        style={{fontSize: '18px', color: '#00AA8D', fontWeight: 'bold'}}
+                                                        className='timeRaiseAnim'>+{parseTimeRaise(auction.extraTime)}</span>}
+                                                </div>
+                                            </div>
                                         </>
                                     }
                                     {status === 'FINISHED' &&
@@ -452,7 +495,7 @@ const Auction = (props) => {
                                         </>
                                     }
                                     <div className="mt-1">
-                                        <LotCarousel lots={status === 'RUNNING' ? carouselCurrentLot : lots} status={status}/>
+                                        <LotCarousel lots={status === 'RUNNING' ? carouselCurrentLot : lots} status={status} auction={auction} parseTimeRaise={parseTimeRaise} errorPictureURL={errorPictureURL}/>
                                     </div>
                                     <div className="mt-1">
                                         {status === 'DRAFT' && (!onEdit &&
@@ -461,21 +504,33 @@ const Auction = (props) => {
                                                     onClick={() => setIsModalStartCountDown(true)}>
                                                 Start countdown
                                             </Button>)}
+                                        {(status === 'WAITING' && auction.tags.length > 0) &&
+                                            <div>
+                                                <h5>Tags</h5>
+                                                <div>
+                                                    {auction.tags.map(tag =>
+                                                        <div className='tagWrapper'>
+                                                            <span style={{borderBottom: '2px solid '+ getColor(tag.categoryId)}}>{tag.name}</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>}
                                     </div>
                                     {status === 'RUNNING' &&
                                     <div className='basicAnim' style={{marginTop: "10px"}}>
                                         <h5>Current price</h5>
-                                        <h1>{currentPrice}$ <span style={{fontSize: '20px', color: 'green'}}>(+{currentPrice-carouselCurrentLot[0].minPrice}$)</span></h1>
+                                        <h1>{currentPrice}$ <span style={{fontSize: '20px', color: '#00AA8D'}}>(+{currentPrice-carouselCurrentLot[0].minPrice}$)</span></h1>
 
                                         {isSubscribed &&
                                         <div style={{padding: '5px'}}>
                                             <div style={{height: '62px'}}>
                                                 <InputGroup>
-                                                    <FormControl aria-label="Amount (to the nearest dollar)"
+                                                    <FormControl aria-label="Amount (to the nearest dollar)" ref={bidInput}
+                                                                 onKeyDown={(e) => e.key === 'Enter' && handleSendBid()}
                                                                  placeholder="Enter the amount" onChange={onBidChange} type='number'/>
                                                     <InputGroup.Text>$</InputGroup.Text>
                                                 </InputGroup>
-                                                {errorMessage &&
+                                                {isErrorMessage &&
                                                 <p className='text-danger responseText'>{errorMessage}</p>}
                                             </div>
                                             <Button onClick={handleSendBid} variant="warning"
@@ -490,9 +545,9 @@ const Auction = (props) => {
                             <Col xs={12} md={4}>
                                 <div>
                                     {(status === 'DRAFT' && auction.id) ?
-                                        <Categories auction={auction}/>
+                                        <Categories auction={auction} getColor={getColor}/>
                                         :
-                                        <div className="auctionBlock" style={{height: "618px", backgroundColor: '#E6EBEE'}}>
+                                        <div className="auctionBlock" style={{height: "640px", backgroundColor: '#E6EBEE'}}>
                                             <Tabs defaultActiveKey="chat" id="chatTabs" className="mb-3">
                                                 <Tab eventKey="chat" title="Chat" onClick={()=>scrollToBottom()}>
                                                     <Chat user={currentUser} messages={chatMessages} handleChatMessage={handleSendMessage}/>
@@ -528,9 +583,9 @@ const Auction = (props) => {
                             {lots.map(lot =>
                                 <div key={lot.id} className="auctionBlock mt-4" style={{height: "300px"}}>
                                     <div style={{width: "30%", display: "inline-block"}}>
-                                        <img alt="No image" src={lot.pictureLink}
+                                        <img alt="No image" src={lot.pictureLink ? lot.pictureLink : errorPictureURL}
                                              style={{width: "100%", maxHeight: "260px", objectFit: "cover"}}
-                                        onError={(e)=>e.target.src='https://st3.depositphotos.com/23594922/31822/v/600/depositphotos_318221368-stock-illustration-missing-picture-page-for-website.jpg'}/>
+                                        onError={(e)=>e.target.src=errorPictureURL}/>
                                     </div>
 
                                     <div style={{width: "70%", float: "right", padding: "20px"}}>

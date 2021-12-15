@@ -7,6 +7,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import ru.netcracker.backend.service.MessageService;
 import ru.netcracker.backend.service.NotificationService;
+import ru.netcracker.backend.service.TransactionService;
 
 @Configuration
 @EnableScheduling
@@ -14,11 +15,13 @@ import ru.netcracker.backend.service.NotificationService;
 public class Schedule {
     private final MessageService messageService;
     private final NotificationService notificationService;
+    private final TransactionService transactionService;
 
     @Autowired
-    public Schedule(MessageService messageService, NotificationService notificationService){
+    public Schedule(MessageService messageService, NotificationService notificationService, TransactionService transactionService){
         this.messageService=messageService;
         this.notificationService=notificationService;
+        this.transactionService = transactionService;
     }
 
     @Scheduled(cron = "${Auckland.schedule.deleteMessages.cron}")
@@ -31,5 +34,11 @@ public class Schedule {
     public void checkNotification(){
         notificationService.deleteOldNotifications();
         log.info("Old notifications are removed");
+    }
+
+    @Scheduled(cron = "${Auckland.schedule.checkTransactions.cron}")
+    public void checkTransactions() {
+        transactionService.deleteTransactionIfExpired();
+        log.info("Check transactions for expiration");
     }
 }

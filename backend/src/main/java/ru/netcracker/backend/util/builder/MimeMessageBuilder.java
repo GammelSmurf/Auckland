@@ -61,8 +61,12 @@ public class MimeMessageBuilder {
         helper.setFrom(fromAddress, senderName);
         helper.setTo(toAddress);
         helper.setSubject(subject);
-        content = content.replace("[[name]]", username);
-        content = content.replace("[[URL]]", methodURL);
+        if (username != null) {
+            content = content.replace("[[name]]", username);
+        }
+        if (methodURL != null) {
+            content = content.replace("[[URL]]", methodURL);
+        }
 
         helper.setText(content, true);
         return message;

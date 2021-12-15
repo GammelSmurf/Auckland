@@ -19,4 +19,8 @@ public interface LotService {
     List<LotResponse> getLotsWonAndTransferred();
 
     List<LotResponse> getLotsWonAndNotTransferred();
+    
+    LotResponse confirmLotTransfer(Long lotId);
+
+    LotResponse confirmLotAcceptance(Long lotId);
 }

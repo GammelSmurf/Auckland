@@ -22,6 +22,12 @@ public class LotResponse {
     private Boolean finished;
     private UserResponse winner;
 
+    private boolean transferred;
+    private boolean buyerAcceptConfirmation;
+    private boolean sellerTransferConfirmation;
+
+    private boolean canceled;
+
     @JsonLocalDateTime
     private LocalDateTime endDateTime;
 }

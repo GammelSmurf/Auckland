@@ -2,17 +2,21 @@ package ru.netcracker.backend.service.impl;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.netcracker.backend.exception.lot.LotNotFoundException;
 import ru.netcracker.backend.model.entity.Lot;
-import ru.netcracker.backend.repository.AuctionRepository;
-import ru.netcracker.backend.repository.LotRepository;
+import ru.netcracker.backend.model.entity.TransactionStatus;
 import ru.netcracker.backend.model.responses.LotResponse;
+import ru.netcracker.backend.repository.LotRepository;
+import ru.netcracker.backend.repository.TransactionRepository;
 import ru.netcracker.backend.service.LotService;
 import ru.netcracker.backend.util.LotUtil;
 import ru.netcracker.backend.util.SecurityUtil;
+import ru.netcracker.backend.util.component.email.EmailSender;
 
+import javax.mail.MessagingException;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -21,11 +25,15 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class LotServiceImpl implements LotService {
     private final LotRepository lotRepository;
+    private final TransactionRepository transactionRepository;
+    private final EmailSender emailSender;
     private final ModelMapper modelMapper;
 
     @Autowired
-    public LotServiceImpl(LotRepository lotRepository, AuctionRepository auctionRepository, ModelMapper modelMapper) {
+    public LotServiceImpl(LotRepository lotRepository, TransactionRepository transactionRepository, EmailSender emailSender, ModelMapper modelMapper) {
         this.lotRepository = lotRepository;
+        this.transactionRepository = transactionRepository;
+        this.emailSender = emailSender;
         this.modelMapper = modelMapper;
     }
 
@@ -47,7 +55,7 @@ public class LotServiceImpl implements LotService {
     public LotResponse updateLot(Long lotId, Lot newLot) {
         Lot oldLot = lotRepository
                 .findById(lotId)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(LotUtil.LOT_NOT_FOUND_MSG_TEMPLATE, lotId)));
+                .orElseThrow(() -> new LotNotFoundException(lotId));
         oldLot.setName(newLot.getName());
         oldLot.setDescription(newLot.getDescription());
         oldLot.setMinPrice(newLot.getMinPrice());
@@ -87,5 +95,45 @@ public class LotServiceImpl implements LotService {
         return lotRepository.findAllByWinner_UsernameAndTransferred(SecurityUtil.getUsernameFromSecurityCtx(), transferred).stream()
                 .map(lot -> modelMapper.map(lot, LotResponse.class))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public LotResponse confirmLotTransfer(Long lotId) {
+        Lot lot = lotRepository
+                .findById(lotId)
+                .orElseThrow(() -> new LotNotFoundException(lotId));
+        LotUtil.validateBeforeConfirmationLotTransfer(lot);
+        lot.confirmSellerTransfer();
+        makeTransactionDoneIfTransferredAndGiveMoneyToSeller(lot);
+        return modelMapper.map(lotRepository.save(lot), LotResponse.class);
+    }
+
+    @Override
+    @Transactional
+    public LotResponse confirmLotAcceptance(Long lotId) {
+        Lot lot = lotRepository
+                .findById(lotId)
+                .orElseThrow(() -> new LotNotFoundException(lotId));
+        LotUtil.validateBeforeConfirmationLotAccept(lot);
+        lot.confirmBuyerAccept();
+        makeTransactionDoneIfTransferredAndGiveMoneyToSeller(lot);
+        return modelMapper.map(lotRepository.save(lot), LotResponse.class);
+    }
+
+    private void makeTransactionDoneIfTransferredAndGiveMoneyToSeller(Lot lot) {
+        if (lot.isTransferred()) {
+            transactionRepository.findByLot(lot).ifPresent(tx -> {
+                tx.setTransactionStatus(TransactionStatus.DONE);
+                lot.getAuction().getCreator().addMoney(tx.getAmount());
+                transactionRepository.save(tx);
+                try {
+                    emailSender.createAndSendBuyerTransactionDoneEmail(tx.getBuyer());
+                    emailSender.createAndSendSellerTransactionDoneEmail(tx.getAuctionCreator(), tx);
+                } catch (MessagingException | UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
     }
 }

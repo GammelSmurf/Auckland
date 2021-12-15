@@ -29,6 +29,10 @@ public class Lot {
 
     private boolean finished = false;
     private boolean transferred = false;
+    private boolean buyerAcceptConfirmation = false;
+    private boolean sellerTransferConfirmation = false;
+
+    private boolean canceled = false;
 
     @OneToOne(mappedBy = "lot")
     private Bid bid;
@@ -45,4 +49,20 @@ public class Lot {
     @JoinColumn(name = "auction_id", nullable = false)
     @JsonBackReference
     private Auction auction;
+
+    public void confirmBuyerAccept() {
+        this.setBuyerAcceptConfirmation(true);
+        checkAndMakeTransferred();
+    }
+
+    public void confirmSellerTransfer() {
+        this.setSellerTransferConfirmation(true);
+        checkAndMakeTransferred();
+    }
+
+    public void checkAndMakeTransferred() {
+        if (this.buyerAcceptConfirmation && this.sellerTransferConfirmation) {
+            this.transferred = true;
+        }
+    }
 }

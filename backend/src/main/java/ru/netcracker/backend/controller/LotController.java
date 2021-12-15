@@ -48,6 +48,16 @@ public class LotController {
         return lotService.getLotsWonAndNotTransferred();
     }
 
+    @PostMapping("/confirm/transfer/{lotId}")
+    public LotResponse confirmLotTransfer(@PathVariable(name = "lotId") Long lotId) {
+        return lotService.confirmLotTransfer(lotId);
+    }
+
+    @PostMapping("/confirm/accept/{lotId}")
+    public LotResponse confirmLotAcceptance(@PathVariable(name = "lotId") Long lotId) {
+        return lotService.confirmLotAcceptance(lotId);
+    }
+
     @PostMapping
     public ResponseEntity<LotResponse> createLot(@Valid @RequestBody LotRequest lotRequest) {
         LotResponse lotResponse = lotService.createLot(

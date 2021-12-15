@@ -20,9 +20,12 @@ import ru.netcracker.backend.service.LogService;
 import ru.netcracker.backend.service.NotificationService;
 import ru.netcracker.backend.util.BidUtil;
 import ru.netcracker.backend.util.SecurityUtil;
+import ru.netcracker.backend.util.component.email.EmailSender;
 import ru.netcracker.backend.util.enumiration.LogLevel;
 import ru.netcracker.backend.util.enumiration.NotificationLevel;
 
+import javax.mail.MessagingException;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -38,17 +41,19 @@ public class BidServiceImpl implements BidService {
     private final TransactionRepository transactionRepository;
     private final LogService logService;
     private final NotificationService notificationService;
+    private final EmailSender emailSender;
     private final ModelMapper modelMapper;
 
     @Autowired
     public BidServiceImpl(BidRepository bidRepository, UserRepository userRepository, AuctionRepository auctionRepository,
-                          TransactionRepository transactionRepository, LogService logService, NotificationService notificationService, ModelMapper modelMapper) {
+                          TransactionRepository transactionRepository, LogService logService, NotificationService notificationService, EmailSender emailSender, ModelMapper modelMapper) {
         this.bidRepository = bidRepository;
         this.userRepository = userRepository;
         this.auctionRepository = auctionRepository;
         this.transactionRepository = transactionRepository;
         this.logService = logService;
         this.notificationService = notificationService;
+        this.emailSender = emailSender;
         this.modelMapper = modelMapper;
     }
 
@@ -176,7 +181,15 @@ public class BidServiceImpl implements BidService {
     private void freezeLastTransaction(Auction auction) {
         auction.getCurrentBid().getTransactions().stream()
                 .max(Comparator.comparing(Transaction::getDateTime))
-                .ifPresent(tx -> tx.setTransactionStatus(TransactionStatus.FROZEN));
+                .ifPresent(tx -> {
+                    tx.setTransactionStatus(TransactionStatus.FROZEN);
+                    try {
+                        emailSender.createAndSendLotWonEmail(tx.getBuyer(), tx.getLot());
+                        emailSender.createAndSendLotSoldEmail(tx.getAuctionCreator(), tx.getLot());
+                    } catch (MessagingException | UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+                });
     }
 
     private void refundMoneyAndDeleteAllTransactionsForBidExceptFrozen(Auction auction) {

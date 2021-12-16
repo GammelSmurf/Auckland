@@ -151,12 +151,17 @@ const Auction = (props) => {
             scrollToBottom();
         }
         if(response.amount){
+            changeUserBalance(response.remainingUserMoney);
             setCurrentPrice(response.amount);
             activateTimer(response.secondsUntil, auction.id);
         }
         if(response.message && !response.username){
             setLogs(logs.concat(response));
         }
+    }
+
+    const changeUserBalance = (currentBalance) => {
+        localStorage.setItem("user", JSON.stringify({...currentUser, money: currentBalance}));
     }
 
     const onBidChange = (e) => {
@@ -351,7 +356,6 @@ const Auction = (props) => {
     }
 
     const parseTimeRaise = (inputTime) => {
-        console.log(inputTime)
         let result = '';
         const parts = inputTime.split(':');
         if(parts[0] !== '00'){

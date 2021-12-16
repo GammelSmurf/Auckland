@@ -4,6 +4,8 @@ import {Navbar, Nav, Container} from 'react-bootstrap';
 import SockJsClient from "react-stomp";
 import Notifications from "./Notifications";
 import UserService from "../services/UserService";
+import {faUser} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 const MyNavBar = (props) => {
     const [notifications, setNotifications] = useState([]);
@@ -44,6 +46,9 @@ const MyNavBar = (props) => {
                             <Nav.Link href="/home">Home</Nav.Link>
                             <Nav.Link href="/auctions">Auctions</Nav.Link>
                             {currentUser.roles.includes('ADMIN') && <Nav.Link href="/users">Users</Nav.Link>}
+                            <Nav.Link href={"/profile/" + currentUser.username}>
+                                <FontAwesomeIcon icon={faUser} size="sm" /> {currentUser.username}
+                            </Nav.Link>
                             <Nav.Link href="/auth/signin" onClick={logOut}>Logout</Nav.Link>
                         </Nav>
                     </Navbar.Collapse>

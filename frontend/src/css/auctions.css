@@ -1,5 +1,6 @@
 .toolkit button {
-    margin-left: 20px;
+    margin-left: 5px;
+    margin-bottom: 5px;
     font-weight: 500;
 }
 
@@ -13,7 +14,11 @@
         width: 300%;
     }
     to {
-        margin-left: 0%;
+        margin-left: 0;
         width: 100%;
     }
+}
+
+.css-1r4vtzz, .css-48ayfv {
+    border: 1px solid #FFC107 !important;
 }

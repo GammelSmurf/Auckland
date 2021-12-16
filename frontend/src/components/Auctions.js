@@ -2,15 +2,14 @@ import React, {useEffect, useState} from "react";
 import {Button} from 'react-bootstrap';
 import AuctionService from "../services/AuctionService";
 import BootStrapTable from 'react-bootstrap-table-next';
-import ToolkitProvider,{Search} from 'react-bootstrap-table2-toolkit';
 import AuthService from "../services/AuthService";
 import ModalDialog from "./ModalDialog";
 import LotService from "../services/LotService";
+import AuctionsToolkit from "./AuctionsToolkit";
 
 const Auctions = (props) => {
     const [data, setData] = useState([]);
     const [isModalAddActive, setIsModalAddActive] = useState(false);
-    const {SearchBar} = Search;
     const currentUser = AuthService.getCurrentUser();
 
     const defAucValues = {
@@ -46,20 +45,31 @@ const Auctions = (props) => {
         return dateTimeFormat(dateTime);
     }
 
+    const parseAuctionFields = (inputData) => {
+        let result = []
+        inputData.forEach(item => {
+            result.push(
+                {
+                    id: item.id,
+                    name: item.name,
+                    beginDateTime: parseDateInfo(item.beginDateTime),
+                    participants: item.usersCountLimit,
+                    likesCount: item.userLikesCount,
+                    subscribedUsersCount: item.subscribedUsersCount,
+                    status: item.status,
+                    creatorUsername: item.creator.username
+                }
+            )
+        });
+        return result;
+    }
+
     useEffect(() => {
-        AuctionService.getAllAuctions().then(
+        /*AuctionService.getAllAuctions().then(
             (response) => {
-                let dataPrev = [];
-                response.data.content.forEach(item => {
-                    dataPrev.push(
-                        {
-                            id: item.id, name: item.name, beginDateTime: parseDateInfo(item.beginDateTime), participants: item.usersCountLimit, likesCount: item.userLikesCount, subscribedUsersCount: item.subscribedUsersCount, status: item.status
-                        }
-                    )
-                })
-                setData(dataPrev);
+                setData(parseAuctionFields(response.data.content));
             }
-        );
+        );*/
     }, []);
 
     const participantsFormatter = (cell, row) => {
@@ -69,34 +79,25 @@ const Auctions = (props) => {
     }
 
     const columns = [{
-        dataField: 'id',
-        text: 'id',
-        sort: true
-    },{
         dataField: 'name',
-        text: 'Auctions name',
-        sort: true
+        text: 'Auctions name'
+    }, {
+        dataField: 'creatorUsername',
+        text: 'Creator'
     }, {
         dataField: 'beginDateTime',
-        text: 'Start',
-        sort: true
+        text: 'Start'
     }, {
         dataField: 'participants',
         text: 'Participants',
-        formatter: participantsFormatter,
-        sort: true
-    }, {
-        dataField: 'userLikesCount',
-        text: 'Likes',
-        sort: true
+        formatter: participantsFormatter
     }, {
         dataField: 'status',
-        text: 'Status',
-        sort: true
+        text: 'Status'
     }];
 
     const rowEvents = {
-        onClick: (e, row, rowIndex) => {
+        onClick: (e, row) => {
             props.history.push("/auctions/" + row.id)
         }
     };
@@ -116,27 +117,16 @@ const Auctions = (props) => {
     return (
         <div className="container">
             <div className="wrapper">
-                <ToolkitProvider
-                    keyField="id"
-                    data={ data }
-                    columns={ columns }
-                    search
-                >
-                    {
-                        props =>
-                            <div>
-                                <div className="toolkit">
-                                    <SearchBar { ...props.searchProps } srText=""/>
-                                    <Button variant={"warning"} onClick={() => setIsModalAddActive(true)} style={{marginBottom: "4px"}}>
-                                        Create auction
-                                    </Button>
-                                </div>
-                                <BootStrapTable keyField='id'  {...props.baseProps} hover bordered={ false } rowEvents={ rowEvents }
-                                                noDataIndication={() => <p>Table is empty</p>}/>
-                            </div>
-
-                    }
-                </ToolkitProvider>
+                <div>
+                    <div className="toolkit">
+                        <Button variant={"warning"} onClick={() => setIsModalAddActive(true)}>
+                            Create auction
+                        </Button>
+                    </div>
+                    <AuctionsToolkit setData={(inputData)=>setData(parseAuctionFields(inputData))}/>
+                    <BootStrapTable keyField='id'  {...props.baseProps} hover bordered={ false } rowEvents={ rowEvents } data={data} columns={columns}
+                                    noDataIndication={() => <p>Table is empty</p>}/>
+                </div>
             </div>
             <ModalDialog show={isModalAddActive} hide={handleModalAddClose} title={"New auction"} body={"Do you really want to create new auction? You will be redirected to auction draft..."} action={createAuction}/>
         </div>

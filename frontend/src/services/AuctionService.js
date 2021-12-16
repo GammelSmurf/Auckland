@@ -109,12 +109,11 @@ const removeCategory = (values) => {
         });
 }
 
-const searchAuctions = (filterList, sortList) => {
+const searchAuctions = (values) => {
     return axios
-        .post(API_URL + 'search', {
-            filterList: filterList,
-            sortList: sortList
-        }, {params:{page: 0, size: 10},headers: authHeader()})
+        .post(API_URL + 'search',
+            values
+        , {params:{page: 0, size: 10},headers: authHeader()})
         .then(response => {
             return response
         });

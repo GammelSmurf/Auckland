@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {Route, Switch, withRouter, Redirect,matchPath} from 'react-router-dom';
 import Home from './components/Home';
 import Login from "./components/Login";
@@ -15,6 +15,7 @@ import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
 import Register from "./components/Register";
 import Auction from "./components/Auction";
 import Users from "./components/Users";
+import Profile from "./components/Profile";
 
 const App = withRouter((props)=> {
     const isAuthenticated = AuthService.isAuthenticated();
@@ -34,7 +35,7 @@ const App = withRouter((props)=> {
   return (
       <div>
 
-          {(isAuthenticated && (props.location.pathname === '/home' || props.location.pathname === '/auctions' || matchPath(props.location.pathname, { path: '/auctions/:id' }) || props.location.pathname === '/users')) && <NavBar history={props.history}/>}
+          {(isAuthenticated && (props.location.pathname === '/home' || props.location.pathname === '/auctions' || matchPath(props.location.pathname, { path: '/auctions/:id' }) || props.location.pathname === '/users' || matchPath(props.location.pathname, { path: '/profile/:username' }))) && <NavBar history={props.history}/>}
         <div>
           <Switch>
               <PrivateRoute path='/home' exact={true} component={Home}/>
@@ -42,6 +43,7 @@ const App = withRouter((props)=> {
               <Route path='/auth/signup' exact={true} component={Register}/>
               <PrivateRoute path='/auctions' exact={true} component={Auctions}/>
               <PrivateRoute path='/auctions/:id' exact={true} component={Auction}/>
+              <PrivateRoute path='/profile/:username' exact={true} component={Profile}/>
               <PrivateRoute path='/users' exact={true} component={Users}/>
               <Route component={GenericNotFound} />
           </Switch>

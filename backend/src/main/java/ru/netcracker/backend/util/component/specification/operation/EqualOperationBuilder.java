@@ -1,7 +1,6 @@
 package ru.netcracker.backend.util.component.specification.operation;
 
 import ru.netcracker.backend.model.entity.*;
-import ru.netcracker.backend.repository.AuctionRepository;
 import ru.netcracker.backend.util.SecurityUtil;
 import ru.netcracker.backend.util.component.specification.Filter;
 import ru.netcracker.backend.util.component.specification.PredicateData;
@@ -30,11 +29,11 @@ public class EqualOperationBuilder extends OperationBuilder {
     }
 
     private Predicate formatOtherPredicate() {
-        return getBuilder().or(ifCreatorPredicate().not(), ifSubscribedPredicate().not(), ifStatusDraft().not());
+        return and(ifStatusDraft().not(), ifCreatorPredicate().not(), or(ifSubscribedPredicate().not(), ifSubscribedPredicateNull()));
     }
 
     private Predicate ifCreatorPredicate() {
-        return equals(getRoot().join(Auction_.creator).get(User_.username), SecurityUtil.getUsernameFromSecurityCtx());
+        return equals(getRoot().join(Auction_.creator, JoinType.LEFT).get(User_.username), SecurityUtil.getUsernameFromSecurityCtx());
     }
 
     private Predicate ifStatusDraft() {
@@ -42,7 +41,15 @@ public class EqualOperationBuilder extends OperationBuilder {
     }
 
     private Predicate ifSubscribedPredicate() {
-        return equals(getRoot().join(Auction_.subscribedUsers, JoinType.LEFT).get(User_.username), SecurityUtil.getUsernameFromSecurityCtx());
+        return equals(getJoinSubscribed(), SecurityUtil.getUsernameFromSecurityCtx());
+    }
+
+    private Predicate ifSubscribedPredicateNull() {
+        return getJoinSubscribed().isNull();
+    }
+
+    private Path<String> getJoinSubscribed() {
+        return getRoot().join(Auction_.subscribedUsers, JoinType.LEFT).get(User_.username);
     }
 
     private Predicate equalsWithOrPredicateOnValues() {
@@ -65,13 +72,5 @@ public class EqualOperationBuilder extends OperationBuilder {
         return getFilter().isOrPredicate()
                 ? getBuilder().or(formatPredicateArray())
                 : getBuilder().and(formatPredicateArray());
-    }
-
-    private Predicate equals(Expression<?> var1, Object var2) {
-        return getBuilder().equal(var1, var2);
-    }
-
-    private Predicate equals(Path<?> var1, Object var2) {
-        return getBuilder().equal(var1, var2);
     }
 }

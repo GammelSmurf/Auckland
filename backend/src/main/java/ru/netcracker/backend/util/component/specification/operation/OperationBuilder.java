@@ -47,4 +47,20 @@ public abstract class OperationBuilder {
     protected Predicate[] formatPredicateArray() {
         return getPredicateList().toArray(new Predicate[0]);
     }
+
+    protected Predicate and(Predicate var1, Predicate var2) {
+        return getBuilder().and(var1, var2);
+    }
+
+    protected Predicate and(Predicate var1, Predicate var2, Predicate var3) {
+        return getBuilder().and(var1, var2, var3);
+    }
+
+    protected Predicate or(Predicate var1, Predicate var2) {
+        return getBuilder().or(var1, var2);
+    }
+
+    protected Predicate equals(Path<?> var1, Object var2) {
+        return getBuilder().equal(var1, var2);
+    }
 }

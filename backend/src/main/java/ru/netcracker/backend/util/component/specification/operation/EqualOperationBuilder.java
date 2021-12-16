@@ -16,15 +16,24 @@ public class EqualOperationBuilder extends OperationBuilder {
 
     @Override
     public Predicate build() {
-        switch (getFilter().getProperty()) {
-            case "subscriber":
-                return ifSubscribedPredicate();
-            case "creator":
-                return ifCreatorPredicate();
-            case "other":
-                return formatOtherPredicate();
-            default:
-                return equalsWithOrPredicateOnValues();
+        return equalsWithOrPredicateOnValues();
+    }
+
+    private void formatSpecialPredicate() {
+        for (String value : getFilter().getValues()) {
+            switch (value) {
+                case "subscriber":
+                    getPredicateList().add(ifSubscribedPredicate());
+                    break;
+                case "creator":
+                    getPredicateList().add(ifCreatorPredicate());
+                    break;
+                case "other":
+                    getPredicateList().add(formatOtherPredicate());
+                    break;
+                default:
+                    throw new IllegalArgumentException("Special values are incorrect");
+            }
         }
     }
 
@@ -63,6 +72,9 @@ public class EqualOperationBuilder extends OperationBuilder {
                     break;
                 case "categories":
                     getPredicateList().add(equals(getRoot().join(Auction_.categories).get(Category_.name), value));
+                    break;
+                case "special":
+                    formatSpecialPredicate();
                     break;
                 default:
                     getPredicateList().add(equals(getRoot().get(getFilter().getProperty()), value));

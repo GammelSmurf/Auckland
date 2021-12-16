@@ -1,28 +1,44 @@
 package ru.netcracker.backend.util.component.specification.operation;
 
+import ru.netcracker.backend.model.entity.Auction_;
 import ru.netcracker.backend.util.component.specification.Filter;
 import ru.netcracker.backend.util.component.specification.PredicateData;
 
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Predicate;
 
-public class LikeOperationBuilder extends OperationBuilder{
+public class LikeOperationBuilder extends OperationBuilder {
     public LikeOperationBuilder(Filter filter, PredicateData data) {
         super(filter, data);
     }
 
     @Override
     public Predicate build() {
-        for (String value : getFilter().getValues()) {
-            getPredicateList().add(like(getConcatExpression(), generateValue(value)));
+        if (getFilter().getProperty().equals("nameAndDescription")) {
+            addNameAndPropertyExpressionsToPredicateList();
+        } else {
+            addAnotherExpressionsToPredicateList();
         }
         return getFilter().isOrPredicate()
                 ? getBuilder().or(formatPredicateArray())
                 : getBuilder().and(formatPredicateArray());
     }
 
-    private Expression<String> getConcatExpression() {
-        return getBuilder().lower(getRoot().get(getFilter().getProperty()));
+    private void addAnotherExpressionsToPredicateList() {
+        for (String value : getFilter().getValues()) {
+            getPredicateList().add(like(getConcatExpression(getFilter().getProperty()), generateValue(value)));
+        }
+    }
+
+    private void addNameAndPropertyExpressionsToPredicateList() {
+        for (String value : getFilter().getValues()) {
+            getPredicateList().add(like(getRoot().get(Auction_.name), generateValue(value)));
+            getPredicateList().add(like(getRoot().get(Auction_.description), generateValue(value)));
+        }
+    }
+
+    private Expression<String> getConcatExpression(String property) {
+        return getBuilder().lower(getRoot().get(property));
     }
 
     private String generateValue(String value) {

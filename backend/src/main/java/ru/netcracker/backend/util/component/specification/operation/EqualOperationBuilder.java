@@ -20,7 +20,7 @@ public class EqualOperationBuilder extends OperationBuilder {
     public Predicate build() {
         switch (getFilter().getProperty()) {
             case "subscriber":
-                return equals(getRoot().join(Auction_.subscribedUsers).get(User_.username), SecurityUtil.getUsernameFromSecurityCtx());
+                return ifSubscribedPredicate();
             case "creator":
                 return ifCreatorPredicate();
             case "other":
@@ -31,7 +31,7 @@ public class EqualOperationBuilder extends OperationBuilder {
     }
 
     private Predicate formatOtherPredicate() {
-        return getBuilder().or(getBuilder().and(ifCreatorPredicate(), ifStatusDraft()), getBuilder().not(ifStatusDraft()));
+        return getBuilder().not(getBuilder().or(ifSubscribedPredicate(), ifCreatorPredicate(), ifStatusDraft()));
     }
 
     private Predicate ifCreatorPredicate() {
@@ -40,6 +40,10 @@ public class EqualOperationBuilder extends OperationBuilder {
 
     private Predicate ifStatusDraft() {
         return equals(getRoot().get(Auction_.status), AuctionStatus.DRAFT);
+    }
+
+    private Predicate ifSubscribedPredicate() {
+        return equals(getRoot().join(Auction_.subscribedUsers).get(User_.username), SecurityUtil.getUsernameFromSecurityCtx());
     }
 
     private Predicate equalsWithOrPredicateOnValues() {

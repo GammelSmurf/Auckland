@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Getter
@@ -14,5 +15,6 @@ public class JwtResponse {
     private String token;
     private final String type = "Bearer";
     private String username;
+    private BigDecimal money;
     private List<String> roles;
 }

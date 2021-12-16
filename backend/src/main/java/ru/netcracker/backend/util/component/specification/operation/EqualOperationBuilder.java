@@ -22,12 +22,24 @@ public class EqualOperationBuilder extends OperationBuilder {
             case "subscriber":
                 return equals(getRoot().join(Auction_.subscribedUsers).get(User_.username), SecurityUtil.getUsernameFromSecurityCtx());
             case "creator":
-                return equals(getRoot().join(Auction_.creator).get(User_.username), SecurityUtil.getUsernameFromSecurityCtx());
+                return ifCreatorPredicate();
             case "other":
-                return getBuilder().not(equals(getRoot().get(Auction_.status), AuctionStatus.DRAFT));
+                return formatOtherPredicate();
             default:
                 return equalsWithOrPredicateOnValues();
         }
+    }
+
+    private Predicate formatOtherPredicate() {
+        return getBuilder().or(getBuilder().and(ifCreatorPredicate(), ifStatusDraft()), getBuilder().not(ifStatusDraft()));
+    }
+
+    private Predicate ifCreatorPredicate() {
+        return equals(getRoot().join(Auction_.creator).get(User_.username), SecurityUtil.getUsernameFromSecurityCtx());
+    }
+
+    private Predicate ifStatusDraft() {
+        return equals(getRoot().get(Auction_.status), AuctionStatus.DRAFT);
     }
 
     private Predicate equalsWithOrPredicateOnValues() {

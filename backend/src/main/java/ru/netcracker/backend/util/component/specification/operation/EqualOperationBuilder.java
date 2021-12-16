@@ -1,13 +1,12 @@
 package ru.netcracker.backend.util.component.specification.operation;
 
 import ru.netcracker.backend.model.entity.*;
+import ru.netcracker.backend.repository.AuctionRepository;
 import ru.netcracker.backend.util.SecurityUtil;
 import ru.netcracker.backend.util.component.specification.Filter;
 import ru.netcracker.backend.util.component.specification.PredicateData;
 
-import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.*;
 
 
 public class EqualOperationBuilder extends OperationBuilder {
@@ -31,7 +30,7 @@ public class EqualOperationBuilder extends OperationBuilder {
     }
 
     private Predicate formatOtherPredicate() {
-        return getBuilder().not(getBuilder().and(ifSubscribedPredicate(), ifCreatorPredicate(), ifStatusDraft()));
+        return getBuilder().or(ifCreatorPredicate().not(), ifSubscribedPredicate().not(), ifStatusDraft().not());
     }
 
     private Predicate ifCreatorPredicate() {
@@ -43,7 +42,7 @@ public class EqualOperationBuilder extends OperationBuilder {
     }
 
     private Predicate ifSubscribedPredicate() {
-        return equals(getRoot().join(Auction_.subscribedUsers).get(User_.username), SecurityUtil.getUsernameFromSecurityCtx());
+        return equals(getRoot().join(Auction_.subscribedUsers, JoinType.LEFT).get(User_.username), SecurityUtil.getUsernameFromSecurityCtx());
     }
 
     private Predicate equalsWithOrPredicateOnValues() {

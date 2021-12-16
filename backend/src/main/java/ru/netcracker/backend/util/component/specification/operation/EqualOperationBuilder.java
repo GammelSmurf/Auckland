@@ -31,7 +31,7 @@ public class EqualOperationBuilder extends OperationBuilder {
     }
 
     private Predicate formatOtherPredicate() {
-        return getBuilder().not(getBuilder().or(ifSubscribedPredicate(), ifCreatorPredicate(), ifStatusDraft()));
+        return getBuilder().not(getBuilder().and(ifSubscribedPredicate(), ifCreatorPredicate(), ifStatusDraft()));
     }
 
     private Predicate ifCreatorPredicate() {

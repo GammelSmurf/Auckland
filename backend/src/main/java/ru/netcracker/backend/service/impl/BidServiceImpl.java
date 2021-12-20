@@ -18,6 +18,7 @@ import ru.netcracker.backend.repository.UserRepository;
 import ru.netcracker.backend.service.BidService;
 import ru.netcracker.backend.service.LogService;
 import ru.netcracker.backend.service.NotificationService;
+import ru.netcracker.backend.service.UserService;
 import ru.netcracker.backend.util.component.BidUtil;
 import ru.netcracker.backend.util.component.email.EmailSender;
 import ru.netcracker.backend.util.enumiration.LogLevel;
@@ -40,19 +41,21 @@ public class BidServiceImpl implements BidService {
     private final TransactionRepository transactionRepository;
     private final LogService logService;
     private final NotificationService notificationService;
+    private final UserService userService;
     private final EmailSender emailSender;
     private final ModelMapper modelMapper;
     private final BidUtil bidUtil;
 
     @Autowired
     public BidServiceImpl(BidRepository bidRepository, UserRepository userRepository, AuctionRepository auctionRepository,
-                          TransactionRepository transactionRepository, LogService logService, NotificationService notificationService, EmailSender emailSender, ModelMapper modelMapper, BidUtil bidUtil) {
+                          TransactionRepository transactionRepository, LogService logService, NotificationService notificationService, UserService userService, EmailSender emailSender, ModelMapper modelMapper, BidUtil bidUtil) {
         this.bidRepository = bidRepository;
         this.userRepository = userRepository;
         this.auctionRepository = auctionRepository;
         this.transactionRepository = transactionRepository;
         this.logService = logService;
         this.notificationService = notificationService;
+        this.userService = userService;
         this.emailSender = emailSender;
         this.modelMapper = modelMapper;
         this.bidUtil = bidUtil;
@@ -72,7 +75,9 @@ public class BidServiceImpl implements BidService {
         Bid bid = formatBit(auction, user, amount);
         createTransaction(bid);
         logService.log(LogLevel.AUCTION_BET, bid.getAuction());
-        return modelMapper.map(bidRepository.save(bid), BidResponse.class);
+        bidRepository.save(bid);
+        userService.sendMoneyToWsByUser(user);
+        return modelMapper.map(bid, BidResponse.class);
     }
 
     private Bid formatBit(Auction auction, User user, BigDecimal amount) {
@@ -146,6 +151,7 @@ public class BidServiceImpl implements BidService {
             freezeLastTransaction(auction);
             deleteAllUnnecessaryWinnerTransactions(auction);
             refundMoneyAndDeleteAllTransactionsForBidExceptFrozen(auction);
+            userService.sendMoneyToWsByUser(auction.getCurrentBid().getUser());
             sendLotWonEmails(auction);
             bidRepository.delete(auction.getCurrentBid());
         }

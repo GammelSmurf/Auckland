@@ -9,13 +9,9 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.*;
-import ru.netcracker.backend.exception.ValidationException;
-import ru.netcracker.backend.model.entity.Message;
-import ru.netcracker.backend.model.requests.MessageRequest;
-import ru.netcracker.backend.model.responses.MessageResponse;
+import ru.netcracker.backend.model.requests.UserRequest;
 import ru.netcracker.backend.model.responses.NotificationResponse;
 import ru.netcracker.backend.model.responses.UserResponse;
-import ru.netcracker.backend.model.requests.UserRequest;
 import ru.netcracker.backend.service.NotificationService;
 import ru.netcracker.backend.service.UserService;
 
@@ -50,8 +46,7 @@ public class UserController {
     }
 
     @MessageMapping("/balance/{username}")
-    @SendTo("/auction/balance/{username}")
-    public BigDecimal sendToWsUserBalance(@DestinationVariable String username) {
-        return userService.getMoneyByUsername(username);
+    public void sendToWsUserBalance(@DestinationVariable String username) {
+        userService.sendMoneyToWsByUsername(username);
     }
 }

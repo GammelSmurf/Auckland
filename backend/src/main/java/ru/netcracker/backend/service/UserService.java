@@ -1,5 +1,6 @@
 package ru.netcracker.backend.service;
 
+import ru.netcracker.backend.model.entity.User;
 import ru.netcracker.backend.model.requests.UserRequest;
 import ru.netcracker.backend.model.responses.UserResponse;
 
@@ -17,7 +18,7 @@ public interface UserService {
 
     UserResponse updateUser(UserRequest userRequest);
 
-    BigDecimal getMoneyByUsername(String username);
+    void sendMoneyToWsByUsername(String username);
 
-
+    void sendMoneyToWsByUser(User user);
 }

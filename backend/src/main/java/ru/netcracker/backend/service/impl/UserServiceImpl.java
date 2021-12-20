@@ -25,6 +25,8 @@ public class UserServiceImpl implements UserService {
     private final BCryptPasswordEncoder encoder;
     private final SimpMessagingTemplate template;
 
+    private static final String WEB_SOCKET_PATH_TEMPLATE_BALANCE = "/auction/balance/%s";
+
     @Autowired
     public UserServiceImpl(UserRepository userRepository,
                            ModelMapper modelMapper,
@@ -36,7 +38,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserResponse> getUsers(){
+    public List<UserResponse> getUsers() {
         return userRepository.findAll().stream()
                 .map(user -> modelMapper.map(user, UserResponse.class))
                 .collect(Collectors.toList());
@@ -69,13 +71,15 @@ public class UserServiceImpl implements UserService {
                 .findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException(username));
         user.addMoney(currency);
-        return modelMapper.map(userRepository.save(user), UserResponse.class);
+        userRepository.save(user);
+        sendMoneyToWsByUser(user);
+        return modelMapper.map(user, UserResponse.class);
     }
 
     @Override
     @Transactional
     public UserResponse updateUser(UserRequest userRequest) {
-        User oldUser=userRepository.findByUsername(userRequest.getUsername())
+        User oldUser = userRepository.findByUsername(userRequest.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException(userRequest.getUsername()));
 
         oldUser.setEmail(userRequest.getEmail());
@@ -84,13 +88,22 @@ public class UserServiceImpl implements UserService {
         oldUser.setAbout(userRequest.getAbout());
         oldUser.setPassword(encoder.encode(userRequest.getPassword()));
 
-        return modelMapper.map(userRepository.save(oldUser),UserResponse.class);
+        return modelMapper.map(userRepository.save(oldUser), UserResponse.class);
     }
 
     @Override
-    public BigDecimal getMoneyByUsername(String username) {
-        return userRepository
-                .findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username))
-                .getMoney();
+    public void sendMoneyToWsByUsername(String username) {
+        sendMoneyToWsByUser(userRepository
+                .findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException(username)));
+    }
+
+    @Override
+    public void sendMoneyToWsByUser(User user) {
+        sendMoneyToWsByUser(user.getUsername(), user.getMoney());
+    }
+
+    private void sendMoneyToWsByUser(String username, BigDecimal money) {
+        template.convertAndSend(String.format(WEB_SOCKET_PATH_TEMPLATE_BALANCE, username), money);
     }
 }

@@ -12,6 +12,7 @@ import ru.netcracker.backend.model.responses.LotTransferredAndNotResponse;
 import ru.netcracker.backend.repository.LotRepository;
 import ru.netcracker.backend.repository.TransactionRepository;
 import ru.netcracker.backend.service.LotService;
+import ru.netcracker.backend.service.UserService;
 import ru.netcracker.backend.util.component.LotUtil;
 import ru.netcracker.backend.util.SecurityUtil;
 import ru.netcracker.backend.util.component.email.EmailSender;
@@ -30,14 +31,16 @@ public class LotServiceImpl implements LotService {
     private final EmailSender emailSender;
     private final ModelMapper modelMapper;
     private final LotUtil lotUtil;
+    private final UserService userService;
 
     @Autowired
-    public LotServiceImpl(LotRepository lotRepository, TransactionRepository transactionRepository, EmailSender emailSender, ModelMapper modelMapper, LotUtil lotUtil) {
+    public LotServiceImpl(LotRepository lotRepository, TransactionRepository transactionRepository, EmailSender emailSender, ModelMapper modelMapper, LotUtil lotUtil, UserService userService) {
         this.lotRepository = lotRepository;
         this.transactionRepository = transactionRepository;
         this.emailSender = emailSender;
         this.modelMapper = modelMapper;
         this.lotUtil = lotUtil;
+        this.userService = userService;
     }
 
     @Override
@@ -128,6 +131,7 @@ public class LotServiceImpl implements LotService {
                 tx.setTransactionStatus(TransactionStatus.DONE);
                 lot.getAuction().getCreator().addMoney(tx.getAmount());
                 transactionRepository.save(tx);
+                userService.sendMoneyToWsByUser(lot.getAuction().getCreator());
                 try {
                     emailSender.createAndSendBuyerTransactionDoneEmail(tx.getBuyer());
                     emailSender.createAndSendSellerTransactionDoneEmail(tx.getAuctionCreator(), tx);

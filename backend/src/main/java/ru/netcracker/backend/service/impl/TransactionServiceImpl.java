@@ -6,7 +6,9 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.netcracker.backend.model.entity.Transaction;
 import ru.netcracker.backend.repository.LotRepository;
 import ru.netcracker.backend.repository.TransactionRepository;
+import ru.netcracker.backend.repository.UserRepository;
 import ru.netcracker.backend.service.TransactionService;
+import ru.netcracker.backend.service.UserService;
 import ru.netcracker.backend.util.component.email.EmailSender;
 
 import javax.mail.MessagingException;
@@ -19,13 +21,17 @@ import java.time.temporal.ChronoUnit;
 public class TransactionServiceImpl implements TransactionService {
     private final TransactionRepository transactionRepository;
     private final LotRepository lotRepository;
+    private final UserRepository userRepository;
     private final EmailSender emailSender;
+    private final UserService userService;
 
     @Autowired
-    public TransactionServiceImpl(TransactionRepository transactionRepository, LotRepository lotRepository, EmailSender emailSender) {
+    public TransactionServiceImpl(TransactionRepository transactionRepository, LotRepository lotRepository, UserRepository userRepository, EmailSender emailSender, UserService userService) {
         this.transactionRepository = transactionRepository;
         this.lotRepository = lotRepository;
+        this.userRepository = userRepository;
         this.emailSender = emailSender;
+        this.userService = userService;
     }
 
     @Override
@@ -35,6 +41,11 @@ public class TransactionServiceImpl implements TransactionService {
             if (isDateTimeEqualOrMoreThan6Months(tx.getDateTime())) {
                 try {
                     tx.getLot().setCanceled(true);
+                    tx.getBuyer().addMoney(tx.getAmount());
+
+                    userRepository.save(tx.getBuyer());
+                    userService.sendMoneyToWsByUser(tx.getBuyer());
+
                     lotRepository.save(tx.getLot());
                     transactionRepository.delete(tx);
 

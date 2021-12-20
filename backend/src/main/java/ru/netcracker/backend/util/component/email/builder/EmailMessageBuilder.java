@@ -1,7 +1,7 @@
 package ru.netcracker.backend.util.component.email.builder;
 
 import lombok.Data;
-import ru.netcracker.backend.util.component.EmailUtil;
+import ru.netcracker.backend.util.EmailUtil;
 import ru.netcracker.backend.util.builder.MimeMessageBuilder;
 import ru.netcracker.backend.util.component.email.Email;
 

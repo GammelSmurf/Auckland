@@ -25,8 +25,6 @@ public class UserServiceImpl implements UserService {
     private final BCryptPasswordEncoder encoder;
     private final SimpMessagingTemplate template;
 
-    private static final String WEB_SOCKET_PATH_TEMPLATE_BALANCE = "/user/balance/%d";
-
     @Autowired
     public UserServiceImpl(UserRepository userRepository,
                            ModelMapper modelMapper,
@@ -90,15 +88,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void sendBalanceToUserAfterUpdate(Long userId) {
-        User user=userRepository.getById(userId);
-        sendBalanceToWs(userId,user.getMoney());
-    }
-    private void sendBalanceToWs(Long userId, BigDecimal balance) {
-        sendObjectToWs(userId, balance);
-    }
-
-    private void sendObjectToWs(Long userId, Object obj) {
-        template.convertAndSend(String.format(WEB_SOCKET_PATH_TEMPLATE_BALANCE, userId), obj);
+    public BigDecimal getMoneyByUsername(String username) {
+        return userRepository
+                .findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username))
+                .getMoney();
     }
 }

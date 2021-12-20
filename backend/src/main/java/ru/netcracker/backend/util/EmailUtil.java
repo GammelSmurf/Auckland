@@ -1,4 +1,4 @@
-package ru.netcracker.backend.util.component;
+package ru.netcracker.backend.util;
 
 public class EmailUtil {
     private EmailUtil() {

@@ -93,7 +93,7 @@ public class AuctionServiceImpl implements AuctionService {
     @Override
     @Transactional
     public AuctionResponse createAuction(Auction auction) {
-        auctionUtil.validateBeforeCreating(auction, auctionRepository);
+        auctionUtil.validateBeforeCreating(auction);
         setRandomName(auction);
         return modelMapper.map(auctionRepository.save(auction), AuctionResponse.class);
     }
@@ -109,7 +109,7 @@ public class AuctionServiceImpl implements AuctionService {
                 .findById(auctionId)
                 .orElseThrow(() -> new AuctionNotFoundException(auctionId));
 
-        auctionUtil.validateBeforeUpdating(oldAuction, newAuction, auctionRepository);
+        auctionUtil.validateBeforeUpdating(oldAuction, newAuction);
         oldAuction.copyMainParamsFrom(newAuction);
         return modelMapper.map(auctionRepository.save(oldAuction), AuctionResponse.class);
     }

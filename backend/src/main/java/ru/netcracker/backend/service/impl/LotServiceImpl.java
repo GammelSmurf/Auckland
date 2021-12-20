@@ -15,6 +15,7 @@ import ru.netcracker.backend.service.LotService;
 import ru.netcracker.backend.service.UserService;
 import ru.netcracker.backend.util.component.LotUtil;
 import ru.netcracker.backend.util.SecurityUtil;
+import ru.netcracker.backend.util.component.RandomNameGenerator;
 import ru.netcracker.backend.util.component.email.EmailSender;
 
 import javax.mail.MessagingException;
@@ -32,15 +33,17 @@ public class LotServiceImpl implements LotService {
     private final ModelMapper modelMapper;
     private final LotUtil lotUtil;
     private final UserService userService;
+    private final RandomNameGenerator randomNameGenerator;
 
     @Autowired
-    public LotServiceImpl(LotRepository lotRepository, TransactionRepository transactionRepository, EmailSender emailSender, ModelMapper modelMapper, LotUtil lotUtil, UserService userService) {
+    public LotServiceImpl(LotRepository lotRepository, TransactionRepository transactionRepository, EmailSender emailSender, ModelMapper modelMapper, LotUtil lotUtil, UserService userService, RandomNameGenerator randomNameGenerator) {
         this.lotRepository = lotRepository;
         this.transactionRepository = transactionRepository;
         this.emailSender = emailSender;
         this.modelMapper = modelMapper;
         this.lotUtil = lotUtil;
         this.userService = userService;
+        this.randomNameGenerator = randomNameGenerator;
     }
 
     @Override
@@ -53,7 +56,15 @@ public class LotServiceImpl implements LotService {
     @Override
     @Transactional
     public LotResponse createLot(Lot lot) {
+        lotUtil.validateBeforeCreating(lot);
+        setRandomNameIfNot(lot);
         return modelMapper.map(lotRepository.save(lot), LotResponse.class);
+    }
+
+    private void setRandomNameIfNot(Lot lot) {
+        if (lot.getName() == null) {
+            lot.setName(randomNameGenerator.getName(7));
+        }
     }
 
     @Override

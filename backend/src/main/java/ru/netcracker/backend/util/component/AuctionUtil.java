@@ -1,5 +1,6 @@
 package ru.netcracker.backend.util.component;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.netcracker.backend.exception.auction.*;
 import ru.netcracker.backend.exception.user.NotSubscribedException;
@@ -13,13 +14,19 @@ import java.time.LocalDateTime;
 
 @Component
 public class AuctionUtil {
-    public void validateBeforeCreating(Auction auction, AuctionRepository auctionRepository) {
+    private final AuctionRepository auctionRepository;
+
+    @Autowired
+    public AuctionUtil(AuctionRepository auctionRepository) {
+        this.auctionRepository = auctionRepository;
+    }
+    public void validateBeforeCreating(Auction auction) {
         if (auctionRepository.existsByName(auction.getName())) {
             throw new AuctionNameAlreadyExistsException(auction);
         }
     }
 
-    public void validateBeforeUpdating(Auction oldAuction, Auction newAuction, AuctionRepository auctionRepository) {
+    public void validateBeforeUpdating(Auction oldAuction, Auction newAuction) {
         if (!oldAuction.getName().equals(newAuction.getName()) && auctionRepository.existsByName(newAuction.getName())) {
             throw new AuctionNameAlreadyExistsException(newAuction);
         }

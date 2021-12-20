@@ -1,7 +1,7 @@
-package ru.netcracker.backend.util;
+package ru.netcracker.backend.util.component;
 
 public class EmailUtil {
-    public EmailUtil() {
+    private EmailUtil() {
     }
 
     public static final String HELLO_MSG_TEMPLATE = "Dear [[name]],<br>";

@@ -25,7 +25,7 @@ import ru.netcracker.backend.repository.UserRepository;
 import ru.netcracker.backend.service.AuctionService;
 import ru.netcracker.backend.service.LogService;
 import ru.netcracker.backend.service.NotificationService;
-import ru.netcracker.backend.util.AuctionUtil;
+import ru.netcracker.backend.util.component.AuctionUtil;
 import ru.netcracker.backend.util.SecurityUtil;
 import ru.netcracker.backend.util.component.RandomNameGenerator;
 import ru.netcracker.backend.util.component.specification.AuctionSpecification;
@@ -47,6 +47,7 @@ public class AuctionServiceImpl implements AuctionService {
     private final AuctionSpecification auctionSpecification;
     private final NotificationService notificationService;
     private final RandomNameGenerator nameGenerator;
+    private final AuctionUtil auctionUtil;
 
     @Autowired
     public AuctionServiceImpl(AuctionRepository auctionRepository,
@@ -54,7 +55,7 @@ public class AuctionServiceImpl implements AuctionService {
                               CategoryRepository categoryRepository,
                               TagRepository tagRepository,
                               LogService logService,
-                              ModelMapper modelMapper, AuctionSpecification auctionSpecification, NotificationService notificationService, RandomNameGenerator nameGenerator) {
+                              ModelMapper modelMapper, AuctionSpecification auctionSpecification, NotificationService notificationService, RandomNameGenerator nameGenerator, AuctionUtil auctionUtil) {
         this.auctionRepository = auctionRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
@@ -64,6 +65,7 @@ public class AuctionServiceImpl implements AuctionService {
         this.auctionSpecification = auctionSpecification;
         this.notificationService = notificationService;
         this.nameGenerator = nameGenerator;
+        this.auctionUtil = auctionUtil;
     }
 
     @Override
@@ -91,7 +93,7 @@ public class AuctionServiceImpl implements AuctionService {
     @Override
     @Transactional
     public AuctionResponse createAuction(Auction auction) {
-        AuctionUtil.validateBeforeCreating(auction, auctionRepository);
+        auctionUtil.validateBeforeCreating(auction, auctionRepository);
         setRandomName(auction);
         return modelMapper.map(auctionRepository.save(auction), AuctionResponse.class);
     }
@@ -107,7 +109,7 @@ public class AuctionServiceImpl implements AuctionService {
                 .findById(auctionId)
                 .orElseThrow(() -> new AuctionNotFoundException(auctionId));
 
-        AuctionUtil.validateBeforeUpdating(oldAuction, newAuction, auctionRepository);
+        auctionUtil.validateBeforeUpdating(oldAuction, newAuction, auctionRepository);
         oldAuction.copyMainParamsFrom(newAuction);
         return modelMapper.map(auctionRepository.save(oldAuction), AuctionResponse.class);
     }
@@ -118,7 +120,7 @@ public class AuctionServiceImpl implements AuctionService {
         Auction auction = auctionRepository
                 .findById(auctionId)
                 .orElseThrow(() -> new AuctionNotFoundException(auctionId));
-        AuctionUtil.validateBeforeDeleting(auction);
+        auctionUtil.validateBeforeDeleting(auction);
         auctionRepository.delete(auction);
     }
 
@@ -127,7 +129,7 @@ public class AuctionServiceImpl implements AuctionService {
         Auction auction = auctionRepository
                 .findById(auctionId)
                 .orElseThrow(() -> new AuctionNotFoundException(auctionId));
-        AuctionUtil.validateBeforeGetting(auction);
+        auctionUtil.validateBeforeGetting(auction);
         return modelMapper.map(auction ,AuctionResponse.class);
     }
 
@@ -138,7 +140,7 @@ public class AuctionServiceImpl implements AuctionService {
                 .findById(auctionId)
                 .orElseThrow(() -> new AuctionNotFoundException(auctionId));
 
-        AuctionUtil.validateBeforeMakingWaiting(auction);
+        auctionUtil.validateBeforeMakingWaiting(auction);
         auction.setWaitingStatus();
         auction.setAnotherLot();
         logService.log(LogLevel.AUCTION_STATUS_CHANGE, auctionRepository.save(auction));
@@ -154,7 +156,7 @@ public class AuctionServiceImpl implements AuctionService {
                 .findById(auctionId)
                 .orElseThrow(() -> new AuctionNotFoundException(auctionId));
 
-        AuctionUtil.validateBeforeSubscribing(auction);
+        auctionUtil.validateBeforeSubscribing(auction);
         user.subscribeToAuction(auction);
         notificationService.log(NotificationLevel.USER_SUBSCRIBED, userRepository.save(user), auction);
         return modelMapper.map(user, UserResponse.class);
@@ -170,7 +172,7 @@ public class AuctionServiceImpl implements AuctionService {
                 .findById(categoryId)
                 .orElseThrow(() -> new CategoryNotFoundException(categoryId));
 
-        AuctionUtil.validateBeforeAddingCategoryToAuction(auction, category);
+        auctionUtil.validateBeforeAddingCategoryToAuction(auction, category);
         auction.addCategory(category);
         auctionRepository.save(auction);
         return modelMapper.map(category, CategoryResponse.class);
@@ -201,7 +203,7 @@ public class AuctionServiceImpl implements AuctionService {
                 .findByUsername(SecurityUtil.getUsernameFromSecurityCtx())
                 .orElseThrow(() -> new UsernameNotFoundException(SecurityUtil.getUsernameFromSecurityCtx()));
 
-        AuctionUtil.validateBeforeLike(auction, user);
+        auctionUtil.validateBeforeLike(auction, user);
         auction.addUserWhoLiked(user);
         return modelMapper.map(auctionRepository.save(auction), AuctionResponse.class);
     }
@@ -216,7 +218,7 @@ public class AuctionServiceImpl implements AuctionService {
                 .findByUsername(SecurityUtil.getUsernameFromSecurityCtx())
                 .orElseThrow(() -> new UsernameNotFoundException(SecurityUtil.getUsernameFromSecurityCtx()));
 
-        AuctionUtil.validateBeforeDislike(auction, user);
+        auctionUtil.validateBeforeDislike(auction, user);
         auction.removeUserWhoLiked(user);
         return modelMapper.map(auctionRepository.save(auction), AuctionResponse.class);
     }

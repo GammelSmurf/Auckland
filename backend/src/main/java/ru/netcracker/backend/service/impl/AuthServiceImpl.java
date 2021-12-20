@@ -16,8 +16,8 @@ import ru.netcracker.backend.model.responses.JwtResponse;
 import ru.netcracker.backend.repository.UserRepository;
 import ru.netcracker.backend.security.MyUserDetails;
 import ru.netcracker.backend.service.AuthService;
-import ru.netcracker.backend.util.JwtUtil;
-import ru.netcracker.backend.util.UserUtil;
+import ru.netcracker.backend.util.component.JwtUtil;
+import ru.netcracker.backend.util.component.UserUtil;
 import ru.netcracker.backend.util.component.email.EmailSender;
 
 import javax.mail.MessagingException;
@@ -34,6 +34,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder encoder;
     private final EmailSender emailSender;
+    private final UserUtil userUtil;
 
     @Autowired
     public AuthServiceImpl(
@@ -41,12 +42,13 @@ public class AuthServiceImpl implements AuthService {
             JwtUtil jwtUtil,
             UserRepository userRepository,
             BCryptPasswordEncoder encoder,
-            EmailSender emailSender) {
+            EmailSender emailSender, UserUtil userUtil) {
         this.authenticationProvider = authenticationProvider;
         this.jwtUtil = jwtUtil;
         this.userRepository = userRepository;
         this.emailSender = emailSender;
         this.encoder = encoder;
+        this.userUtil = userUtil;
     }
 
     @Override
@@ -69,7 +71,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public void createUser(User user, String siteURL) throws MessagingException, UnsupportedEncodingException {
-        UserUtil.validate(user, userRepository);
+        userUtil.validate(user, userRepository);
         user.setPassword(encoder.encode(user.getPassword()));
         user.getUserRoles().add(UserRole.USER);
         emailSender.createAndSendVerificationEmail(userRepository.save(user), siteURL);

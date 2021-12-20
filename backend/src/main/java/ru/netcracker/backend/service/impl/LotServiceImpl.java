@@ -12,7 +12,7 @@ import ru.netcracker.backend.model.responses.LotTransferredAndNotResponse;
 import ru.netcracker.backend.repository.LotRepository;
 import ru.netcracker.backend.repository.TransactionRepository;
 import ru.netcracker.backend.service.LotService;
-import ru.netcracker.backend.util.LotUtil;
+import ru.netcracker.backend.util.component.LotUtil;
 import ru.netcracker.backend.util.SecurityUtil;
 import ru.netcracker.backend.util.component.email.EmailSender;
 
@@ -29,13 +29,15 @@ public class LotServiceImpl implements LotService {
     private final TransactionRepository transactionRepository;
     private final EmailSender emailSender;
     private final ModelMapper modelMapper;
+    private final LotUtil lotUtil;
 
     @Autowired
-    public LotServiceImpl(LotRepository lotRepository, TransactionRepository transactionRepository, EmailSender emailSender, ModelMapper modelMapper) {
+    public LotServiceImpl(LotRepository lotRepository, TransactionRepository transactionRepository, EmailSender emailSender, ModelMapper modelMapper, LotUtil lotUtil) {
         this.lotRepository = lotRepository;
         this.transactionRepository = transactionRepository;
         this.emailSender = emailSender;
         this.modelMapper = modelMapper;
+        this.lotUtil = lotUtil;
     }
 
     @Override
@@ -109,7 +111,7 @@ public class LotServiceImpl implements LotService {
         Lot lot = lotRepository
                 .findById(lotId)
                 .orElseThrow(() -> new LotNotFoundException(lotId));
-        LotUtil.validateBeforeConfirmationLotTransfer(lot);
+        lotUtil.validateBeforeConfirmationLotTransfer(lot);
         lot.confirmSellerTransfer();
         makeTransactionDoneIfTransferredAndGiveMoneyToSeller(lot);
         return modelMapper.map(lotRepository.save(lot), LotResponse.class);
@@ -121,7 +123,7 @@ public class LotServiceImpl implements LotService {
         Lot lot = lotRepository
                 .findById(lotId)
                 .orElseThrow(() -> new LotNotFoundException(lotId));
-        LotUtil.validateBeforeConfirmationLotAccept(lot);
+        lotUtil.validateBeforeConfirmationLotAccept(lot);
         lot.confirmBuyerAccept();
         makeTransactionDoneIfTransferredAndGiveMoneyToSeller(lot);
         return modelMapper.map(lotRepository.save(lot), LotResponse.class);

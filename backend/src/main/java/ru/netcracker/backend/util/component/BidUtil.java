@@ -1,5 +1,6 @@
-package ru.netcracker.backend.util;
+package ru.netcracker.backend.util.component;
 
+import org.springframework.stereotype.Component;
 import ru.netcracker.backend.exception.auction.NotCorrectStatusException;
 import ru.netcracker.backend.exception.bet.*;
 import ru.netcracker.backend.exception.user.NotSubscribedException;
@@ -10,11 +11,9 @@ import ru.netcracker.backend.model.entity.User;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+@Component
 public class BidUtil {
-    private BidUtil() {
-    }
-
-    public static void validate(Auction auction, BigDecimal amount, User user)
+    public void validate(Auction auction, BigDecimal amount, User user)
             throws BankLessThanMinException, BankLessThanOldException, BankLessThanStepException,
             LotTimeExpiredException, NoCurrencyException, NotSubscribedException {
         if (user.getSubscribedAuctions().isEmpty() || !user.getSubscribedAuctions().contains(auction)) {
@@ -49,7 +48,7 @@ public class BidUtil {
         }
     }
 
-    private static boolean isLess(BigDecimal a, BigDecimal b) {
+    private boolean isLess(BigDecimal a, BigDecimal b) {
         return a.compareTo(b) < 0;
     }
 }

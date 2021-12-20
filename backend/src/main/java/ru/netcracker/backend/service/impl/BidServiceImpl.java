@@ -18,7 +18,7 @@ import ru.netcracker.backend.repository.UserRepository;
 import ru.netcracker.backend.service.BidService;
 import ru.netcracker.backend.service.LogService;
 import ru.netcracker.backend.service.NotificationService;
-import ru.netcracker.backend.util.BidUtil;
+import ru.netcracker.backend.util.component.BidUtil;
 import ru.netcracker.backend.util.component.email.EmailSender;
 import ru.netcracker.backend.util.enumiration.LogLevel;
 import ru.netcracker.backend.util.enumiration.NotificationLevel;
@@ -42,10 +42,11 @@ public class BidServiceImpl implements BidService {
     private final NotificationService notificationService;
     private final EmailSender emailSender;
     private final ModelMapper modelMapper;
+    private final BidUtil bidUtil;
 
     @Autowired
     public BidServiceImpl(BidRepository bidRepository, UserRepository userRepository, AuctionRepository auctionRepository,
-                          TransactionRepository transactionRepository, LogService logService, NotificationService notificationService, EmailSender emailSender, ModelMapper modelMapper) {
+                          TransactionRepository transactionRepository, LogService logService, NotificationService notificationService, EmailSender emailSender, ModelMapper modelMapper, BidUtil bidUtil) {
         this.bidRepository = bidRepository;
         this.userRepository = userRepository;
         this.auctionRepository = auctionRepository;
@@ -54,6 +55,7 @@ public class BidServiceImpl implements BidService {
         this.notificationService = notificationService;
         this.emailSender = emailSender;
         this.modelMapper = modelMapper;
+        this.bidUtil = bidUtil;
     }
 
     @Override
@@ -66,7 +68,7 @@ public class BidServiceImpl implements BidService {
                 .findById(auctionId)
                 .orElseThrow(() -> new AuctionNotFoundException(auctionId));
 
-        BidUtil.validate(auction, amount, user);
+        bidUtil.validate(auction, amount, user);
         Bid bid = formatBit(auction, user, amount);
         createTransaction(bid);
         logService.log(LogLevel.AUCTION_BET, bid.getAuction());

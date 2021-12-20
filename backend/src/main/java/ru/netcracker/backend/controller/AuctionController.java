@@ -22,6 +22,7 @@ import ru.netcracker.backend.model.responses.UserResponse;
 import ru.netcracker.backend.service.AuctionService;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/auctions")
@@ -41,6 +42,11 @@ public class AuctionController {
     @GetMapping
     public Page<AuctionResponse> getAllAuctions(Pageable pageable) {
         return auctionService.getAllAuctions(pageable);
+    }
+
+    @GetMapping("/creator")
+    public List<AuctionResponse> getAllAuctionsIfCreator(){
+        return auctionService.getAllIfCreator();
     }
 
     @PostMapping("/search")

@@ -98,8 +98,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private boolean isUserValidToVerify(User user, String verificationCode) {
-        return  user.getVerificationCode().equals(verificationCode) &&
-                !user.isEnabled();
+        return  user.getVerificationCode().equals(verificationCode) && !user.isEnabled();
     }
 
     @Override

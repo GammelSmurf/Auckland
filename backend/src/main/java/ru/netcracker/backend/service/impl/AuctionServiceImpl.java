@@ -10,7 +10,10 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.netcracker.backend.exception.auction.AuctionNotFoundException;
 import ru.netcracker.backend.exception.category.CategoryNotFoundException;
 import ru.netcracker.backend.exception.user.UsernameNotFoundException;
-import ru.netcracker.backend.model.entity.*;
+import ru.netcracker.backend.model.entity.Auction;
+import ru.netcracker.backend.model.entity.Category;
+import ru.netcracker.backend.model.entity.Tag;
+import ru.netcracker.backend.model.entity.User;
 import ru.netcracker.backend.model.requests.SearchRequest;
 import ru.netcracker.backend.model.responses.AuctionResponse;
 import ru.netcracker.backend.model.responses.CategoryResponse;
@@ -22,14 +25,15 @@ import ru.netcracker.backend.repository.UserRepository;
 import ru.netcracker.backend.service.AuctionService;
 import ru.netcracker.backend.service.LogService;
 import ru.netcracker.backend.service.NotificationService;
+import ru.netcracker.backend.util.AuctionUtil;
 import ru.netcracker.backend.util.SecurityUtil;
 import ru.netcracker.backend.util.component.RandomNameGenerator;
 import ru.netcracker.backend.util.component.specification.AuctionSpecification;
-import ru.netcracker.backend.util.AuctionUtil;
 import ru.netcracker.backend.util.enumiration.LogLevel;
 import ru.netcracker.backend.util.enumiration.NotificationLevel;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -67,6 +71,14 @@ public class AuctionServiceImpl implements AuctionService {
         return auctionRepository
                 .findAll(pageable)
                 .map(auction -> modelMapper.map(auction, AuctionResponse.class));
+    }
+
+    @Override
+    public List<AuctionResponse> getAllIfCreator() {
+        return auctionRepository
+                .findAllByCreator_Username(SecurityUtil.getUsernameFromSecurityCtx()).stream()
+                .map(auction -> modelMapper.map(auction, AuctionResponse.class))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -188,6 +200,7 @@ public class AuctionServiceImpl implements AuctionService {
         User user = userRepository
                 .findByUsername(SecurityUtil.getUsernameFromSecurityCtx())
                 .orElseThrow(() -> new UsernameNotFoundException(SecurityUtil.getUsernameFromSecurityCtx()));
+
         AuctionUtil.validateBeforeLike(auction, user);
         auction.addUserWhoLiked(user);
         return modelMapper.map(auctionRepository.save(auction), AuctionResponse.class);
@@ -202,6 +215,7 @@ public class AuctionServiceImpl implements AuctionService {
         User user = userRepository
                 .findByUsername(SecurityUtil.getUsernameFromSecurityCtx())
                 .orElseThrow(() -> new UsernameNotFoundException(SecurityUtil.getUsernameFromSecurityCtx()));
+
         AuctionUtil.validateBeforeDislike(auction, user);
         auction.removeUserWhoLiked(user);
         return modelMapper.map(auctionRepository.save(auction), AuctionResponse.class);

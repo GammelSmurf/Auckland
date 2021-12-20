@@ -8,6 +8,7 @@ import ru.netcracker.backend.exception.lot.LotNotFoundException;
 import ru.netcracker.backend.model.entity.Lot;
 import ru.netcracker.backend.model.entity.TransactionStatus;
 import ru.netcracker.backend.model.responses.LotResponse;
+import ru.netcracker.backend.model.responses.LotTransferredAndNotResponse;
 import ru.netcracker.backend.repository.LotRepository;
 import ru.netcracker.backend.repository.TransactionRepository;
 import ru.netcracker.backend.service.LotService;
@@ -82,19 +83,24 @@ public class LotServiceImpl implements LotService {
     }
 
     @Override
-    public List<LotResponse> getLotsWonAndTransferred() {
-        return getResponseLotsByTransferred(true);
+    public LotTransferredAndNotResponse getLotsTransferredAndNot() {
+        return new LotTransferredAndNotResponse(
+                getLotsResponseByTransferred(true),
+                getLotsResponseByTransferred(false)
+        );
     }
 
-    @Override
-    public List<LotResponse> getLotsWonAndNotTransferred() {
-        return getResponseLotsByTransferred(false);
-    }
-
-    private List<LotResponse> getResponseLotsByTransferred(boolean transferred) {
-        return lotRepository.findAllByWinner_UsernameAndTransferred(SecurityUtil.getUsernameFromSecurityCtx(), transferred).stream()
+    private List<LotResponse> getLotsResponseByTransferred(boolean transferred) {
+        return getLotsByTransferred(transferred).stream()
                 .map(lot -> modelMapper.map(lot, LotResponse.class))
                 .collect(Collectors.toList());
+    }
+
+    private List<Lot> getLotsByTransferred(boolean transferred) {
+        return lotRepository.findAllByWinner_UsernameOrAuction_Creator_UsernameAndTransferredAndWinnerIsNotNull(
+                SecurityUtil.getUsernameFromSecurityCtx(),
+                SecurityUtil.getUsernameFromSecurityCtx(),
+                transferred);
     }
 
     @Override

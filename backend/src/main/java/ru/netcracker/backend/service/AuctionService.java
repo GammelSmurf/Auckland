@@ -8,8 +8,12 @@ import ru.netcracker.backend.model.responses.AuctionResponse;
 import ru.netcracker.backend.model.responses.CategoryResponse;
 import ru.netcracker.backend.model.responses.UserResponse;
 
+import java.util.List;
+
 public interface AuctionService {
     Page<AuctionResponse> getAllAuctions(Pageable pageable);
+
+    List<AuctionResponse> getAllIfCreator();
 
     Page<AuctionResponse> searchAuctions(SearchRequest searchRequest, int page, int size);
 

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.netcracker.backend.model.entity.Lot;
 import ru.netcracker.backend.model.requests.LotRequest;
 import ru.netcracker.backend.model.responses.LotResponse;
+import ru.netcracker.backend.model.responses.LotTransferredAndNotResponse;
 import ru.netcracker.backend.service.LotService;
 
 import javax.validation.Valid;
@@ -38,14 +39,9 @@ public class LotController {
         return lotService.getLotsByAuctionId(id);
     }
 
-    @GetMapping("/won/received")
-    public List<LotResponse> getLotsWonAndTransferred() {
-        return lotService.getLotsWonAndTransferred();
-    }
-
-    @GetMapping("/won/pending")
-    public List<LotResponse> getLotsWonAndNotTransferred() {
-        return lotService.getLotsWonAndNotTransferred();
+    @GetMapping("/won")
+    public LotTransferredAndNotResponse getLotsWonAndTransferred() {
+        return lotService.getLotsTransferredAndNot();
     }
 
     @PostMapping("/confirm/transfer/{lotId}")

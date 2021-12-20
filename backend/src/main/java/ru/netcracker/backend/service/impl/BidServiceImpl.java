@@ -71,7 +71,6 @@ public class BidServiceImpl implements BidService {
         createTransaction(bid);
         logService.log(LogLevel.AUCTION_BET, bid.getAuction());
         return modelMapper.map(bidRepository.save(bid), BidResponse.class);
-
     }
 
     private Bid formatBit(Auction auction, User user, BigDecimal amount) {

@@ -93,16 +93,9 @@ public class LotServiceImpl implements LotService {
     }
 
     private List<LotResponse> getLotsResponseByTransferred(boolean transferred) {
-        return getLotsByTransferred(transferred).stream()
+        return lotRepository.findAllIfWinnerOrCreatorByTransferred(SecurityUtil.getUsernameFromSecurityCtx(), transferred).stream()
                 .map(lot -> modelMapper.map(lot, LotResponse.class))
                 .collect(Collectors.toList());
-    }
-
-    private List<Lot> getLotsByTransferred(boolean transferred) {
-        return lotRepository.findAllByWinner_UsernameOrAuction_Creator_UsernameAndTransferredAndWinnerIsNotNull(
-                SecurityUtil.getUsernameFromSecurityCtx(),
-                SecurityUtil.getUsernameFromSecurityCtx(),
-                transferred);
     }
 
     @Override

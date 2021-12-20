@@ -18,4 +18,6 @@ public interface UserService {
     UserResponse updateUser(UserRequest userRequest);
 
     BigDecimal getMoneyByUsername(String username);
+
+
 }

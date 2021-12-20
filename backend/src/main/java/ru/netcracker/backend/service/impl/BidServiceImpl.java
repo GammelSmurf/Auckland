@@ -204,6 +204,7 @@ public class BidServiceImpl implements BidService {
                 .filter(tx -> !tx.getTransactionStatus().equals(TransactionStatus.FROZEN))
                 .forEach(tx -> {
                     tx.getBuyer().addMoney(tx.getAmount());
+                    userService.sendMoneyToWsByUser(tx.getBuyer());
                     transactionRepository.delete(tx);
                 });
     }

@@ -8,6 +8,10 @@ const getAllAuctions = () => {
     return axios.get(API_URL, { headers: authHeader() });
 }
 
+const getOwnAuctions = () => {
+    return axios.get(API_URL + 'creator', { headers: authHeader() });
+}
+
 const getAuction = (id) => {
     return axios.get(API_URL + id, { headers: authHeader() }).then(response => {
         return response
@@ -119,4 +123,4 @@ const searchAuctions = (values) => {
         });
 }
 
-export default {getAllAuctions, getAuction, deleteAuction, createAuction, updateAuction, setStatusWaiting, getAuctionLogs, subscribe, addCategory, removeCategory, searchAuctions};
+export default {getAllAuctions, getAuction, deleteAuction, createAuction, updateAuction, setStatusWaiting, getAuctionLogs, subscribe, addCategory, removeCategory, searchAuctions, getOwnAuctions};

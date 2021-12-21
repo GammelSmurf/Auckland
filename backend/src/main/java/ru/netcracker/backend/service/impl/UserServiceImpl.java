@@ -90,11 +90,9 @@ public class UserServiceImpl implements UserService {
         User oldUser = userRepository.findByUsername(userRequest.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException(userRequest.getUsername()));
 
-        oldUser.setEmail(userRequest.getEmail());
         oldUser.setFirstName(userRequest.getFirstName());
         oldUser.setSecondName(userRequest.getSecondName());
         oldUser.setAbout(userRequest.getAbout());
-        oldUser.setPassword(encoder.encode(userRequest.getPassword()));
 
         return modelMapper.map(userRepository.save(oldUser), UserResponse.class);
     }

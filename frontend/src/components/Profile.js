@@ -1,101 +1,274 @@
 import React, {useEffect, useState} from "react";
 import AdminService from "../services/AdminService";
-import {Col, Container, Row} from "react-bootstrap";
+import {Col, Container, Row, Button, Form} from "react-bootstrap";
 import LotService from "../services/LotService";
+import Lot from "./Lot";
+import AuthService from "../services/AuthService";
+import UserService from "../services/UserService";
+import {Cell, Legend, Pie, ResponsiveContainer, PieChart, Tooltip} from "recharts";
+import AuctionService from "../services/AuctionService";
 
 
 const Profile = (props) => {
     const [user, setUser] = useState({});
-    //const [transLots, setTransLots] = useState([]);
-    //const [notTransLots, setNotTransLots] = useState([]);
+    const [isOwner, setIsOwner] = useState(false);
+    const [validated, setValidated] = useState(false);
+    const [userValues, setUserValues] = useState({});
+    const [isResponseText, setIsResponseText] = useState(false);
+    const [wonLots, setWonLots] = useState({});
+    const currentUser = AuthService.getCurrentUser();
 
-    //const errorPictureURL = 'https://st3.depositphotos.com/23594922/31822/v/600/depositphotos_318221368-stock-illustration-missing-picture-page-for-website.jpg';
+    const [pieData, setPieData] = useState([]);
 
     useEffect(() => {
         AdminService.getUsers().then(
             (response) => {
-                setUser(response.data.filter(item =>
-                    item.username === props.match.params.username)[0]);
+                const user = response.data.filter(item =>
+                    item.username === props.match.params.username)[0];
+                setUser(user);
+                if(currentUser.id === user.id){
+                    setIsOwner(true);
+                }
+
+                setUserValues({
+                    username: user.username,
+                    email: user.email,
+                    firstName: user.firstName,
+                    secondName: user.secondName,
+                    about: user.about,
+                });
             }
         );
-        LotService.getWonTransferredLots().then((response)=>{console.log('Transfered',response.data);setTransLots(response.data)});
-        LotService.getWonNotTransferredLots().then((response)=>{console.log('Not transfered',response.data);setNotTransLots(response.data)});
+
+        AuctionService.getOwnAuctions().then((response)=>
+        {
+            setPieData([
+                {name: 'DRAFT', value: response.data.filter(auc=>auc.status === 'DRAFT').length},
+                {name: 'WAITING', value: response.data.filter(auc=>auc.status === 'WAITING').length},
+                {name: 'RUNNING', value: response.data.filter(auc=>auc.status === 'RUNNING').length},
+                {name: 'FINISHED', value: response.data.filter(auc=>auc.status === 'FINISHED').length}
+            ]);
+        });
+
+        LotService.getWonLots().then((response)=>{
+            console.log(response.data)
+            setWonLots({notConfirmedToTransferLots: response.data.notTransferredLots.filter(lot=>lot.winner.id !== currentUser.id),
+                notConfirmedToAcceptLots: response.data.notTransferredLots.filter(lot=>lot.winner.id === currentUser.id),
+                confirmedTransferredLots: response.data.transferredLots.filter(lot=>lot.winner.id !== currentUser.id),
+                confirmedAcceptedLots: response.data.transferredLots.filter(lot=>lot.winner.id === currentUser.id)}
+        )});
     }, []);
 
-    /*const handleConfirmLot = (lotId) => {
+    const handleTransferLot = (lotId) => {
+        LotService.transferLot(lotId).then((response)=>console.log(response.data));
+        window.location.reload();
+    }
+
+    const handleAcceptLot = (lotId) => {
         LotService.acceptLot(lotId).then((response)=>console.log(response.data));
-    }*/
+        window.location.reload();
+    }
+
+    const handleChangeSettings = (event) => {
+        const form = event.currentTarget;
+        if (form.checkValidity() === false) {
+            setValidated(true);
+        }
+        else {
+            setIsResponseText(false);
+            UserService.updateUser(userValues).then(()=>{setIsResponseText(true)});
+        }
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
+    const onChangeUser = (name) => (e) => {
+        let value = e.target.value;
+        setUser({...user, [name]: value})
+        setUserValues({...userValues, [name]: value});
+    };
+
+    const pieColors = [{
+        id: 0,
+        color: '#AAAAAA'
+    }, {
+        id: 1,
+        color: '#FFC107'
+    },{
+        id: 2,
+        color: '#91D0A9'
+    },{
+        id: 3,
+        color: '#9434B3'
+    }]
+
+    const isBlendStroke = () => {
+        let flag;
+        pieData.filter(item => item.value === 0).length === 2 ? flag = true : flag = false;
+        return flag;
+    }
+
+    const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, index }) => {
+        const RADIAN = Math.PI / 180;
+        const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+        const x = cx + radius * Math.cos(-midAngle * RADIAN);
+        const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+        return (
+            <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" fontSize={20}>
+                {pieData[index].value > 0 && pieData[index].value}
+            </text>
+        );
+    };
 
     return(
         <Container style={{paddingBottom: '80px'}}>
             <Row>
-                <Col>
-                    <div className="standardPageHeader">
-                        <h2>Profile</h2>
-                        <hr />
+                <div className="standardPageHeader">
+                    <h2>Profile</h2>
+                    <hr />
+                </div>
+                <Col xs={4}>
+                    {isOwner ?
+                    <div style={{overflow: "hidden", padding: '5px'}}>
+                        <Form noValidate validated={validated} onSubmit={handleChangeSettings} className="basicAnim">
+                            <Form.Group controlId="username">
+                                <Form.Label><b>Username</b></Form.Label>
+                                <Form.Control
+                                    required
+                                    type="text"
+                                    onChange={onChangeUser("username")}
+                                    defaultValue={user.username}
+                                    disabled
+                                />
+                            </Form.Group>
+
+                            <Form.Group controlId="email">
+                                <Form.Label><b>Email</b></Form.Label>
+                                <Form.Control
+                                    required
+                                    type="email"
+                                    onChange={onChangeUser("email")}
+                                    defaultValue={user.email}
+                                    disabled
+                                />
+                            </Form.Group>
+                            <Form.Group controlId="firstName">
+                                <Form.Label><b>First Name</b></Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    onChange={onChangeUser("firstName")}
+                                    defaultValue={user.firstName}
+                                />
+                            </Form.Group>
+                            <Form.Group controlId="secondName">
+                                <Form.Label><b>Second Name</b></Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    onChange={onChangeUser("secondName")}
+                                    defaultValue={user.secondName}
+                                />
+                            </Form.Group>
+                            <Form.Group controlId="about">
+                                <Form.Label><b>About</b></Form.Label>
+                                <Form.Control
+                                    as="textarea" rows={4}
+                                    type="text"
+                                    onChange={onChangeUser("about")}
+                                    defaultValue={user.about}
+                                />
+                            </Form.Group>
+                            <Form.Group style={{height: '20px'}}>
+                            {isResponseText &&
+                            <Form.Text className="text-danger responseText">
+                                <b>Changed successfully!</b>
+                            </Form.Text>
+                            }
+                        </Form.Group>
+                            <Button type="submit" variant="warning" className="authSubmitButton">Submit</Button>
+                        </Form>
                     </div>
-                    <h5>Username</h5>
-                    <p>{user.username}</p>
-                    <h5>Email</h5>
-                    <p>{user.email}</p>
-                    <h5>First name</h5>
-                    <p>{user.firstName}</p>
-                    <h5>Second name</h5>
-                    <p>{user.secondName}</p>
-                    <h5>About</h5>
-                    <p>{user.about}</p>
+                        :
+                    <div>
+                        <h5>Username</h5>
+                        <p>{user.username}</p>
+                        <h5>Email</h5>
+                        <p>{user.email}</p>
+                        {user.firstName &&
+                            <>
+                                <h5>First Name</h5>
+                                <p>{user.firstName}</p>
+                            </>
+                        }
+                        {user.secondName &&
+                        <>
+                            <h5>Second Name</h5>
+                            <p>{user.secondName}</p>
+                        </>
+                        }
+                        {user.about &&
+                        <>
+                            <h5>About</h5>
+                            <p>{user.about}</p>
+                        </>
+                        }
+                    </div>}
+
+                </Col>
+                <Col>
+                    <h5 style={{textAlign: 'center'}}>My auctions</h5>
+                    <ResponsiveContainer width={'100%'} height={260}>
+                        <PieChart>
+                            <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%"
+                                 outerRadius={80} fill="#8884d8" paddingAngle={0} label={renderCustomizedLabel} labelLine={false} isAnimationActive={false} blendStroke={isBlendStroke()}>
+                                {
+                                    pieData.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={pieColors[index].color}/>
+                                    ))
+                                }
+                            </Pie>
+                            <Legend verticalAlign="bottom"/>
+                            <Tooltip />
+                        </PieChart>
+                    </ResponsiveContainer>
                 </Col>
             </Row>
-           {/* <Row>
+            <Row>
                 <div className="standardPageHeader">
                     <h2>Not confirmed lots</h2>
                     <hr />
                 </div>
-                {notTransLots.filter(lot=>lot.winner.username === user.username).map(lot =>
-                    <div key={lot.id} className="auctionBlock mt-4" style={{height: "300px"}}>
-                        <div style={{width: "30%", display: "inline-block"}}>
-                            <img alt="No image" src={lot.pictureLink ? lot.pictureLink : errorPictureURL}
-                                 style={{width: "100%", maxHeight: "260px", objectFit: "cover"}}
-                                 onError={(e)=>e.target.src=errorPictureURL}/>
-                        </div>
-
-                        <div style={{width: "70%", float: "right", padding: "20px"}}>
-                            <h5>{lot.name}</h5>
-                            <p>{lot.description}</p>
-                            <div style={{textAlign: "right"}}>
-                                {lot.buyerAcceptConfirmation ? <h5 className='basicAnim'>Waiting for creator transfer...</h5> :
-                                    <Button variant="warning" style={{marginRight: "10px"}} onClick={()=>handleConfirmLot(lot.id)}>Confirm</Button>
-                                }
-                            </div>
-
-                        </div>
-                    </div>
-                )}
+                <div style={{padding: '10px'}}>
+                    <h3>To transfer</h3>
+                    {(wonLots.notConfirmedToTransferLots && wonLots.notConfirmedToTransferLots.length !== 0) ? wonLots.notConfirmedToTransferLots.map(lot=>
+                        <Lot key={lot.id} lot={lot} action={handleTransferLot} isWaiting={lot.sellerTransferConfirmation}/>
+                    ) : <p className='fst-italic'>There is no lots to confirm</p>}
+                </div>
+                <div style={{padding: '10px'}}>
+                    <h3>To accept</h3>
+                    {(wonLots.notConfirmedToAcceptLots && wonLots.notConfirmedToAcceptLots.length !== 0) ? wonLots.notConfirmedToAcceptLots.map(lot=>
+                        <Lot key={lot.id} lot={lot} action={handleAcceptLot} isWaiting={lot.buyerAcceptConfirmation}/>
+                    ) : <p className='fst-italic'>There is no lots to confirm</p>}
+                </div>
             </Row>
             <Row>
                 <div className="standardPageHeader">
-                    <h2>Not transferred lots</h2>
+                    <h2>Confirmed lots</h2>
                     <hr />
                 </div>
-                {transLots.filter(lot=>lot.winner.username !== user.username).map(lot =>
-                    <div key={lot.id} className="auctionBlock mt-4" style={{height: "300px"}}>
-                        <div style={{width: "30%", display: "inline-block"}}>
-                            <img alt="No image" src={lot.pictureLink ? lot.pictureLink : errorPictureURL}
-                                 style={{width: "100%", maxHeight: "260px", objectFit: "cover"}}
-                                 onError={(e)=>e.target.src=errorPictureURL}/>
-                        </div>
-
-                        <div style={{width: "70%", float: "right", padding: "20px"}}>
-                            <h5>{lot.name}</h5>
-                            <p>{lot.description}</p>
-                            <div style={{textAlign: "right"}}>
-                                <Button variant="warning" style={{marginRight: "10px"}} onClick={()=>handleConfirmLot(lot.id)}>Confirm</Button>
-                            </div>
-
-                        </div>
-                    </div>
-                )}
-            </Row>*/}
+                <div style={{padding: '10px'}}>
+                    <h3>Transferred</h3>
+                    {(wonLots.confirmedTransferredLots && wonLots.confirmedTransferredLots.length !== 0) ?wonLots.confirmedTransferredLots.map(lot=>
+                        <Lot key={lot.id} lot={lot} isConfirmed/>
+                    ) : <p className='fst-italic'>There is no transferred lots yet</p>}
+                </div>
+                <div style={{padding: '10px'}}>
+                    <h3>Accepted</h3>
+                    {(wonLots.confirmedAcceptedLots && wonLots.confirmedAcceptedLots.length !== 0) ? wonLots.confirmedAcceptedLots.map(lot=>
+                        <Lot key={lot.id} lot={lot} isConfirmed/>
+                    ) : <p className='fst-italic'>There is no accepted lots yet</p>}
+                </div>
+            </Row>
         </Container>
     )
 }

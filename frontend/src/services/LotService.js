@@ -11,12 +11,8 @@ const getLotsByAuctionId = (id) => {
     return axios.get(API_URL + id, { headers: authHeader() });
 }
 
-const getWonTransferredLots = () => {
-    return axios.get(API_URL + 'won/received', { headers: authHeader() });
-}
-
-const getWonNotTransferredLots = () => {
-    return axios.get(API_URL + 'won/pending', { headers: authHeader() });
+const getWonLots = () => {
+    return axios.get(API_URL + 'won', { headers: authHeader() });
 }
 
 const acceptLot = (lotId) =>{
@@ -78,4 +74,4 @@ const updateLot = (values) =>{
         });
 };
 
-export default {createLot, updateLot, getLotsByAuctionId, deleteLot, getAllLots, getWonTransferredLots, getWonNotTransferredLots, acceptLot, transferLot}
+export default {createLot, updateLot, getLotsByAuctionId, deleteLot, getAllLots, getWonLots, acceptLot, transferLot}

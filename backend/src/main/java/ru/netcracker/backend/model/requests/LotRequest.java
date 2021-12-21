@@ -12,7 +12,6 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LotRequest {
-    @NotBlank(message="Lot's name should not be blank")
     @Size(min=3,max=1000)
     private String name;
     @NotBlank(message="Lot's description should not be blank")

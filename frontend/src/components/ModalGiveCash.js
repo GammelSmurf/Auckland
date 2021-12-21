@@ -45,7 +45,6 @@ const ModalGiveCash = (props) => {
                         <InputGroup>
                             <InputGroup.Text>$</InputGroup.Text>
                             <FormControl required type='number' placeholder="Enter the amount" onChange={handleChange} min={1}/>
-                            <InputGroup.Text>.00</InputGroup.Text>
                         </InputGroup>
                         <Form.Control.Feedback type="invalid">
                             Incorrect value

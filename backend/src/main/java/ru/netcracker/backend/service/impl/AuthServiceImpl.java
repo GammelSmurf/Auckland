@@ -65,7 +65,7 @@ public class AuthServiceImpl implements AuthService {
                 .collect(Collectors.toList());
 
         String jwt = jwtUtil.generateJwtToken(userDetails);
-        return new JwtResponse(userDetails.getId(), jwt, userDetails.getUsername(), user.getMoney(), roles);
+        return new JwtResponse(userDetails.getId(), jwt, userDetails.getUsername(), userDetails.getUser().getMoney(), roles);
     }
 
     @Override

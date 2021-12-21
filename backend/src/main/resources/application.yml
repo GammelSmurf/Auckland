@@ -1,8 +1,8 @@
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/auckland
-    username: student
-    password: 12121212
+    username:
+    password:
   jpa:
     generate-ddl: true
     open-in-view: true
@@ -10,7 +10,7 @@ spring:
     host: smtp.yandex.ru
     port: 465
     username: aucklandteam@yandex.ru
-    password: Auckland66
+    password:
     properties:
       "mail.smtp.auth": true
       "mail.smtp.starttls.enable": true
@@ -35,6 +35,5 @@ Auckland:
       cron: 0 0 05 * * ?
     checkTransactions:
       cron: 0 0 0 1 * *
-  removalPeriod:
-    messages: 7
-    notification: 7
+  removalPeriodInDays:
+    notifications: 7

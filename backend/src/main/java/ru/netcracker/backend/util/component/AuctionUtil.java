@@ -79,7 +79,7 @@ public class AuctionUtil {
         return auction.getCreator().getUsername().equals(SecurityUtil.getUsernameFromSecurityCtx());
     }
 
-    public void validateBeforeLike(Auction auction, User user) {
+    public void validateBeforeAddingLike(Auction auction, User user) {
         checkIfUserSubscribed(auction, user);
         if (auction.getUsersWhoLiked().contains(user)) {
             throw new AlreadyLikedException(auction, user);

@@ -1,6 +1,7 @@
 package ru.netcracker.backend.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,8 +14,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "bids")
-@Getter
-@Setter
+@Data
 public class Bid {
     @Id
     @Column(name = "bid_id")
@@ -32,7 +32,7 @@ public class Bid {
     @JsonBackReference
     private Lot lot;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name="user_id")
     @JsonBackReference
     private User user;
@@ -50,7 +50,7 @@ public class Bid {
         this.lot = auction.getCurrentLot();
     }
 
-    public void updateWith(BigDecimal amount, User user, Auction auction) {
+    public void updateWithAnotherBidRequest(BigDecimal amount, User user, Auction auction) {
         setAmount(this.amount.add(amount));
         addExtraTime();
         setUser(user);

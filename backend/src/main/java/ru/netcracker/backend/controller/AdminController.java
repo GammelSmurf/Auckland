@@ -2,7 +2,6 @@ package ru.netcracker.backend.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -34,24 +33,23 @@ public class AdminController {
     }
 
     @PostMapping("/ban")
-    public ResponseEntity<?> banUser(@NotBlank @RequestParam("username") String username)
-            throws UserExistsException {
+    public ResponseEntity<?> banUser(@NotBlank @RequestParam("username") String username) throws UserExistsException {
         UserResponse userResponse = userService.banUser(username);
         log.info("banned user: {}", userResponse);
-        return new ResponseEntity<>(userResponse, HttpStatus.OK);
+        return ResponseEntity.ok(userResponse);
     }
 
     @PostMapping("/unban")
     public ResponseEntity<?> unbanUser(@NotBlank @RequestParam("username") String username) {
         UserResponse userResponse = userService.unbanUser(username);
         log.info("unbanned user: {}", userResponse);
-        return new ResponseEntity<>(userResponse, HttpStatus.OK);
+        return ResponseEntity.ok(userResponse);
     }
 
     @PostMapping("/money/add")
-    public ResponseEntity<?> addCurrency(@Valid @RequestBody MoneyRequest currencyRequest) {
-        UserResponse userResponse = userService.addMoney(currencyRequest.getUsername(), currencyRequest.getMoney());
-        log.info("added {}$ to user {}", currencyRequest.getMoney(), currencyRequest.getUsername());
-        return new ResponseEntity<>(userResponse, HttpStatus.OK);
+    public ResponseEntity<?> addMoney(@Valid @RequestBody MoneyRequest moneyRequest) {
+        UserResponse userResponse = userService.addMoney(moneyRequest.getUsername(), moneyRequest.getMoney());
+        log.info("added {}$ to user {}", moneyRequest.getMoney(), moneyRequest.getUsername());
+        return ResponseEntity.ok(userResponse);
     }
 }

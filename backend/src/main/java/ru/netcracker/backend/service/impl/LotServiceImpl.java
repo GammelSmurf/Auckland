@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.netcracker.backend.exception.lot.LotNotFoundException;
 import ru.netcracker.backend.model.entity.Lot;
+import ru.netcracker.backend.model.entity.Transaction;
 import ru.netcracker.backend.model.entity.TransactionStatus;
 import ru.netcracker.backend.model.responses.LotResponse;
 import ru.netcracker.backend.model.responses.LotTransferredAndNotResponse;
@@ -36,7 +37,13 @@ public class LotServiceImpl implements LotService {
     private final RandomNameGenerator randomNameGenerator;
 
     @Autowired
-    public LotServiceImpl(LotRepository lotRepository, TransactionRepository transactionRepository, EmailSender emailSender, ModelMapper modelMapper, LotUtil lotUtil, UserService userService, RandomNameGenerator randomNameGenerator) {
+    public LotServiceImpl(LotRepository lotRepository,
+                          TransactionRepository transactionRepository,
+                          EmailSender emailSender,
+                          ModelMapper modelMapper,
+                          LotUtil lotUtil,
+                          UserService userService,
+                          RandomNameGenerator randomNameGenerator) {
         this.lotRepository = lotRepository;
         this.transactionRepository = transactionRepository;
         this.emailSender = emailSender;
@@ -57,11 +64,11 @@ public class LotServiceImpl implements LotService {
     @Transactional
     public LotResponse createLot(Lot lot) {
         lotUtil.validateBeforeCreating(lot);
-        setRandomNameIfNot(lot);
+        setRandomNameIfNull(lot);
         return modelMapper.map(lotRepository.save(lot), LotResponse.class);
     }
 
-    private void setRandomNameIfNot(Lot lot) {
+    private void setRandomNameIfNull(Lot lot) {
         if (lot.getName() == null) {
             lot.setName(randomNameGenerator.getName(7));
         }
@@ -73,22 +80,18 @@ public class LotServiceImpl implements LotService {
         Lot oldLot = lotRepository
                 .findById(lotId)
                 .orElseThrow(() -> new LotNotFoundException(lotId));
-        oldLot.setName(newLot.getName());
-        oldLot.setDescription(newLot.getDescription());
-        oldLot.setMinPrice(newLot.getMinPrice());
-        oldLot.setPictureLink(newLot.getPictureLink());
+        oldLot.copyMainParamsFrom(newLot);
         return modelMapper.map(lotRepository.save(oldLot), LotResponse.class);
     }
 
     @Override
     @Transactional
     public void deleteLot(Long lotId) {
-        Optional<Lot> lotOptional = lotRepository.findById(lotId);
-        if (lotOptional.isPresent()) {
-            Lot lot = lotOptional.get();
-            lot.getAuction().getLots().remove(lot);
-            lotRepository.delete(lot);
-        }
+        Lot lot = lotRepository
+                .findById(lotId)
+                .orElseThrow(() -> new LotNotFoundException(lotId));
+        lot.getAuction().getLots().remove(lot);
+        lotRepository.delete(lot);
     }
 
     @Override
@@ -143,13 +146,17 @@ public class LotServiceImpl implements LotService {
                 lot.getAuction().getCreator().addMoney(tx.getAmount());
                 transactionRepository.save(tx);
                 userService.sendMoneyToWsByUser(lot.getAuction().getCreator());
-                try {
-                    emailSender.createAndSendBuyerTransactionDoneEmail(tx.getBuyer());
-                    emailSender.createAndSendSellerTransactionDoneEmail(tx.getAuctionCreator(), tx);
-                } catch (MessagingException | UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
+                sendTransferredStatusEmails(tx);
             });
+        }
+    }
+
+    private void sendTransferredStatusEmails(Transaction tx) {
+        try {
+            emailSender.createAndSendBuyerTransactionDoneEmail(tx.getBuyer());
+            emailSender.createAndSendSellerTransactionDoneEmail(tx.getAuctionCreator(), tx);
+        } catch (MessagingException | UnsupportedEncodingException e) {
+            e.printStackTrace();
         }
     }
 }

@@ -1,6 +1,7 @@
 package ru.netcracker.backend.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import ru.netcracker.backend.exception.auction.NoLotsException;
@@ -12,8 +13,7 @@ import java.util.*;
 
 @Entity
 @Table(name = "auctions")
-@Getter
-@Setter
+@Data
 public class Auction {
     @Id
     @Column(name = "auction_id")
@@ -138,12 +138,12 @@ public class Auction {
         this.subscribedUsersCount++;
     }
 
-    public void addUserWhoLiked(User user) {
+    public void addUserWhoLikedAndIncreaseLikesCount(User user) {
         getUsersWhoLiked().add(user);
         incLikes();
     }
 
-    public void removeUserWhoLiked(User user) {
+    public void removeUserWhoLikedAndDecreaseLikesCount(User user) {
         getUsersWhoLiked().remove(user);
         decLikes();
     }

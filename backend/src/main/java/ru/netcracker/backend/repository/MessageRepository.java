@@ -18,6 +18,6 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     @Transactional
     @Modifying
     @Query("DELETE FROM Message m WHERE m IN " +
-            "(SELECT m FROM Message m INNER JOIN Auction a  ON m.auction=a WHERE a.status='FINISHED' and a.beginDateTime<:dateLineChat)")
-    void deleteOldChats(@Param("dateLineChat") LocalDateTime dateLineChat);
+            "(SELECT m FROM Message m INNER JOIN Auction a  ON m.auction = a WHERE a.status = 'FINISHED' and a.beginDateTime < :dateTime)")
+    void deleteOldMessagesBefore(@Param("dateTime") LocalDateTime dateTime);
 }

@@ -7,8 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.netcracker.backend.model.entity.Auction;
 import ru.netcracker.backend.model.entity.Log;
-import ru.netcracker.backend.repository.LogRepository;
 import ru.netcracker.backend.model.responses.LogResponse;
+import ru.netcracker.backend.repository.LogRepository;
 import ru.netcracker.backend.service.LogService;
 import ru.netcracker.backend.util.enumiration.LogLevel;
 
@@ -24,6 +24,7 @@ public class LogServiceImpl implements LogService {
     private final ModelMapper modelMapper;
 
     private static final String WEB_SOCKET_PATH_TEMPLATE = "/auction/logs/%d";
+
     private static final String LOG_BET_MSG_TEMPLATE = "%s повысил ставку до %s";
     private static final String LOG_CHANGE_MSG_TEMPLATE = "Статус аукциона изменился на %s";
     private static final String LOG_WINNER_MSG_TEMPLATE = "%s выиграл лот \"%s\"";
@@ -49,39 +50,43 @@ public class LogServiceImpl implements LogService {
     public void log(LogLevel level, Auction auction) {
         switch (level) {
             case AUCTION_BET:
-                sendAuctionLogToWs(
-                        auction.getId(),
-                        addLog(level, auction,
-                                String.format(LOG_BET_MSG_TEMPLATE, auction.getCurrentBid().getUser().getUsername(), auction.getCurrentBid().getAmount().toPlainString())));
+                sendAuctionLogMessageToWs(auction, level, String.format(
+                        LOG_BET_MSG_TEMPLATE,
+                        auction.getCurrentBid().getUser().getUsername(),
+                        auction.getCurrentBid().getAmount().toPlainString()));
                 break;
             case AUCTION_STATUS_CHANGE:
-                sendAuctionLogToWs(
-                        auction.getId(),
-                        addLog(level, auction, String.format(LOG_CHANGE_MSG_TEMPLATE, auction.getStatus())));
+                sendAuctionLogMessageToWs(auction, level, String.format(
+                        LOG_CHANGE_MSG_TEMPLATE,
+                        auction.getStatus()));
                 break;
             case AUCTION_WINNER:
-                sendAuctionLogToWs(
-                        auction.getId(),
-                        addLog(level, auction,
-                                String.format(LOG_WINNER_MSG_TEMPLATE, auction.getCurrentLot().getWinner().getUsername(), auction.getCurrentLot().getName())));
+                sendAuctionLogMessageToWs(auction, level, String.format(
+                        LOG_WINNER_MSG_TEMPLATE,
+                        auction.getCurrentLot().getWinner().getUsername(),
+                        auction.getCurrentLot().getName()));
                 break;
             case AUCTION_NO_WINNER:
-                sendAuctionLogToWs(auction.getId(),
-                        addLog(level, auction,
-                                String.format(LOG_NO_WINNER_MSG_TEMPLATE, auction.getCurrentLot().getName())));
+                sendAuctionLogMessageToWs(auction, level, String.format(
+                        LOG_NO_WINNER_MSG_TEMPLATE,
+                        auction.getCurrentLot().getName()));
                 break;
         }
     }
 
     private Log addLog(LogLevel level, Auction auction, String msg) {
-        Log log = new Log();
-        log.setAuction(auction);
-        log.setMessage(generateMainString(level, msg));
-        log.setDateTime(LocalDateTime.now());
-        return logRepository.save(log);
+        return logRepository.save(Log.builder()
+                .auction(auction)
+                .message(generateMainString(level, msg))
+                .dateTime(LocalDateTime.now())
+                .build());
     }
 
-    private void sendAuctionLogToWs(Long auctionId, Log log) {
+    private void sendAuctionLogMessageToWs(Auction auction, LogLevel level, String message) {
+        sendLogMessageToWs(auction.getId(), addLog(level, auction, message));
+    }
+
+    private void sendLogMessageToWs(Long auctionId, Log log) {
         sendObjectToWs(auctionId, modelMapper.map(log, LogResponse.class));
     }
 

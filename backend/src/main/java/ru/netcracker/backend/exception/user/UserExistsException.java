@@ -5,6 +5,6 @@ import ru.netcracker.backend.model.entity.User;
 
 public class UserExistsException extends ValidationException {
     public UserExistsException(final User user) {
-        super(user.getUsername());
+        super(String.format("There is account with username: %s", user.getUsername()));
     }
 }

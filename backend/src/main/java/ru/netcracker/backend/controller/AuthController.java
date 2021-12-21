@@ -2,7 +2,6 @@ package ru.netcracker.backend.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.netcracker.backend.exception.user.EmailExistsException;
@@ -32,12 +31,9 @@ public class AuthController {
 
     @PostMapping("/signin")
     public ResponseEntity<?> generateToken(@Valid @RequestBody SignInRequest signInRequest) {
-        return new ResponseEntity<>((authService.authenticateUser(
-                new User(
-                        signInRequest.getUsername(),
-                        signInRequest.getPassword()
-                        ))),
-                HttpStatus.OK);
+        return ResponseEntity.ok((authService.authenticateUser(new User(
+                signInRequest.getUsername(),
+                signInRequest.getPassword()))));
     }
 
     @PostMapping("/signup")
@@ -50,15 +46,14 @@ public class AuthController {
                 signUpRequest.getPassword(),
                 signUpRequest.getEmail()), getSiteURL(request));
         log.info("created user with email: {} and username: {}", signUpRequest.getEmail(), signUpRequest.getUsername());
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/password/change")
-    public ResponseEntity<Void> passwordChangeRequest(
-            @NotBlank @RequestParam("username") String username, HttpServletRequest request)
+    public ResponseEntity<Void> passwordChangeRequest(@NotBlank @RequestParam("username") String username, HttpServletRequest request)
             throws MessagingException, UnsupportedEncodingException {
         authService.generateNewPasswordAndSendEmail(username, getSiteURL(request));
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/send/verification")
@@ -66,7 +61,7 @@ public class AuthController {
             @NotBlank @RequestParam("username") String username, HttpServletRequest request)
             throws MessagingException, UnsupportedEncodingException {
         authService.sendVerificationLinkToUserEmail(username, getSiteURL(request));
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok().build();
     }
 
     private String getSiteURL(HttpServletRequest request) {

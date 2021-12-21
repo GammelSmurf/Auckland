@@ -3,7 +3,6 @@ package ru.netcracker.backend.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -37,17 +36,15 @@ public class TagController {
 
     @PostMapping
     public ResponseEntity<TagResponse> createTag(@Valid @RequestBody TagRequest tagRequest) {
-        TagResponse tagResponse = tagService.createTag(
-                modelMapper.map(tagRequest, Tag.class));
-
+        TagResponse tagResponse = tagService.createTag(modelMapper.map(tagRequest, Tag.class));
         log.info("created tag: {}", tagRequest);
-        return new ResponseEntity<>(tagResponse, HttpStatus.CREATED);
+        return ResponseEntity.ok(tagResponse);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTag(@PathVariable(name = "id") Long id) {
         tagService.deleteTag(id);
         log.info("deleted tag with id: {}", id);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok().build();
     }
 }

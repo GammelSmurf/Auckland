@@ -42,7 +42,8 @@ public class AuthServiceImpl implements AuthService {
             JwtUtil jwtUtil,
             UserRepository userRepository,
             BCryptPasswordEncoder encoder,
-            EmailSender emailSender, UserUtil userUtil) {
+            EmailSender emailSender,
+            UserUtil userUtil) {
         this.authenticationProvider = authenticationProvider;
         this.jwtUtil = jwtUtil;
         this.userRepository = userRepository;
@@ -54,9 +55,10 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public JwtResponse authenticateUser(User user) {
-        Authentication authentication = authenticationProvider
-                .authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        Authentication authentication = authenticationProvider.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
+        SecurityContextHolder
+                .getContext()
+                .setAuthentication(authentication);
 
         MyUserDetails userDetails = (MyUserDetails) authentication.getPrincipal();
         List<String> roles = userDetails
@@ -64,8 +66,12 @@ public class AuthServiceImpl implements AuthService {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
-        String jwt = jwtUtil.generateJwtToken(userDetails);
-        return new JwtResponse(userDetails.getId(), jwt, userDetails.getUsername(), userDetails.getUser().getMoney(), roles);
+        return new JwtResponse(
+                userDetails.getId(),
+                jwtUtil.generateJwtToken(userDetails),
+                userDetails.getUsername(),
+                userDetails.getUser().getMoney(),
+                roles);
     }
 
     @Override
@@ -100,7 +106,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private boolean isUserValidToVerify(User user, String verificationCode) {
-        return  user.getVerificationCode().equals(verificationCode) && !user.isEnabled();
+        return user.getVerificationCode().equals(verificationCode) && !user.isEnabled();
     }
 
     @Override

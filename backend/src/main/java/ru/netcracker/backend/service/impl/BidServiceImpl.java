@@ -47,8 +47,15 @@ public class BidServiceImpl implements BidService {
     private final BidUtil bidUtil;
 
     @Autowired
-    public BidServiceImpl(BidRepository bidRepository, UserRepository userRepository, AuctionRepository auctionRepository,
-                          TransactionRepository transactionRepository, LogService logService, NotificationService notificationService, UserService userService, EmailSender emailSender, ModelMapper modelMapper, BidUtil bidUtil) {
+    public BidServiceImpl(BidRepository bidRepository,
+                          UserRepository userRepository,
+                          AuctionRepository auctionRepository,
+                          TransactionRepository transactionRepository,
+                          LogService logService,
+                          NotificationService notificationService,
+                          UserService userService,
+                          EmailSender emailSender,
+                          ModelMapper modelMapper, BidUtil bidUtil) {
         this.bidRepository = bidRepository;
         this.userRepository = userRepository;
         this.auctionRepository = auctionRepository;
@@ -70,12 +77,12 @@ public class BidServiceImpl implements BidService {
         Auction auction = auctionRepository
                 .findById(auctionId)
                 .orElseThrow(() -> new AuctionNotFoundException(auctionId));
-
         bidUtil.validate(auction, amount, user);
         Bid bid = formatBit(auction, user, amount);
         createTransaction(bid);
-        logService.log(LogLevel.AUCTION_BET, bid.getAuction());
+
         bidRepository.save(bid);
+        logService.log(LogLevel.AUCTION_BET, bid.getAuction());
         userService.sendMoneyToWsByUser(user);
         return modelMapper.map(bid, BidResponse.class);
     }
@@ -84,7 +91,7 @@ public class BidServiceImpl implements BidService {
         Bid bid = (auction.getCurrentBid() != null)
                 ? auction.getCurrentBid()
                 : new Bid(auction);
-        bid.updateWith(amount, user, auction);
+        bid.updateWithAnotherBidRequest(amount, user, auction);
         return bid;
     }
 
@@ -98,7 +105,6 @@ public class BidServiceImpl implements BidService {
         Auction auction = auctionRepository
                 .findById(auctionId)
                 .orElseThrow(() -> new AuctionNotFoundException(auctionId));
-
         LocalDateTime currentDateTime = LocalDateTime.now();
         switch (auction.getStatus()) {
             case WAITING:
@@ -117,7 +123,6 @@ public class BidServiceImpl implements BidService {
         if (isAfterOrEqual(currentDateTime, auction.getBeginDateTime())) {
             auction.setRunningStatus();
             setNewEndTime(auction, currentDateTime);
-
             sendLogAndNotificationAboutChangingAuctionStatus(auction);
         }
         return generateSyncResponse(auction, currentDateTime, false);
@@ -147,7 +152,7 @@ public class BidServiceImpl implements BidService {
 
     private void handleWinnerIfExists(Auction auction) {
         if (hasWinner(auction)) {
-            makeLotWon(auction);
+            setLotWinnerAndWinPrice(auction);
             freezeLastTransaction(auction);
             deleteAllUnnecessaryWinnerTransactions(auction);
             refundMoneyAndDeleteAllTransactionsForBidExceptFrozen(auction);
@@ -162,12 +167,11 @@ public class BidServiceImpl implements BidService {
             auction.setFinishedStatus();
             auction.setEndDateTime(currentDateTime);
             auctionRepository.save(auction);
-
-            logWinnerIfExists(auction);
+            logWinnerOrNoWinner(auction);
             sendLogAndNotificationAboutChangingAuctionStatus(auction);
             return generateSyncResponse(auction, currentDateTime, false);
         } else {
-            logWinnerIfExists(auction);
+            logWinnerOrNoWinner(auction);
             return generateSyncResponse(setAndSaveAnotherLot(auction, currentDateTime), currentDateTime, true);
         }
     }
@@ -181,7 +185,7 @@ public class BidServiceImpl implements BidService {
         return auction.getCurrentBid() != null;
     }
 
-    private void makeLotWon(Auction auction) {
+    private void setLotWinnerAndWinPrice(Auction auction) {
         auction.getCurrentLot().setWinner(auction.getCurrentBid().getUser());
         auction.getCurrentLot().setWinPrice(auction.getCurrentBid().getAmount());
     }
@@ -211,7 +215,6 @@ public class BidServiceImpl implements BidService {
 
     private void sendLotWonEmails(Auction auction) {
         try {
-            System.out.println("sendEmail");
             emailSender.createAndSendLotWonEmail(auction.getCurrentBid().getUser(), auction.getCurrentLot());
             emailSender.createAndSendLotSoldEmail(auction.getCreator(), auction.getCurrentLot());
         } catch (MessagingException | UnsupportedEncodingException e) {
@@ -219,7 +222,7 @@ public class BidServiceImpl implements BidService {
         }
     }
 
-    private void logWinnerIfExists(Auction auction) {
+    private void logWinnerOrNoWinner(Auction auction) {
         if (auction.getCurrentLot().getWinner() != null) {
             logService.log(LogLevel.AUCTION_WINNER, auction);
         } else {

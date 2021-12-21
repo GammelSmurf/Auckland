@@ -4,7 +4,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.netcracker.backend.model.entity.User;
@@ -22,7 +21,6 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
-    private final BCryptPasswordEncoder encoder;
     private final SimpMessagingTemplate template;
 
     private static final String WEB_SOCKET_PATH_TEMPLATE_BALANCE = "/auction/balance/%s";
@@ -30,10 +28,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     public UserServiceImpl(UserRepository userRepository,
                            ModelMapper modelMapper,
-                           BCryptPasswordEncoder encoder, SimpMessagingTemplate template) {
+                           SimpMessagingTemplate template) {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
-        this.encoder = encoder;
         this.template = template;
     }
 
@@ -89,11 +86,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse updateUser(UserRequest userRequest) {
         User oldUser = userRepository.findByUsername(userRequest.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException(userRequest.getUsername()));
-
-        oldUser.setFirstName(userRequest.getFirstName());
-        oldUser.setSecondName(userRequest.getSecondName());
-        oldUser.setAbout(userRequest.getAbout());
-
+        oldUser.copyMainParamsFrom(userRequest);
         return modelMapper.map(userRepository.save(oldUser), UserResponse.class);
     }
 

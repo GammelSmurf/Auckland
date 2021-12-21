@@ -1,9 +1,11 @@
 package ru.netcracker.backend.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import net.bytebuddy.utility.RandomString;
+import ru.netcracker.backend.model.requests.UserRequest;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -14,16 +16,17 @@ import java.util.Set;
 
 @Entity
 @Table(name = "users")
-@Getter
-@Setter
+@Data
 public class User {
     @Id
     @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
     private String username;
     private String password;
+    @Column(unique = true)
     private String email;
     private String firstName;
     private String secondName;
@@ -50,8 +53,8 @@ public class User {
         this.email = email;
     }
 
-    @OneToOne(mappedBy = "user")
-    private Bid bid;
+    @OneToMany(mappedBy = "user")
+    private Set<Bid> bid;
 
     @OneToMany(
             mappedBy = "winner",
@@ -94,5 +97,11 @@ public class User {
         auction.getSubscribedUsers().add(this);
         auction.incUsersCount();
         this.getSubscribedAuctions().add(auction);
+    }
+
+    public void copyMainParamsFrom(UserRequest userRequest) {
+        setFirstName(userRequest.getFirstName());
+        setSecondName(userRequest.getSecondName());
+        setAbout(userRequest.getAbout());
     }
 }

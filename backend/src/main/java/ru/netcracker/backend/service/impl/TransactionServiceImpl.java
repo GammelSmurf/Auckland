@@ -26,7 +26,11 @@ public class TransactionServiceImpl implements TransactionService {
     private final UserService userService;
 
     @Autowired
-    public TransactionServiceImpl(TransactionRepository transactionRepository, LotRepository lotRepository, UserRepository userRepository, EmailSender emailSender, UserService userService) {
+    public TransactionServiceImpl(TransactionRepository transactionRepository,
+                                  LotRepository lotRepository,
+                                  UserRepository userRepository,
+                                  EmailSender emailSender,
+                                  UserService userService) {
         this.transactionRepository = transactionRepository;
         this.lotRepository = lotRepository;
         this.userRepository = userRepository;
@@ -39,22 +43,25 @@ public class TransactionServiceImpl implements TransactionService {
     public void deleteTransactionIfExpired() {
         for (Transaction tx : transactionRepository.findAll()) {
             if (isDateTimeEqualOrMoreThan6Months(tx.getDateTime())) {
-                try {
-                    tx.getLot().setCanceled(true);
-                    tx.getBuyer().addMoney(tx.getAmount());
+                tx.getLot().setCanceled(true);
+                tx.getBuyer().addMoney(tx.getAmount());
 
-                    userRepository.save(tx.getBuyer());
-                    userService.sendMoneyToWsByUser(tx.getBuyer());
+                userRepository.save(tx.getBuyer());
+                lotRepository.save(tx.getLot());
 
-                    lotRepository.save(tx.getLot());
-                    transactionRepository.delete(tx);
-
-                    emailSender.createAndSendTransferExpiredEmail(tx.getAuctionCreator());
-                    emailSender.createAndSendTransferExpiredEmail(tx.getBuyer());
-                } catch (MessagingException | UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
+                userService.sendMoneyToWsByUser(tx.getBuyer());
+                transactionRepository.delete(tx);
+                sendTransactionExpiredEmails(tx);
             }
+        }
+    }
+
+    private void sendTransactionExpiredEmails(Transaction tx) {
+        try {
+            emailSender.createAndSendTransferExpiredEmail(tx.getAuctionCreator());
+            emailSender.createAndSendTransferExpiredEmail(tx.getBuyer());
+        } catch (MessagingException | UnsupportedEncodingException e) {
+            e.printStackTrace();
         }
     }
 

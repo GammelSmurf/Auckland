@@ -26,13 +26,17 @@ public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
 
     private static final String WEB_SOCKET_PATH_TEMPLATE = "/user/notifications/%d";
+
     private static final String USER_SUBSCRIBED_MSG_TEMPLATE = "User '%s' subscribed to auction '%s'";
     private static final String SUBSCRIBED_AUCTION_STATUS_CHANGED_MSG_TEMPLATE = "An auction you subscribed '%s' changed status to '%s'";
     private static final String OWN_AUCTION_STATUS_CHANGED_MSG_TEMPLATE = "Your auction '%s' changed status to '%s'";
-    @Value("${Auckland.removalPeriod.notification}")
-    private String daysForDelete;
 
-    public NotificationServiceImpl(SimpMessagingTemplate template, ModelMapper modelMapper, NotificationRepository notificationRepository) {
+    @Value("${Auckland.removalPeriodInDays.notifications}")
+    private Long daysForDelete;
+
+    public NotificationServiceImpl(SimpMessagingTemplate template,
+                                   ModelMapper modelMapper,
+                                   NotificationRepository notificationRepository) {
         this.template = template;
         this.modelMapper = modelMapper;
         this.notificationRepository = notificationRepository;
@@ -50,22 +54,25 @@ public class NotificationServiceImpl implements NotificationService {
     public void log(NotificationLevel level, User user, Auction auction) {
         switch (level) {
             case USER_SUBSCRIBED:
-                sendNotificationToWs(
-                        auction.getCreator().getId(),
-                        addNotification(auction.getCreator(), auction, String.format(USER_SUBSCRIBED_MSG_TEMPLATE,
-                                user.getUsername(), auction.getName())));
+                sendNotificationToWs(auction.getCreator().getId(),
+                        addNotification(auction.getCreator(), auction, String.format(
+                                USER_SUBSCRIBED_MSG_TEMPLATE,
+                                user.getUsername(),
+                                auction.getName())));
                 break;
             case SUBSCRIBED_AUCTION_STATUS_CHANGED:
-                sendNotificationToWs(
-                        auction.getCreator().getId(),
-                        addNotification(auction.getCreator(), auction, String.format(OWN_AUCTION_STATUS_CHANGED_MSG_TEMPLATE,
-                                auction.getName(), auction.getStatus())));
+                sendNotificationToWs(auction.getCreator().getId(),
+                        addNotification(auction.getCreator(), auction, String.format(
+                                OWN_AUCTION_STATUS_CHANGED_MSG_TEMPLATE,
+                                auction.getName(),
+                                auction.getStatus())));
 
                 for (User member : auction.getSubscribedUsers()) {
-                    sendNotificationToWs(
-                            member.getId(),
-                            addNotification(member, auction, String.format(SUBSCRIBED_AUCTION_STATUS_CHANGED_MSG_TEMPLATE,
-                                    auction.getName(), auction.getStatus())));
+                    sendNotificationToWs(member.getId(),
+                            addNotification(member, auction, String.format(
+                                    SUBSCRIBED_AUCTION_STATUS_CHANGED_MSG_TEMPLATE,
+                                    auction.getName(),
+                                    auction.getStatus())));
                 }
                 break;
         }
@@ -74,17 +81,16 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     @Transactional
     public void deleteOldNotifications() {
-        notificationRepository.deleteAllByDateTimeIsLessThan(LocalDateTime.now().minusDays(Long.parseLong(daysForDelete)));
+        notificationRepository.deleteAllByDateTimeIsLessThan(LocalDateTime.now().minusDays(daysForDelete));
     }
 
     private Notification addNotification(User user, Auction auction, String msg) {
-        Notification notification = new Notification();
-        notification.setUser(user);
-        notification.setAuction(auction);
-        notification.setMessage(msg);
-        notification.setDateTime(LocalDateTime.now());
-
-        return notificationRepository.save(notification);
+        return notificationRepository.save(Notification.builder()
+                .user(user)
+                .auction(auction)
+                .message(msg)
+                .dateTime(LocalDateTime.now())
+                .build());
     }
 
     private void sendNotificationToWs(Long userId, Notification notification) {

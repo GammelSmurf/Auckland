@@ -1,6 +1,7 @@
 package ru.netcracker.backend.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,8 +9,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "tags")
-@Getter
-@Setter
+@Data
 public class Tag {
     @Id
     @Column(name = "tag_id")

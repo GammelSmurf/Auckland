@@ -6,6 +6,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.netcracker.backend.model.responses.MessageResponse;
 import ru.netcracker.backend.service.MessageService;
+
 import java.util.List;
 
 @RestController
@@ -23,7 +24,6 @@ public class MessageController {
 
     @GetMapping("/{id}")
     public List<MessageResponse> getMessagesByAuction(@PathVariable(name = "id") Long id) {
-        return messageService.getMessagesByAuction(id);
+        return messageService.getMessagesByAuctionId(id);
     }
-
 }

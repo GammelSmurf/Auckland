@@ -1,6 +1,7 @@
 package ru.netcracker.backend.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,8 +11,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "categories")
-@Getter
-@Setter
+@Data
 public class Category {
     @Id
     @Column(name = "category_id")
@@ -29,4 +29,11 @@ public class Category {
 
     @ManyToMany(mappedBy = "categories")
     private Set<Auction> auctions = new HashSet<>();
+
+    public Category(String name) {
+        setName(name);
+    }
+
+    public Category() {
+    }
 }

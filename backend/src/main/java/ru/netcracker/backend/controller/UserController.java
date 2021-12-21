@@ -1,9 +1,7 @@
 package ru.netcracker.backend.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -26,7 +24,7 @@ public class UserController {
     private final UserService userService;
 
     @Autowired
-    public UserController(NotificationService notificationService, UserService userService, ModelMapper modelMapper) {
+    public UserController(NotificationService notificationService, UserService userService) {
         this.notificationService = notificationService;
         this.userService = userService;
     }
@@ -45,7 +43,7 @@ public class UserController {
     public ResponseEntity<UserResponse> updateUser(@Valid @RequestBody UserRequest userRequest){
         UserResponse userResponse = userService.updateUser(userRequest);
         log.info("updated user: {} with username: {}", userRequest, userRequest.getUsername());
-        return new ResponseEntity<>(userResponse, HttpStatus.OK);
+        return ResponseEntity.ok(userResponse);
     }
 
     @MessageMapping("/balance/{username}")

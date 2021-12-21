@@ -1,5 +1,6 @@
 package ru.netcracker.backend.model.entity;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,8 +9,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "messages")
-@Getter
-@Setter
+@Data
 public class Message {
     @Id
     @Column(name = "message_id")

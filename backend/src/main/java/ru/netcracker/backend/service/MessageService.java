@@ -7,11 +7,11 @@ import java.util.List;
 
 public interface MessageService {
 
-    List<MessageResponse> getMessagesByAuction(Long auctionId);
+    List<MessageResponse> getMessagesByAuctionId(Long auctionId);
 
     void deleteMessage(Long messageId);
 
     MessageResponse addMessage(Message message);
 
-    void deleteOldChats();
+    void deleteOldMessagesBeforeLastSevenDays();
 }

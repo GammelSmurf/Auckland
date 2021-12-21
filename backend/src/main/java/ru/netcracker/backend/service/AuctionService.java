@@ -33,7 +33,7 @@ public interface AuctionService {
 
     AuctionResponse removeCategoryFromAuction(Long auctionId, Long categoryId);
 
-    AuctionResponse like(Long auctionId);
+    AuctionResponse addLike(Long auctionId);
 
-    AuctionResponse dislike(Long auctionId);
+    AuctionResponse removeLike(Long auctionId);
 }

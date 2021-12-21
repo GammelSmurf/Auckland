@@ -2,7 +2,6 @@ package ru.netcracker.backend.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -56,27 +55,23 @@ public class LotController {
 
     @PostMapping
     public ResponseEntity<LotResponse> createLot(@Valid @RequestBody LotRequest lotRequest) {
-        LotResponse lotResponse = lotService.createLot(
-                modelMapper.map(lotRequest, Lot.class));
-
+        LotResponse lotResponse = lotService.createLot(modelMapper.map(lotRequest, Lot.class));
         log.info("created lot: {}", lotRequest);
-        return new ResponseEntity<>(lotResponse, HttpStatus.CREATED);
+        return ResponseEntity.ok(lotResponse);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<LotResponse> updateLot(
             @PathVariable long id, @Valid @RequestBody LotRequest lotRequest) {
-        LotResponse lotResponse = lotService.updateLot(id,
-                modelMapper.map(lotRequest, Lot.class));
-
+        LotResponse lotResponse = lotService.updateLot(id, modelMapper.map(lotRequest, Lot.class));
         log.info("updated lot: {} with id: {}", lotRequest, id);
-        return new ResponseEntity<>(lotResponse, HttpStatus.OK);
+        return ResponseEntity.ok(lotResponse);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteLot(@PathVariable(name = "id") Long id) {
         lotService.deleteLot(id);
         log.info("deleted lot with id: {}", id);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok().build();
     }
 }

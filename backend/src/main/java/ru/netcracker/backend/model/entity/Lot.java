@@ -1,6 +1,7 @@
 package ru.netcracker.backend.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,8 +11,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "lots")
-@Getter
-@Setter
+@Data
 public class Lot {
     @Id
     @Column(name = "lot_id")
@@ -64,5 +64,12 @@ public class Lot {
         if (this.buyerAcceptConfirmation && this.sellerTransferConfirmation) {
             this.transferred = true;
         }
+    }
+
+    public void copyMainParamsFrom(Lot lot) {
+        setName(lot.getName());
+        setDescription(lot.getDescription());
+        setMinPrice(lot.getMinPrice());
+        setPictureLink(lot.getPictureLink());
     }
 }

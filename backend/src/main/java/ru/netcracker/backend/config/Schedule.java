@@ -18,20 +18,22 @@ public class Schedule {
     private final TransactionService transactionService;
 
     @Autowired
-    public Schedule(MessageService messageService, NotificationService notificationService, TransactionService transactionService){
-        this.messageService=messageService;
-        this.notificationService=notificationService;
+    public Schedule(MessageService messageService,
+                    NotificationService notificationService,
+                    TransactionService transactionService) {
+        this.messageService = messageService;
+        this.notificationService = notificationService;
         this.transactionService = transactionService;
     }
 
     @Scheduled(cron = "${Auckland.schedule.deleteMessages.cron}")
-    public void checkChats(){
-        messageService.deleteOldChats();
+    public void checkChats() {
+        messageService.deleteOldMessagesBeforeLastSevenDays();
         log.info("Old chats are removed");
     }
 
     @Scheduled(cron = "${Auckland.schedule.deleteNotifications.cron}")
-    public void checkNotification(){
+    public void checkNotification() {
         notificationService.deleteOldNotifications();
         log.info("Old notifications are removed");
     }

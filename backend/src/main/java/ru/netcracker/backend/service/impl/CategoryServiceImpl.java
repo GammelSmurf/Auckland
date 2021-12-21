@@ -35,8 +35,8 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     public CategoryResponse addCategory(String categoryName) {
-        Category category=new Category();
-        category.setName(categoryName);
-        return modelMapper.map(categoryRepository.save(category),CategoryResponse.class);
+        return modelMapper.map(
+                categoryRepository.save(new Category(categoryName)),
+                CategoryResponse.class);
     }
 }

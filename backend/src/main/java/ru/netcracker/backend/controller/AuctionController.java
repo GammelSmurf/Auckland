@@ -5,7 +5,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -45,7 +44,7 @@ public class AuctionController {
     }
 
     @GetMapping("/creator")
-    public List<AuctionResponse> getAllAuctionsIfCreator(){
+    public List<AuctionResponse> getAllAuctionsIfCreator() {
         return auctionService.getAllIfCreator();
     }
 
@@ -58,72 +57,65 @@ public class AuctionController {
     public ResponseEntity<AuctionResponse> getAuction(@PathVariable(name = "auctionId") Long auctionId) {
         AuctionResponse auctionResponse = auctionService.getAuctionById(auctionId);
         log.info("sent auction: {}", auctionResponse);
-        return new ResponseEntity<>(auctionResponse, HttpStatus.OK);
+        return ResponseEntity.ok(auctionResponse);
     }
 
     @PostMapping
     public ResponseEntity<AuctionResponse> createAuction(@Valid @RequestBody AuctionRequest auctionRequest) {
-        AuctionResponse auctionResponse = auctionService
-                .createAuction(modelMapper.map(auctionRequest, Auction.class));
-
+        AuctionResponse auctionResponse = auctionService.createAuction(modelMapper.map(auctionRequest, Auction.class));
         log.info("created auction: {}", auctionRequest);
-        return new ResponseEntity<>(auctionResponse, HttpStatus.CREATED);
+        return ResponseEntity.ok(auctionResponse);
     }
 
     @PutMapping("/{id}/available")
     public ResponseEntity<Void> makeAuctionAvailable(@PathVariable long id) throws NoLotsException, NotCorrectStatusException {
         auctionService.makeAuctionWaitingWithAnotherLot(id);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<AuctionResponse> updateAuction(
             @PathVariable Long id, @Valid @RequestBody AuctionRequest auctionRequest) {
-        AuctionResponse auctionResponse = auctionService.updateAuction(
-                id, modelMapper.map(auctionRequest, Auction.class));
-
+        AuctionResponse auctionResponse = auctionService.updateAuction(id, modelMapper.map(auctionRequest, Auction.class));
         log.info("updated auction: {} with id: {}", auctionRequest, id);
-        return new ResponseEntity<>(auctionResponse, HttpStatus.OK);
+        return ResponseEntity.ok(auctionResponse);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAuction(@PathVariable(name = "id") Long id) {
         auctionService.deleteAuction(id);
-
         log.info("deleted auction with id: {}", id);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/like/{auctionId}")
-    public ResponseEntity<AuctionResponse> like(@PathVariable(name = "auctionId") Long auctionId) {
-        return new ResponseEntity<>(auctionService.like(auctionId), HttpStatus.OK);
+    @PostMapping("/like/add/{auctionId}")
+    public ResponseEntity<AuctionResponse> addLike(@PathVariable(name = "auctionId") Long auctionId) {
+        return ResponseEntity.ok(auctionService.addLike(auctionId));
     }
 
-    @PostMapping("/dislike/{auctionId}")
-    public ResponseEntity<AuctionResponse> dislike(@PathVariable(name = "auctionId") Long auctionId) {
-        return new ResponseEntity<>(auctionService.dislike(auctionId), HttpStatus.OK);
+    @PostMapping("/like/remove/{auctionId}")
+    public ResponseEntity<AuctionResponse> removeLike(@PathVariable(name = "auctionId") Long auctionId) {
+        return ResponseEntity.ok(auctionService.removeLike(auctionId));
     }
 
     @PostMapping("/subscribe")
     public ResponseEntity<UserResponse> subscribe(@Valid @RequestBody SubscribeRequest subscribeRequest) {
         UserResponse userResponse = auctionService.subscribe(subscribeRequest.getAuctionId());
         log.info("user: {} subscribed to auction with id: {}", userResponse.getUsername(), subscribeRequest.getAuctionId());
-        return new ResponseEntity<>(userResponse, HttpStatus.OK);
+        return ResponseEntity.ok(userResponse);
     }
 
     @PostMapping("/category/add")
     public ResponseEntity<CategoryResponse> addCategoryToAuction(@RequestBody CategoryRequest categoryRequest) {
-        CategoryResponse categoryResponse = auctionService.addCategoryToAuction(
-                categoryRequest.getAuctionId(), categoryRequest.getCategoryId());
+        CategoryResponse categoryResponse = auctionService.addCategoryToAuction(categoryRequest.getAuctionId(), categoryRequest.getCategoryId());
         log.info("category with id: {} was added to auction with id: {}", categoryRequest.getCategoryId(), categoryRequest.getAuctionId());
-        return new ResponseEntity<>(categoryResponse, HttpStatus.OK);
+        return ResponseEntity.ok(categoryResponse);
     }
 
     @PostMapping("/category/remove")
     public ResponseEntity<AuctionResponse> removeCategoryFromAuction(@RequestBody CategoryRequest categoryRequest) {
-        AuctionResponse auctionResponse = auctionService.removeCategoryFromAuction(
-                categoryRequest.getAuctionId(), categoryRequest.getCategoryId());
+        AuctionResponse auctionResponse = auctionService.removeCategoryFromAuction(categoryRequest.getAuctionId(), categoryRequest.getCategoryId());
         log.info("category with id: {} was deleted from auction with id: {}", categoryRequest.getCategoryId(), categoryRequest.getAuctionId());
-        return new ResponseEntity<>(auctionResponse, HttpStatus.OK);
+        return ResponseEntity.ok(auctionResponse);
     }
 }

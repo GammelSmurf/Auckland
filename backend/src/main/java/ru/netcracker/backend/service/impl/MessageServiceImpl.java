@@ -26,7 +26,7 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public List<MessageResponse> getMessagesByAuction(Long auctionId) {
+    public List<MessageResponse> getMessagesByAuctionId(Long auctionId) {
         return messageRepository
                 .getMessagesByAuction_Id(auctionId).stream()
                 .map(message -> modelMapper.map(message,MessageResponse.class))
@@ -44,7 +44,7 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public void deleteOldChats() {
-        messageRepository.deleteOldChats(LocalDateTime.now().minusDays(7));
+    public void deleteOldMessagesBeforeLastSevenDays() {
+        messageRepository.deleteOldMessagesBefore(LocalDateTime.now().minusDays(7));
     }
 }

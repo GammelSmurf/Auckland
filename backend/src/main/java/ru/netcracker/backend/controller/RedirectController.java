@@ -11,9 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import ru.netcracker.backend.service.AuthService;
 
-import javax.mail.MessagingException;
-import java.io.UnsupportedEncodingException;
-
 @Controller
 public class RedirectController implements ErrorController {
     private final AuthService authService;

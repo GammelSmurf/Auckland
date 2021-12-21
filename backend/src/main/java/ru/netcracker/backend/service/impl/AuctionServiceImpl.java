@@ -25,8 +25,8 @@ import ru.netcracker.backend.repository.UserRepository;
 import ru.netcracker.backend.service.AuctionService;
 import ru.netcracker.backend.service.LogService;
 import ru.netcracker.backend.service.NotificationService;
-import ru.netcracker.backend.util.component.AuctionUtil;
 import ru.netcracker.backend.util.SecurityUtil;
+import ru.netcracker.backend.util.component.AuctionUtil;
 import ru.netcracker.backend.util.component.RandomNameGenerator;
 import ru.netcracker.backend.util.component.specification.AuctionSpecification;
 import ru.netcracker.backend.util.enumiration.LogLevel;
@@ -55,7 +55,11 @@ public class AuctionServiceImpl implements AuctionService {
                               CategoryRepository categoryRepository,
                               TagRepository tagRepository,
                               LogService logService,
-                              ModelMapper modelMapper, AuctionSpecification auctionSpecification, NotificationService notificationService, RandomNameGenerator nameGenerator, AuctionUtil auctionUtil) {
+                              ModelMapper modelMapper,
+                              AuctionSpecification auctionSpecification,
+                              NotificationService notificationService,
+                              RandomNameGenerator nameGenerator,
+                              AuctionUtil auctionUtil) {
         this.auctionRepository = auctionRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
@@ -108,7 +112,6 @@ public class AuctionServiceImpl implements AuctionService {
         Auction oldAuction = auctionRepository
                 .findById(auctionId)
                 .orElseThrow(() -> new AuctionNotFoundException(auctionId));
-
         auctionUtil.validateBeforeUpdating(oldAuction, newAuction);
         oldAuction.copyMainParamsFrom(newAuction);
         return modelMapper.map(auctionRepository.save(oldAuction), AuctionResponse.class);
@@ -139,7 +142,6 @@ public class AuctionServiceImpl implements AuctionService {
         Auction auction = auctionRepository
                 .findById(auctionId)
                 .orElseThrow(() -> new AuctionNotFoundException(auctionId));
-
         auctionUtil.validateBeforeMakingWaiting(auction);
         auction.setWaitingStatus();
         auction.setAnotherLot();
@@ -155,7 +157,6 @@ public class AuctionServiceImpl implements AuctionService {
         Auction auction = auctionRepository
                 .findById(auctionId)
                 .orElseThrow(() -> new AuctionNotFoundException(auctionId));
-
         auctionUtil.validateBeforeSubscribing(auction);
         user.subscribeToAuction(auction);
         notificationService.log(NotificationLevel.USER_SUBSCRIBED, userRepository.save(user), auction);
@@ -171,7 +172,6 @@ public class AuctionServiceImpl implements AuctionService {
         Category category = categoryRepository
                 .findById(categoryId)
                 .orElseThrow(() -> new CategoryNotFoundException(categoryId));
-
         auctionUtil.validateBeforeAddingCategoryToAuction(auction, category);
         auction.addCategory(category);
         auctionRepository.save(auction);
@@ -187,39 +187,8 @@ public class AuctionServiceImpl implements AuctionService {
         Category category = categoryRepository
                 .findById(categoryId)
                 .orElseThrow(() -> new CategoryNotFoundException(categoryId));
-
         removeTagConnectionsFromCategoryAndAuction(auction, category);
         auction.removeCategory(category);
-        return modelMapper.map(auctionRepository.save(auction), AuctionResponse.class);
-    }
-
-    @Override
-    @Transactional
-    public AuctionResponse like(Long auctionId) {
-        Auction auction = auctionRepository
-                .findById(auctionId)
-                .orElseThrow(() -> new AuctionNotFoundException(auctionId));
-        User user = userRepository
-                .findByUsername(SecurityUtil.getUsernameFromSecurityCtx())
-                .orElseThrow(() -> new UsernameNotFoundException(SecurityUtil.getUsernameFromSecurityCtx()));
-
-        auctionUtil.validateBeforeLike(auction, user);
-        auction.addUserWhoLiked(user);
-        return modelMapper.map(auctionRepository.save(auction), AuctionResponse.class);
-    }
-
-    @Override
-    @Transactional
-    public AuctionResponse dislike(Long auctionId) {
-        Auction auction = auctionRepository
-                .findById(auctionId)
-                .orElseThrow(() -> new AuctionNotFoundException(auctionId));
-        User user = userRepository
-                .findByUsername(SecurityUtil.getUsernameFromSecurityCtx())
-                .orElseThrow(() -> new UsernameNotFoundException(SecurityUtil.getUsernameFromSecurityCtx()));
-
-        auctionUtil.validateBeforeDislike(auction, user);
-        auction.removeUserWhoLiked(user);
         return modelMapper.map(auctionRepository.save(auction), AuctionResponse.class);
     }
 
@@ -227,5 +196,33 @@ public class AuctionServiceImpl implements AuctionService {
         List<Tag> tags = tagRepository.findAllByAuction_IdAndCategory_Id(auction.getId(), category.getId());
         tags.forEach(auction.getTags()::remove);
         tags.forEach(category.getTags()::remove);
+    }
+
+    @Override
+    @Transactional
+    public AuctionResponse addLike(Long auctionId) {
+        Auction auction = auctionRepository
+                .findById(auctionId)
+                .orElseThrow(() -> new AuctionNotFoundException(auctionId));
+        User user = userRepository
+                .findByUsername(SecurityUtil.getUsernameFromSecurityCtx())
+                .orElseThrow(() -> new UsernameNotFoundException(SecurityUtil.getUsernameFromSecurityCtx()));
+        auctionUtil.validateBeforeAddingLike(auction, user);
+        auction.addUserWhoLikedAndIncreaseLikesCount(user);
+        return modelMapper.map(auctionRepository.save(auction), AuctionResponse.class);
+    }
+
+    @Override
+    @Transactional
+    public AuctionResponse removeLike(Long auctionId) {
+        Auction auction = auctionRepository
+                .findById(auctionId)
+                .orElseThrow(() -> new AuctionNotFoundException(auctionId));
+        User user = userRepository
+                .findByUsername(SecurityUtil.getUsernameFromSecurityCtx())
+                .orElseThrow(() -> new UsernameNotFoundException(SecurityUtil.getUsernameFromSecurityCtx()));
+        auctionUtil.validateBeforeDislike(auction, user);
+        auction.removeUserWhoLikedAndDecreaseLikesCount(user);
+        return modelMapper.map(auctionRepository.save(auction), AuctionResponse.class);
     }
 }

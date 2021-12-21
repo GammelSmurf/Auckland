@@ -77,6 +77,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserResponse getUserByUsername(String username) {
+        return modelMapper.map(userRepository
+                .findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException(username)),
+                UserResponse.class);
+    }
+
+    @Override
     @Transactional
     public UserResponse updateUser(UserRequest userRequest) {
         User oldUser = userRepository.findByUsername(userRequest.getUsername())

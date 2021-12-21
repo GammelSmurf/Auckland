@@ -51,7 +51,7 @@ public class Bid {
     }
 
     public void updateWith(BigDecimal amount, User user, Auction auction) {
-        setAmount(amount);
+        setAmount(this.amount.add(amount));
         addExtraTime();
         setUser(user);
         setAuction(auction);

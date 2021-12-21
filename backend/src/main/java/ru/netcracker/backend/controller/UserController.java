@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.*;
 import ru.netcracker.backend.model.requests.UserRequest;
 import ru.netcracker.backend.model.responses.NotificationResponse;
@@ -16,7 +15,6 @@ import ru.netcracker.backend.service.NotificationService;
 import ru.netcracker.backend.service.UserService;
 
 import javax.validation.Valid;
-import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -31,6 +29,11 @@ public class UserController {
     public UserController(NotificationService notificationService, UserService userService, ModelMapper modelMapper) {
         this.notificationService = notificationService;
         this.userService = userService;
+    }
+
+    @GetMapping("/{username}")
+    public UserResponse getUser(@PathVariable String username) {
+        return userService.getUserByUsername(username);
     }
 
     @GetMapping("/notifications")

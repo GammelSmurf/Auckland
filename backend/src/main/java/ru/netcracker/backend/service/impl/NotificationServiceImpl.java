@@ -11,7 +11,7 @@ import ru.netcracker.backend.model.entity.User;
 import ru.netcracker.backend.model.responses.NotificationResponse;
 import ru.netcracker.backend.repository.NotificationRepository;
 import ru.netcracker.backend.service.NotificationService;
-import ru.netcracker.backend.util.SecurityUtil;
+import ru.netcracker.backend.util.component.SecurityUtil;
 import ru.netcracker.backend.util.enumiration.NotificationLevel;
 
 import java.time.LocalDateTime;

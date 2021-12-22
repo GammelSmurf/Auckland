@@ -8,7 +8,6 @@ import ru.netcracker.backend.exception.lot.LotNotWonException;
 import ru.netcracker.backend.exception.lot.UserIsNotLotWinnerException;
 import ru.netcracker.backend.model.entity.Lot;
 import ru.netcracker.backend.repository.LotRepository;
-import ru.netcracker.backend.util.SecurityUtil;
 
 @Component
 public class LotUtil {
@@ -33,8 +32,8 @@ public class LotUtil {
         }
     }
 
-    private boolean isAuctionCreator(Lot lot) {
-        return lot.getAuction().getCreator().getUsername().equals(SecurityUtil.getUsernameFromSecurityCtx());
+    public void validateBeforeDeleting(Lot lot) {
+        checkIfAuctionOwn(lot);
     }
 
     private boolean isLotWinner(Lot lot) {
@@ -52,6 +51,26 @@ public class LotUtil {
     }
 
     public void validateBeforeCreating(Lot lot) {
+        checkIfAuctionOwn(lot);
+        checkIfNameExists(lot);
+    }
+
+    public void validateBeforeUpdating(Lot lot) {
+        checkIfAuctionOwn(lot);
+        checkIfNameExists(lot);
+    }
+
+    private void checkIfAuctionOwn(Lot lot) {
+        if (isAuctionCreator(lot)) {
+            throw new AuctionIsNotOwnByUserException(lot.getAuction());
+        }
+    }
+
+    private boolean isAuctionCreator(Lot lot) {
+        return lot.getAuction().getCreator().getUsername().equals(SecurityUtil.getUsernameFromSecurityCtx());
+    }
+
+    private void checkIfNameExists(Lot lot) {
         if (lotRepository.existsByName(lot.getName())) {
             throw new LotNameAlreadyExistsException(lot);
         }

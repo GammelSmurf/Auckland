@@ -1,4 +1,4 @@
-package ru.netcracker.backend.util.builder;
+package ru.netcracker.backend.util.component.email;
 
 import com.sun.istack.NotNull;
 import lombok.NonNull;

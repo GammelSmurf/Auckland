@@ -8,6 +8,7 @@ import ru.netcracker.backend.model.entity.Category;
 import ru.netcracker.backend.model.responses.CategoryResponse;
 import ru.netcracker.backend.repository.CategoryRepository;
 import ru.netcracker.backend.service.CategoryService;
+import ru.netcracker.backend.util.CategoryUtil;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,11 +18,13 @@ import java.util.stream.Collectors;
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
     private final ModelMapper modelMapper;
+    private final CategoryUtil categoryUtil;
 
     @Autowired
-    public CategoryServiceImpl(CategoryRepository categoryRepository, ModelMapper modelMapper) {
+    public CategoryServiceImpl(CategoryRepository categoryRepository, ModelMapper modelMapper, CategoryUtil categoryUtil) {
         this.categoryRepository = categoryRepository;
         this.modelMapper = modelMapper;
+        this.categoryUtil = categoryUtil;
     }
 
     @Override
@@ -35,8 +38,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     public CategoryResponse addCategory(String categoryName) {
-        return modelMapper.map(
-                categoryRepository.save(new Category(categoryName)),
-                CategoryResponse.class);
+        categoryUtil.validateBeforeAdding(categoryName);
+        return modelMapper.map(categoryRepository.save(new Category(categoryName)), CategoryResponse.class);
     }
 }

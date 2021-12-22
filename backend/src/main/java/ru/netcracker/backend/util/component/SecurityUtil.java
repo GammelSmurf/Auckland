@@ -1,4 +1,4 @@
-package ru.netcracker.backend.util;
+package ru.netcracker.backend.util.component;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 

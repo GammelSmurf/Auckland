@@ -1,7 +1,7 @@
 package ru.netcracker.backend.util.component.specification.operation;
 
 import ru.netcracker.backend.model.entity.*;
-import ru.netcracker.backend.util.SecurityUtil;
+import ru.netcracker.backend.util.component.SecurityUtil;
 import ru.netcracker.backend.util.component.specification.Filter;
 import ru.netcracker.backend.util.component.specification.PredicateData;
 

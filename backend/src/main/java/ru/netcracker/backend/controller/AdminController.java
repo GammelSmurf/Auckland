@@ -7,7 +7,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.netcracker.backend.exception.user.UserExistsException;
 import ru.netcracker.backend.model.requests.MoneyRequest;
+import ru.netcracker.backend.model.responses.CategoryResponse;
 import ru.netcracker.backend.model.responses.UserResponse;
+import ru.netcracker.backend.service.CategoryService;
 import ru.netcracker.backend.service.UserService;
 
 import javax.validation.Valid;
@@ -21,10 +23,12 @@ import java.util.List;
 @Validated
 public class AdminController {
     private final UserService userService;
+    private final CategoryService categoryService;
 
     @Autowired
-    public AdminController(UserService userService) {
+    public AdminController(UserService userService, CategoryService categoryService) {
         this.userService = userService;
+        this.categoryService = categoryService;
     }
 
     @GetMapping
@@ -51,5 +55,12 @@ public class AdminController {
         UserResponse userResponse = userService.addMoney(moneyRequest.getUsername(), moneyRequest.getMoney());
         log.info("added {}$ to user {}", moneyRequest.getMoney(), moneyRequest.getUsername());
         return ResponseEntity.ok(userResponse);
+    }
+
+    @PostMapping("/category/add")
+    public ResponseEntity<?> addCategory(@NotBlank @RequestParam("name") String name) {
+        CategoryResponse categoryResponse = categoryService.addCategory(name);
+        log.info("added {} category", categoryResponse.getName());
+        return ResponseEntity.ok(categoryResponse);
     }
 }

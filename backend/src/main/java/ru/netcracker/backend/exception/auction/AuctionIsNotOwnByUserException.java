@@ -2,7 +2,7 @@ package ru.netcracker.backend.exception.auction;
 
 import ru.netcracker.backend.exception.ValidationException;
 import ru.netcracker.backend.model.entity.Auction;
-import ru.netcracker.backend.util.SecurityUtil;
+import ru.netcracker.backend.util.component.SecurityUtil;
 
 public class AuctionIsNotOwnByUserException extends ValidationException {
     public AuctionIsNotOwnByUserException(Auction auction) {

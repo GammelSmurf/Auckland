@@ -15,14 +15,13 @@ import ru.netcracker.backend.repository.TransactionRepository;
 import ru.netcracker.backend.service.LotService;
 import ru.netcracker.backend.service.UserService;
 import ru.netcracker.backend.util.component.LotUtil;
-import ru.netcracker.backend.util.SecurityUtil;
+import ru.netcracker.backend.util.component.SecurityUtil;
 import ru.netcracker.backend.util.component.RandomNameGenerator;
 import ru.netcracker.backend.util.component.email.EmailSender;
 
 import javax.mail.MessagingException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -77,6 +76,7 @@ public class LotServiceImpl implements LotService {
     @Override
     @Transactional
     public LotResponse updateLot(Long lotId, Lot newLot) {
+        lotUtil.validateBeforeUpdating(newLot);
         Lot oldLot = lotRepository
                 .findById(lotId)
                 .orElseThrow(() -> new LotNotFoundException(lotId));
@@ -90,6 +90,7 @@ public class LotServiceImpl implements LotService {
         Lot lot = lotRepository
                 .findById(lotId)
                 .orElseThrow(() -> new LotNotFoundException(lotId));
+        lotUtil.validateBeforeDeleting(lot);
         lot.getAuction().getLots().remove(lot);
         lotRepository.delete(lot);
     }

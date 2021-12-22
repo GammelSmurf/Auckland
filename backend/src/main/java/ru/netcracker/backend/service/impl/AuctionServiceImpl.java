@@ -25,7 +25,7 @@ import ru.netcracker.backend.repository.UserRepository;
 import ru.netcracker.backend.service.AuctionService;
 import ru.netcracker.backend.service.LogService;
 import ru.netcracker.backend.service.NotificationService;
-import ru.netcracker.backend.util.SecurityUtil;
+import ru.netcracker.backend.util.component.SecurityUtil;
 import ru.netcracker.backend.util.component.AuctionUtil;
 import ru.netcracker.backend.util.component.RandomNameGenerator;
 import ru.netcracker.backend.util.component.specification.AuctionSpecification;

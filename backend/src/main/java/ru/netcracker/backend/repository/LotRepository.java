@@ -10,7 +10,9 @@ import java.util.List;
 @Repository
 public interface LotRepository extends JpaRepository<Lot, Long> {
     List<Lot> findAllByAuction_Id(Long auctionId);
+
     boolean existsByName(String name);
+
     @Query("select l from Lot l where (l.winner.username = ?1 or l.auction.creator.username = ?1) and l.transferred = ?2")
     List<Lot> findAllIfWinnerOrCreatorByTransferred(String username, boolean transferred);
 }

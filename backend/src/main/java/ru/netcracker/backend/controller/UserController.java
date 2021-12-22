@@ -7,6 +7,7 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.web.bind.annotation.*;
 import ru.netcracker.backend.model.requests.UserRequest;
+import ru.netcracker.backend.model.responses.ContactInfoResponse;
 import ru.netcracker.backend.model.responses.NotificationResponse;
 import ru.netcracker.backend.model.responses.UserResponse;
 import ru.netcracker.backend.service.NotificationService;
@@ -37,6 +38,11 @@ public class UserController {
     @GetMapping("/notifications")
     public List<NotificationResponse> getUserNotifications() {
         return notificationService.getUserNotifications();
+    }
+
+    @GetMapping("/contact")
+    public ContactInfoResponse getUserContactInfoByLotId(@RequestParam("lotId") Long lotId) {
+        return userService.getContactInfoByLotId(lotId);
     }
 
     @PutMapping("/update")

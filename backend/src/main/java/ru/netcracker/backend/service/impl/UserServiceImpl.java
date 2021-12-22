@@ -6,11 +6,14 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.netcracker.backend.exception.lot.LotNotFoundException;
 import ru.netcracker.backend.model.entity.User;
 import ru.netcracker.backend.model.requests.UserRequest;
+import ru.netcracker.backend.model.responses.ContactInfoResponse;
 import ru.netcracker.backend.model.responses.UserResponse;
 import ru.netcracker.backend.repository.UserRepository;
 import ru.netcracker.backend.service.UserService;
+import ru.netcracker.backend.util.component.UserUtil;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -22,16 +25,18 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final SimpMessagingTemplate template;
+    private final UserUtil userUtil;
 
     private static final String WEB_SOCKET_PATH_TEMPLATE_BALANCE = "/auction/balance/%s";
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository,
                            ModelMapper modelMapper,
-                           SimpMessagingTemplate template) {
+                           SimpMessagingTemplate template, UserUtil userUtil) {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
         this.template = template;
+        this.userUtil = userUtil;
     }
 
     @Override
@@ -100,6 +105,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public void sendMoneyToWsByUser(User user) {
         sendMoneyToWsByUser(user.getUsername(), user.getMoney());
+    }
+
+    @Override
+    public ContactInfoResponse getContactInfoByLotId(Long lotId) {
+        userUtil.validateBeforeGettingContactInfo(lotId);
+        User user = userRepository.findCreatorByLotId(lotId)
+                .orElseThrow(() -> new LotNotFoundException(lotId));
+        return modelMapper.map(user, ContactInfoResponse.class);
     }
 
     private void sendMoneyToWsByUser(String username, BigDecimal money) {

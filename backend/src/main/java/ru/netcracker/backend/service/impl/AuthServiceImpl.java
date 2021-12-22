@@ -77,7 +77,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public void createUser(User user, String siteURL) throws MessagingException, UnsupportedEncodingException {
-        userUtil.validate(user, userRepository);
+        userUtil.validateBeforeSigningUp(user, userRepository);
         user.setPassword(encoder.encode(user.getPassword()));
         user.getUserRoles().add(UserRole.USER);
         emailSender.createAndSendVerificationEmail(userRepository.save(user), siteURL);

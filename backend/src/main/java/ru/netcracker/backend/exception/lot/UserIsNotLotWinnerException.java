@@ -2,7 +2,7 @@ package ru.netcracker.backend.exception.lot;
 
 import ru.netcracker.backend.exception.ValidationException;
 import ru.netcracker.backend.model.entity.Lot;
-import ru.netcracker.backend.util.SecurityUtil;
+import ru.netcracker.backend.util.component.SecurityUtil;
 
 public class UserIsNotLotWinnerException extends ValidationException {
     public UserIsNotLotWinnerException(Lot lot) {

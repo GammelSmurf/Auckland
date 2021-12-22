@@ -12,7 +12,7 @@ import ru.netcracker.backend.model.requests.LotRequest;
 import ru.netcracker.backend.model.requests.MessageRequest;
 import ru.netcracker.backend.model.requests.TagRequest;
 import ru.netcracker.backend.model.responses.*;
-import ru.netcracker.backend.util.SecurityUtil;
+import ru.netcracker.backend.util.component.SecurityUtil;
 
 import java.time.Duration;
 import java.time.LocalDateTime;

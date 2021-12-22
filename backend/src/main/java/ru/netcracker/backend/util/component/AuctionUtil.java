@@ -8,7 +8,6 @@ import ru.netcracker.backend.model.entity.Auction;
 import ru.netcracker.backend.model.entity.Category;
 import ru.netcracker.backend.model.entity.User;
 import ru.netcracker.backend.repository.AuctionRepository;
-import ru.netcracker.backend.util.SecurityUtil;
 
 import java.time.LocalDateTime;
 

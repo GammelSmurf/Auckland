@@ -197,20 +197,24 @@ public class BidServiceImpl implements BidService {
     }
 
     private void deleteAllUnnecessaryWinnerTransactions(Auction auction) {
-        auction.getCurrentBid().getTransactions().stream()
-                .filter(tx -> (tx.getBuyer().equals(auction.getCurrentLot().getWinner())
-                        && !tx.getTransactionStatus().equals(TransactionStatus.FROZEN)))
-                .forEach(transactionRepository::delete);
+        if (!auction.getCurrentBid().getTransactions().isEmpty()) {
+            auction.getCurrentBid().getTransactions().stream()
+                    .filter(tx -> (tx.getBuyer().equals(auction.getCurrentLot().getWinner())
+                            && !tx.getTransactionStatus().equals(TransactionStatus.FROZEN)))
+                    .forEach(transactionRepository::delete);
+        }
     }
 
     private void refundMoneyAndDeleteAllTransactionsForBidExceptFrozen(Auction auction) {
-        auction.getCurrentBid().getTransactions().stream()
-                .filter(tx -> !tx.getTransactionStatus().equals(TransactionStatus.FROZEN))
-                .forEach(tx -> {
-                    tx.getBuyer().addMoney(tx.getAmount());
-                    userService.sendMoneyToWsByUser(tx.getBuyer());
-                    transactionRepository.delete(tx);
-                });
+        if (!auction.getCurrentBid().getTransactions().isEmpty()) {
+            auction.getCurrentBid().getTransactions().stream()
+                    .filter(tx -> !tx.getTransactionStatus().equals(TransactionStatus.FROZEN))
+                    .forEach(tx -> {
+                        tx.getBuyer().addMoney(tx.getAmount());
+                        userService.sendMoneyToWsByUser(tx.getBuyer());
+                        transactionRepository.delete(tx);
+                    });
+        }
     }
 
     private void sendLotWonEmails(Auction auction) {

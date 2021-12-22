@@ -25,7 +25,7 @@ public class LotUtil {
 
     public void validateBeforeConfirmationLotTransfer(Lot lot) {
         checkIfLotWon(lot);
-        if (!isAuctionCreator(lot)) {
+        if (!isAuctionCreator(lot.getAuction())) {
             throw new AuctionIsNotOwnByUserException(lot.getAuction());
         }
     }
@@ -66,16 +66,16 @@ public class LotUtil {
     }
 
     private void checkIfAuctionOwn(Lot lot) {
-        if (isAuctionCreator(lot)) {
-            throw new AuctionIsNotOwnByUserException(lot.getAuction());
+        Auction auction = auctionRepository
+                .findById(lot.getAuction().getId())
+                .orElseThrow(() -> new AuctionNotFoundException(lot.getAuction().getId()));
+        if (isAuctionCreator(auction)) {
+            throw new AuctionIsNotOwnByUserException(auction);
         }
     }
 
-    private boolean isAuctionCreator(Lot lot) {
-        return auctionRepository
-                .findById(lot.getAuction().getId())
-                .orElseThrow(() -> new AuctionNotFoundException(lot.getAuction().getId()))
-                .getCreator().getUsername().equals(SecurityUtil.getUsernameFromSecurityCtx());
+    private boolean isAuctionCreator(Auction auction) {
+        return auction.getCreator().getUsername().equals(SecurityUtil.getUsernameFromSecurityCtx());
     }
 
     private void checkIfNameExists(Lot lot) {

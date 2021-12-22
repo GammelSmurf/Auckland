@@ -13,7 +13,8 @@ import java.util.*;
 
 @Entity
 @Table(name = "auctions")
-@Data
+@Getter
+@Setter
 public class Auction {
     @Id
     @Column(name = "auction_id")

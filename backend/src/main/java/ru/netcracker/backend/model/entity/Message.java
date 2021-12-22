@@ -9,7 +9,8 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "messages")
-@Data
+@Getter
+@Setter
 public class Message {
     @Id
     @Column(name = "message_id")

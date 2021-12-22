@@ -16,7 +16,8 @@ import java.util.Set;
 
 @Entity
 @Table(name = "users")
-@Data
+@Getter
+@Setter
 public class User {
     @Id
     @Column(name = "user_id")
@@ -54,6 +55,7 @@ public class User {
     }
 
     @OneToMany(mappedBy = "user")
+    @JsonBackReference
     private Set<Bid> bid;
 
     @OneToMany(

@@ -14,7 +14,8 @@ import java.util.Set;
 
 @Entity
 @Table(name = "bids")
-@Data
+@Getter
+@Setter
 public class Bid {
     @Id
     @Column(name = "bid_id")

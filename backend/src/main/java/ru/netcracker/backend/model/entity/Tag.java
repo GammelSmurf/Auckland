@@ -9,7 +9,8 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "tags")
-@Data
+@Getter
+@Setter
 public class Tag {
     @Id
     @Column(name = "tag_id")

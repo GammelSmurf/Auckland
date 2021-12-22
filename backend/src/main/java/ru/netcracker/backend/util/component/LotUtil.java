@@ -69,7 +69,7 @@ public class LotUtil {
         Auction auction = auctionRepository
                 .findById(lot.getAuction().getId())
                 .orElseThrow(() -> new AuctionNotFoundException(lot.getAuction().getId()));
-        if (isAuctionCreator(auction)) {
+        if (!isAuctionCreator(auction)) {
             throw new AuctionIsNotOwnByUserException(auction);
         }
     }

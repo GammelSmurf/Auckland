@@ -28,6 +28,7 @@
     "react-scroll": "^1.8.4",
     "react-stomp": "^5.1.0",
     "reactstrap": "^8.10.0",
+    "recharts": "^2.1.8",
     "sockjs-client": "^1.5.2",
     "stomp-websocket": "^2.3.4-next",
     "use-interval": "^1.4.0",

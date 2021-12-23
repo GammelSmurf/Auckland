@@ -3,6 +3,7 @@ package ru.netcracker.backend.service.impl;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.netcracker.backend.exception.auction.AuctionNotFoundException;
 import ru.netcracker.backend.exception.auction.NotCorrectStatusException;
@@ -31,6 +32,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -78,21 +80,33 @@ public class BidServiceImpl implements BidService {
                 .findById(auctionId)
                 .orElseThrow(() -> new AuctionNotFoundException(auctionId));
         bidUtil.validate(auction, amount, user);
-        Bid bid = formatBit(auction, user, amount);
-        createTransaction(bid);
-
+        Bid bid = formatAndFillBid(auction, user, amount);
+        bid.getUser().subtractMoney(amount);
         bidRepository.save(bid);
+        createOrRewriteLastUserTransaction(user, bid);
+
         logService.log(LogLevel.AUCTION_BET, bid.getAuction());
-        userService.sendMoneyToWsByUser(user);
+        userService.sendMoneyToWsByUser(userRepository.save(user));
         return modelMapper.map(bid, BidResponse.class);
     }
 
-    private Bid formatBit(Auction auction, User user, BigDecimal amount) {
+    private Bid formatAndFillBid(Auction auction, User user, BigDecimal amount) {
         Bid bid = (auction.getCurrentBid() != null)
                 ? auction.getCurrentBid()
                 : new Bid(auction);
         bid.updateWithAnotherBidRequest(amount, user, auction);
         return bid;
+    }
+
+    private void createOrRewriteLastUserTransaction(User user, Bid bid) {
+        Optional<Transaction> txOptional = transactionRepository.findByBuyer_UsernameAndLot_Id(user.getUsername(), bid.getLot().getId());
+        if (txOptional.isPresent()) {
+            Transaction tx = txOptional.get();
+            tx.updateWith(bid);
+            transactionRepository.save(tx);
+        } else {
+            createTransaction(bid);
+        }
     }
 
     private void createTransaction(Bid bid) {
@@ -154,7 +168,6 @@ public class BidServiceImpl implements BidService {
         if (hasWinner(auction)) {
             setLotWinnerAndWinPrice(auction);
             freezeLastTransaction(auction);
-            deleteAllUnnecessaryWinnerTransactions(auction);
             refundMoneyAndDeleteAllTransactionsForBidExceptFrozen(auction);
             userService.sendMoneyToWsByUser(auction.getCurrentBid().getUser());
             sendLotWonEmails(auction);
@@ -194,15 +207,6 @@ public class BidServiceImpl implements BidService {
         auction.getCurrentBid().getTransactions().stream()
                 .max(Comparator.comparing(Transaction::getDateTime))
                 .ifPresent(tx -> tx.setTransactionStatus(TransactionStatus.FROZEN));
-    }
-
-    private void deleteAllUnnecessaryWinnerTransactions(Auction auction) {
-        if (!auction.getCurrentBid().getTransactions().isEmpty()) {
-            auction.getCurrentBid().getTransactions().stream()
-                    .filter(tx -> (tx.getBuyer().equals(auction.getCurrentLot().getWinner())
-                            && !tx.getTransactionStatus().equals(TransactionStatus.FROZEN)))
-                    .forEach(transactionRepository::delete);
-        }
     }
 
     private void refundMoneyAndDeleteAllTransactionsForBidExceptFrozen(Auction auction) {

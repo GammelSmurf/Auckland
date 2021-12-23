@@ -9,5 +9,5 @@ import java.util.Optional;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
     Optional<Transaction> findByLot(Lot lot);
-    Optional<Transaction> findByBuyer_UsernameAndLot(String username, Long lotId);
+    Optional<Transaction> findByBuyer_UsernameAndLot_Id(String username, Long lotId);
 }

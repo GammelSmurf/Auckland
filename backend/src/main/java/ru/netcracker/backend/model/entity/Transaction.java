@@ -1,6 +1,5 @@
 package ru.netcracker.backend.model.entity;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -36,6 +35,10 @@ public class Transaction {
     }
 
     public Transaction(Bid bid) {
+        updateWith(bid);
+    }
+
+    public void updateWith(Bid bid) {
         this.buyer = bid.getUser();
         this.amount = bid.getAmount();
         this.auctionCreator = bid.getAuction().getCreator();

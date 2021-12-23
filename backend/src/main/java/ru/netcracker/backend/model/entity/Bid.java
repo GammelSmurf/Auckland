@@ -52,12 +52,11 @@ public class Bid {
     }
 
     public void updateWithAnotherBidRequest(BigDecimal amount, User user, Auction auction) {
-        setAmount(this.amount.add(amount));
+        setAmount(amount);
         addExtraTime();
         setUser(user);
         setAuction(auction);
         auction.setCurrentBid(this);
-        user.subtractMoney(amount);
     }
 
     public void addExtraTime() {

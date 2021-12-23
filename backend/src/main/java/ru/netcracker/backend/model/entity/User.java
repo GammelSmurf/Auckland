@@ -1,7 +1,6 @@
 package ru.netcracker.backend.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import net.bytebuddy.utility.RandomString;
@@ -53,7 +52,7 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     @JsonBackReference
-    private Set<Bid> bid;
+    private Set<Bid> bid = new HashSet<>(0);
 
     @OneToMany(
             mappedBy = "winner",

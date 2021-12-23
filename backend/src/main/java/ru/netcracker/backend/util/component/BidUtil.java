@@ -35,11 +35,15 @@ public class BidUtil {
             throw new NoCurrencyException();
         }
 
-        if (isNoBid(auction) && isLess(amount, auction.getCurrentLot().getMinPrice())) {
+        if (isLess(amount, auction.getCurrentLot().getMinPrice())) {
             throw new BankLessThanMinException(auction);
         }
 
-        if (!isNoBid(auction) && isLess(amount, auction.getCurrentLot().getPriceIncreaseMinStep())) {
+        if (!isNoBid(auction) && isLess(amount, auction.getCurrentBid().getAmount())) {
+            throw new BankLessThanOldException(auction);
+        }
+
+        if (!isNoBid(auction) && isLess(amount.subtract(auction.getCurrentBid().getAmount()), auction.getCurrentLot().getPriceIncreaseMinStep())) {
             throw new BankLessThanStepException(auction);
         }
     }

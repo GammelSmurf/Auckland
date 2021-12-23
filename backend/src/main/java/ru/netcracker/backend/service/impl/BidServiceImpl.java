@@ -3,8 +3,6 @@ package ru.netcracker.backend.service.impl;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.netcracker.backend.exception.auction.AuctionNotFoundException;
 import ru.netcracker.backend.exception.auction.NotCorrectStatusException;
@@ -82,12 +80,11 @@ public class BidServiceImpl implements BidService {
                 .orElseThrow(() -> new AuctionNotFoundException(auctionId));
         bidUtil.validate(auction, amount, user);
         Bid bid = formatAndFillBid(auction, user, amount);
-        bid.getUser().subtractMoney(amount);
         bidRepository.save(bid);
-        createOrRewriteLastUserTransaction(user, bid);
+        createOrRewriteLastUserTransactionAndSubstractUserMoney(user, bid);
 
         logService.log(LogLevel.AUCTION_BET, bid.getAuction());
-        userService.sendMoneyToWsByUser(userRepository.save(user));
+        userService.sendMoneyToWsByUser(user);
         return modelMapper.map(bid, BidResponse.class);
     }
 
@@ -99,12 +96,14 @@ public class BidServiceImpl implements BidService {
         return bid;
     }
 
-    private void createOrRewriteLastUserTransaction(User user, Bid bid) {
+    private void createOrRewriteLastUserTransactionAndSubstractUserMoney(User user, Bid bid) {
         Optional<Transaction> txOptional = transactionRepository.findByBuyer_UsernameAndLot_Id(user.getUsername(), bid.getLot().getId());
         if (txOptional.isPresent()) {
             Transaction tx = txOptional.get();
+            bid.getUser().subtractMoney(bid.getAmount().subtract(tx.getAmount()));
             tx.updateWith(bid);
             transactionRepository.save(tx);
+            userRepository.save(user);
         } else {
             createTransaction(bid);
         }

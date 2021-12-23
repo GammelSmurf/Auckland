@@ -2,12 +2,14 @@ import {Dropdown, FormControl, InputGroup,Button} from "react-bootstrap";
 import React, {useEffect, useState} from "react";
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
 import AuctionService from "../services/AuctionService";
-import {faSearch} from "@fortawesome/free-solid-svg-icons";
+import {faSearch, faArrowDown, faArrowUp} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {CheckboxGroupHeading} from "react-multiselect-checkboxes/lib/CheckboxGroup";
 
 const AuctionsToolkit = (props) => {
-    const [displayableSort, setDisplayableSort] = useState('Most popular (DESC)');
+    const [displayableSort, setDisplayableSort] = useState('Begin date');
     const [searchBarValue, setSearchBarValue] = useState('');
+    const [isASC, setIsASC] = useState(false);
 
     const statuses = {
         DRAFT: 'DRAFT',
@@ -18,7 +20,7 @@ const AuctionsToolkit = (props) => {
 
     const [sortValues, setSortValues] = useState({
         type: 'DESC',
-        field: 'userLikesCount'
+        field: 'beginDateTime'
     })
 
     const [filterValues, setFilterValues] = useState({
@@ -34,11 +36,11 @@ const AuctionsToolkit = (props) => {
         handleSearch();
     }, []);
 
-    const sortOptions = [{
+    const sortOptions = [/*{
         id: 0,
         sortDataField: 'userLikesCount',
         sortName: 'Most popular'
-    }, {
+    },*/ {
         id: 1,
         sortDataField: 'subscribedUsersCount',
         sortName: 'Members'
@@ -53,25 +55,37 @@ const AuctionsToolkit = (props) => {
     }]
 
     const filterOptions = [
-        // type
-        { label: 'My auctions', value: 'creator', field: 'type'},
-        { label: 'My subscriptions', value: 'subscriber', field: 'type'},
-        { label: 'Other auctions', value: 'other', field: 'type'},
-        // status
-        { label: 'DRAFT', value: statuses.DRAFT, field: 'status'},
-        { label: 'WAITING', value: statuses.WAITING, field: 'status'},
-        { label: 'RUNNING', value: statuses.RUNNING, field: 'status'},
-        { label: 'FINISHED', value: statuses.FINISHED, field: 'status'},
-        // categories
-        { label: 'ART', value: 'ART', field: 'category'},
-        { label: 'ENTERTAINMENT', value: 'ENTERTAINMENT', field: 'category'},
-        { label: 'SCIENCE', value: 'SCIENCE', field: 'category'},
-        { label: 'LIFE', value: 'LIFE', field: 'category'},
-
+        {
+            label: "Type",
+            options: [
+                { label: 'My auctions', value: 'creator', field: 'type'},
+                { label: 'My subscriptions', value: 'subscriber', field: 'type'},
+                { label: 'Other auctions', value: 'other', field: 'type'}
+            ]
+        },
+        {
+            label: "Status",
+            options: [
+                { label: 'DRAFT', value: statuses.DRAFT, field: 'status'},
+                { label: 'WAITING', value: statuses.WAITING, field: 'status'},
+                { label: 'RUNNING', value: statuses.RUNNING, field: 'status'},
+                { label: 'FINISHED', value: statuses.FINISHED, field: 'status'}
+            ]
+        },
+        {
+            label: "Category",
+            options: [
+                { label: 'ART', value: 'ART', field: 'category'},
+                { label: 'ENTERTAINMENT', value: 'ENTERTAINMENT', field: 'category'},
+                { label: 'SCIENCE', value: 'SCIENCE', field: 'category'},
+                { label: 'LIFE', value: 'LIFE', field: 'category'}
+            ]
+        }
     ];
 
-    const setCurrentDisplayableSort = (sortDataField, sortType) =>{
-        setDisplayableSort(sortOptions.find(el=>el.sortDataField === sortDataField).sortName + ' (' + sortType + ')');
+    const setCurrentDisplayableSort = (sortDataField, sortType) => {
+        setDisplayableSort(sortOptions.find(el=>el.sortDataField === sortDataField).sortName);
+        sortType === 'ASC' ? setIsASC(true) : setIsASC(false);
     }
 
     const handleChangeSortField = (newSortDataField) => {
@@ -141,10 +155,18 @@ const AuctionsToolkit = (props) => {
     }
 
     const handleSearch = () => {
-        console.log('Request',buildRequestData(setSearchFilterValues()));
         AuctionService.searchAuctions(buildRequestData(setSearchFilterValues()))
             .then((response)=>{console.log(response.data.content);props.setData(response.data.content)})
     }
+
+    let GroupHeading = props => (
+        <div>
+            <div width="100%">
+                <hr/>
+            </div>
+            <CheckboxGroupHeading className={[]} {...props} />
+        </div>
+    );
 
     return (
         <div className='row' style={{marginBottom: '10px'}}>
@@ -173,7 +195,7 @@ const AuctionsToolkit = (props) => {
 
                     <Dropdown style={{display: 'inline-block', textAlign: 'center'}}>
                         <Dropdown.Toggle variant="warning" id="dropdown-basic" style={{backgroundColor: 'white', boxShadow: '0 1px 1px 1px rgb(0 0 0 / 8%)'}}>
-                            {displayableSort}
+                            {displayableSort} {isASC ? <FontAwesomeIcon icon={faArrowUp} size="sm"/> : <FontAwesomeIcon icon={faArrowDown} size="sm"/>}
                         </Dropdown.Toggle>
                         <Dropdown.Menu style={{textAlign: 'center'}}>
                             {sortOptions.map(sortEl => (
@@ -200,8 +222,8 @@ const AuctionsToolkit = (props) => {
                     <div style={{display: 'inline-block', marginRight: '10px'}}>
                         <h5>Filter: </h5>
                     </div>
-                    <div style={{display: 'inline-block'}}>
-                        <ReactMultiSelectCheckboxes options={filterOptions} onChange={setCheckBoxFilterValues}/>
+                    <div style={{display: 'inline-block', textAlign: 'left'}}>
+                        <ReactMultiSelectCheckboxes components={{ GroupHeading }} options={filterOptions} onChange={setCheckBoxFilterValues}/>
                     </div>
                 </div>
             </div>

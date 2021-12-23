@@ -78,7 +78,7 @@ public class BidServiceImpl implements BidService {
                 .findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException(username));
         Auction auction = auctionRepository
-                .findById(auctionId)
+                .findByIdWithPessimistic(auctionId)
                 .orElseThrow(() -> new AuctionNotFoundException(auctionId));
         bidUtil.validate(auction, amount, user);
         Bid bid = formatAndFillBid(auction, user, amount);

@@ -12,13 +12,14 @@ const MyNavBar = (props) => {
     const [notificationCounter, setNotificationCounter] = useState(0);
     const [newNotificationsIds, setNewNotificationsIds] = useState([]);
     const currentUser = AuthService.getCurrentUser();
-    const [balance, setBalance] = useState(currentUser.money);
+    const [balance, setBalance] = useState();
     const client = useRef(null);
 
     useEffect(() => {
         UserService.getUserNotifications().then((response)=>{
             setNotifications(response.data);
         });
+        UserService.getUser(currentUser.username).then((response)=>setBalance(response.data.money));
     }, [])
 
     const logOut = () => {

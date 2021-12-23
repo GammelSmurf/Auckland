@@ -20,4 +20,8 @@ const updateUser = (values) =>{
         });
 };
 
-export default {getUserNotifications, updateUser}
+const getUser = (username) => {
+    return axios.get(API_URL + username, { headers: authHeader() });
+}
+
+export default {getUserNotifications, updateUser, getUser}

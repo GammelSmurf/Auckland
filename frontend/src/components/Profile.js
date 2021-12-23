@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from "react";
-import AdminService from "../services/AdminService";
 import {Col, Container, Row, Button, Form} from "react-bootstrap";
 import LotService from "../services/LotService";
 import Lot from "./Lot";
@@ -16,32 +15,34 @@ const Profile = (props) => {
     const [userValues, setUserValues] = useState({});
     const [isResponseText, setIsResponseText] = useState(false);
     const [wonLots, setWonLots] = useState({});
+    const [isPie, setIsPie] = useState(false);
+
     const currentUser = AuthService.getCurrentUser();
 
     const [pieData, setPieData] = useState([]);
 
     useEffect(() => {
-        AdminService.getUsers().then(
-            (response) => {
-                const user = response.data.filter(item =>
-                    item.username === props.match.params.username)[0];
-                setUser(user);
-                if(currentUser.id === user.id){
-                    setIsOwner(true);
-                }
+        UserService.getUser(props.match.params.username).then((response)=>{
+            setUser(response.data);
 
-                setUserValues({
-                    username: user.username,
-                    email: user.email,
-                    firstName: user.firstName,
-                    secondName: user.secondName,
-                    about: user.about,
-                });
+            if(currentUser.id === response.data.id){
+                setIsOwner(true);
             }
-        );
+
+            setUserValues({
+                username: response.data.username,
+                email: response.data.email,
+                firstName: response.data.firstName,
+                secondName: response.data.secondName,
+                about: response.data.about,
+            });
+        })
 
         AuctionService.getOwnAuctions().then((response)=>
         {
+            if(response.data.length !== 0){
+                setIsPie(true);
+            }
             setPieData([
                 {name: 'DRAFT', value: response.data.filter(auc=>auc.status === 'DRAFT').length},
                 {name: 'WAITING', value: response.data.filter(auc=>auc.status === 'WAITING').length},
@@ -51,7 +52,6 @@ const Profile = (props) => {
         });
 
         LotService.getWonLots().then((response)=>{
-            console.log(response.data)
             setWonLots({notConfirmedToTransferLots: response.data.notTransferredLots.filter(lot=>lot.winner.id !== currentUser.id),
                 notConfirmedToAcceptLots: response.data.notTransferredLots.filter(lot=>lot.winner.id === currentUser.id),
                 confirmedTransferredLots: response.data.transferredLots.filter(lot=>lot.winner.id !== currentUser.id),
@@ -215,12 +215,15 @@ const Profile = (props) => {
                     </div>}
 
                 </Col>
+
+                {isPie && isOwner &&
                 <Col>
                     <h5 style={{textAlign: 'center'}}>My auctions</h5>
                     <ResponsiveContainer width={'100%'} height={260}>
                         <PieChart>
                             <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%"
-                                 outerRadius={80} fill="#8884d8" paddingAngle={0} label={renderCustomizedLabel} labelLine={false} isAnimationActive={false} blendStroke={isBlendStroke()}>
+                                 outerRadius={80} fill="#8884d8" paddingAngle={0} label={renderCustomizedLabel}
+                                 labelLine={false} isAnimationActive={false} blendStroke={isBlendStroke()}>
                                 {
                                     pieData.map((entry, index) => (
                                         <Cell key={`cell-${index}`} fill={pieColors[index].color}/>
@@ -228,47 +231,55 @@ const Profile = (props) => {
                                 }
                             </Pie>
                             <Legend verticalAlign="bottom"/>
-                            <Tooltip />
+                            <Tooltip/>
                         </PieChart>
                     </ResponsiveContainer>
-                </Col>
+                </Col>}
+
             </Row>
-            <Row>
-                <div className="standardPageHeader">
-                    <h2>Not confirmed lots</h2>
-                    <hr />
-                </div>
-                <div style={{padding: '10px'}}>
-                    <h3>To transfer</h3>
-                    {(wonLots.notConfirmedToTransferLots && wonLots.notConfirmedToTransferLots.length !== 0) ? wonLots.notConfirmedToTransferLots.map(lot=>
-                        <Lot key={lot.id} lot={lot} action={handleTransferLot} isWaiting={lot.sellerTransferConfirmation}/>
-                    ) : <p className='fst-italic'>There is no lots to confirm</p>}
-                </div>
-                <div style={{padding: '10px'}}>
-                    <h3>To accept</h3>
-                    {(wonLots.notConfirmedToAcceptLots && wonLots.notConfirmedToAcceptLots.length !== 0) ? wonLots.notConfirmedToAcceptLots.map(lot=>
-                        <Lot key={lot.id} lot={lot} action={handleAcceptLot} isWaiting={lot.buyerAcceptConfirmation}/>
-                    ) : <p className='fst-italic'>There is no lots to confirm</p>}
-                </div>
-            </Row>
-            <Row>
-                <div className="standardPageHeader">
-                    <h2>Confirmed lots</h2>
-                    <hr />
-                </div>
-                <div style={{padding: '10px'}}>
-                    <h3>Transferred</h3>
-                    {(wonLots.confirmedTransferredLots && wonLots.confirmedTransferredLots.length !== 0) ?wonLots.confirmedTransferredLots.map(lot=>
-                        <Lot key={lot.id} lot={lot} isConfirmed/>
-                    ) : <p className='fst-italic'>There is no transferred lots yet</p>}
-                </div>
-                <div style={{padding: '10px'}}>
-                    <h3>Accepted</h3>
-                    {(wonLots.confirmedAcceptedLots && wonLots.confirmedAcceptedLots.length !== 0) ? wonLots.confirmedAcceptedLots.map(lot=>
-                        <Lot key={lot.id} lot={lot} isConfirmed/>
-                    ) : <p className='fst-italic'>There is no accepted lots yet</p>}
-                </div>
-            </Row>
+
+            {isOwner &&
+            <>
+                <Row>
+                    <div className="standardPageHeader">
+                        <h2>Not confirmed lots</h2>
+                        <hr/>
+                    </div>
+                    <div style={{padding: '10px'}}>
+                        <h3>To transfer</h3>
+                        {(wonLots.notConfirmedToTransferLots && wonLots.notConfirmedToTransferLots.length !== 0) ? wonLots.notConfirmedToTransferLots.map(lot =>
+                            <Lot key={lot.id} lot={lot} action={handleTransferLot}
+                                 isWaiting={lot.sellerTransferConfirmation}/>
+                        ) : <p className='fst-italic'>There is no lots to confirm</p>}
+                    </div>
+                    <div style={{padding: '10px'}}>
+                        <h3>To accept</h3>
+                        {(wonLots.notConfirmedToAcceptLots && wonLots.notConfirmedToAcceptLots.length !== 0) ? wonLots.notConfirmedToAcceptLots.map(lot =>
+                            <Lot key={lot.id} lot={lot} action={handleAcceptLot}
+                                 isWaiting={lot.buyerAcceptConfirmation}/>
+                        ) : <p className='fst-italic'>There is no lots to confirm</p>}
+                    </div>
+                </Row>
+                <Row>
+                    <div className="standardPageHeader">
+                        <h2>Confirmed lots</h2>
+                        <hr/>
+                    </div>
+                    <div style={{padding: '10px'}}>
+                        <h3>Transferred</h3>
+                        {(wonLots.confirmedTransferredLots && wonLots.confirmedTransferredLots.length !== 0) ? wonLots.confirmedTransferredLots.map(lot =>
+                            <Lot key={lot.id} lot={lot} isConfirmed/>
+                        ) : <p className='fst-italic'>There is no transferred lots yet</p>}
+                    </div>
+                    <div style={{padding: '10px'}}>
+                        <h3>Accepted</h3>
+                        {(wonLots.confirmedAcceptedLots && wonLots.confirmedAcceptedLots.length !== 0) ? wonLots.confirmedAcceptedLots.map(lot =>
+                            <Lot key={lot.id} lot={lot} isConfirmed/>
+                        ) : <p className='fst-italic'>There is no accepted lots yet</p>}
+                    </div>
+                </Row>
+            </>}
+
         </Container>
     )
 }

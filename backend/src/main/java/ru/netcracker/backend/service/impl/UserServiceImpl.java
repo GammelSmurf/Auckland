@@ -96,6 +96,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void sendMoneyToWsByUsername(String username) {
         sendMoneyToWsByUser(userRepository
                 .findByUsername(username)
@@ -103,6 +104,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void sendMoneyToWsByUser(User user) {
         sendMoneyToWsByUser(user.getUsername(), user.getMoney());
     }

@@ -4,6 +4,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.netcracker.backend.exception.auction.AuctionNotFoundException;
 import ru.netcracker.backend.exception.auction.NotCorrectStatusException;
@@ -158,7 +159,7 @@ public class BidServiceImpl implements BidService {
         return one.isAfter(other) || one.isEqual(other);
     }
 
-    public SyncResponse handleLotFinished(Auction auction, LocalDateTime currentDateTime) {
+    private SyncResponse handleLotFinished(Auction auction, LocalDateTime currentDateTime) {
         auction.getCurrentLot().setFinished(true);
         handleWinnerIfExists(auction);
         return handleIfAuctionFinished(auction, currentDateTime);

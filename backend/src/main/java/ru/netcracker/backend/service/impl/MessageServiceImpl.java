@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 public class MessageServiceImpl implements MessageService {
     private final MessageRepository messageRepository;
     private final ModelMapper modelMapper;
@@ -34,16 +34,19 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
+    @Transactional
     public MessageResponse addMessage(Message message) {
         return modelMapper.map(messageRepository.save(message), MessageResponse.class);
     }
 
     @Override
+    @Transactional
     public void deleteMessage(Long messageId) {
         messageRepository.deleteById(messageId);
     }
 
     @Override
+    @Transactional
     public void deleteOldMessagesBeforeLastSevenDays() {
         messageRepository.deleteOldMessagesBefore(LocalDateTime.now().minusDays(7));
     }

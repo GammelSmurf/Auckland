@@ -170,7 +170,6 @@ public class BidServiceImpl implements BidService {
             setLotWinnerAndWinPrice(auction);
             freezeLastTransaction(auction);
             refundMoneyAndDeleteAllTransactionsForBidExceptFrozen(auction);
-            userService.sendMoneyToWsByUser(auction.getCurrentBid().getUser());
             sendLotWonEmails(auction);
             bidRepository.delete(auction.getCurrentBid());
         }
@@ -216,6 +215,7 @@ public class BidServiceImpl implements BidService {
                     .filter(tx -> !tx.getTransactionStatus().equals(TransactionStatus.FROZEN))
                     .forEach(tx -> {
                         tx.getBuyer().addMoney(tx.getAmount());
+                        userRepository.save(tx.getBuyer());
                         userService.sendMoneyToWsByUser(tx.getBuyer());
                         transactionRepository.delete(tx);
                     });

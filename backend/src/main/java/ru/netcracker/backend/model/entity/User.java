@@ -52,7 +52,7 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     @JsonBackReference
-    private Set<Bid> bid = new HashSet<>(0);
+    private Set<Bid> bid = new HashSet<>();
 
     @OneToMany(
             mappedBy = "winner",

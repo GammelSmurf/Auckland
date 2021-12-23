@@ -118,7 +118,7 @@ public class BidServiceImpl implements BidService {
     @Transactional
     public SyncResponse handleAuctionProcess(Long auctionId) {
         Auction auction = auctionRepository
-                .findById(auctionId)
+                .findByIdWithPessimistic(auctionId)
                 .orElseThrow(() -> new AuctionNotFoundException(auctionId));
         LocalDateTime currentDateTime = LocalDateTime.now();
         switch (auction.getStatus()) {

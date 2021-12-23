@@ -39,9 +39,10 @@ public class Transaction {
     }
 
     public void updateWith(Bid bid) {
-        this.buyer = bid.getUser();
-        this.amount = bid.getAmount();
-        this.auctionCreator = bid.getAuction().getCreator();
-        this.lot = bid.getLot();
+        setBuyer(bid.getUser());
+        setAmount(bid.getAmount());
+        setAuctionCreator(bid.getAuction().getCreator());
+        setLot(bid.getLot());
+        setDateTime(LocalDateTime.now());
     }
 }

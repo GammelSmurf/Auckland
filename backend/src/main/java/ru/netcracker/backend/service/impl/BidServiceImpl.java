@@ -81,7 +81,7 @@ public class BidServiceImpl implements BidService {
         bidUtil.validate(auction, amount, user);
         Bid bid = formatAndFillBid(auction, user, amount);
         bidRepository.save(bid);
-        createOrRewriteLastUserTransactionAndSubstractUserMoney(user, bid);
+        createOrRewriteLastUserTransactionAndSubtractUserMoney(user, bid);
 
         logService.log(LogLevel.AUCTION_BET, bid.getAuction());
         userService.sendMoneyToWsByUser(user);
@@ -96,17 +96,27 @@ public class BidServiceImpl implements BidService {
         return bid;
     }
 
-    private void createOrRewriteLastUserTransactionAndSubstractUserMoney(User user, Bid bid) {
+    private void createOrRewriteLastUserTransactionAndSubtractUserMoney(User user, Bid bid) {
         Optional<Transaction> txOptional = transactionRepository.findByBuyer_UsernameAndLot_Id(user.getUsername(), bid.getLot().getId());
         if (txOptional.isPresent()) {
             Transaction tx = txOptional.get();
-            bid.getUser().subtractMoney(bid.getAmount().subtract(tx.getAmount()));
+            subtractUserMoneyWithFullAmount(bid, tx.getAmount());
             tx.updateWith(bid);
             transactionRepository.save(tx);
-            userRepository.save(user);
         } else {
             createTransaction(bid);
+            subtractUserMoney(bid);
         }
+    }
+
+    private void subtractUserMoney(Bid bid) {
+        bid.getUser().subtractMoney(bid.getAmount());
+        userRepository.save(bid.getUser());
+    }
+
+    private void subtractUserMoneyWithFullAmount(Bid bid, BigDecimal lastAmount) {
+        bid.getUser().subtractMoney(bid.getAmount().subtract(lastAmount));
+        userRepository.save(bid.getUser());
     }
 
     private void createTransaction(Bid bid) {
